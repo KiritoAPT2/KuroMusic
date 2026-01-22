@@ -3,7 +3,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/KuroMusic/main/assets/banner.png" alt="KuroMusic Banner" width="100%"/>
   
-### Cliente Avanzado YouTube Music con Material Design 3 para Android (Negro/Morado)
+### Cliente Avanzado Music Pro con Material Design 3 para Android (Negro/Morado)
 
   [![GitHub release (latest by date)](https://img.shields.io/github/v/release/KuroMusic/KuroMusic?style=for-the-badge&color=7B1FA2)](https://github.com/KuroMusic/KuroMusic/releases)
   [![GitHub stars](https://img.shields.io/github/stars/KuroMusic/KuroMusic?style=for-the-badge&color=000000)](https://github.com/KuroMusic/KuroMusic/stargazers)
@@ -13,7 +13,7 @@
 
 </div>
 
-**Overview:** KuroMusic es un cliente open-source de YouTube Music para Android diseñado con Material Design 3 en tonos negro (#000000) y morado (#7B1FA2). Ofrece una experiencia musical sin anuncios, con reproducción en segundo plano, modo offline y total privacidad. No está afiliado a Google LLC ni a YouTube.
+**Overview:** KuroMusic es un cliente open-source de Music Pro para Android diseñado con Material Design 3 en tonos negro (#000000) y morado (#7B1FA2). Ofrece una experiencia musical sin anuncios, con reproducción en segundo plano, modo offline y total privacidad. No está afiliado a Google LLC ni a YouTube.
 
 ## Tech Stack
 
@@ -81,7 +81,7 @@ cd KuroMusic
 
 ## Contributing
 
-Reporta Issues, crea Forks/Branches y envía PRs. Únete a nuestro Telegram: [t.me/KuroMusic_chat](https://t.me/KuroMusic_chat).
+Reporta Issues, crea Forks/Branches y envía PRs. Únete a nuestro Telegram: [t.me/KiritoAPT2](https://t.me/KiritoAPT2).
 
 ## Support
 
