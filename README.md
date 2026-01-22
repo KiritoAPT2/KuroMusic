@@ -11,6 +11,8 @@
   [![License](https://img.shields.io/github/license/KuroMusic/KuroMusic?style=for-the-badge&color=000000)](LICENSE)
   [![Telegram](https://img.shields.io/badge/Telegram-Chat-blue?style=for-the-badge&logo=telegram)](https://t.me/KiritoAPT2)
 
+![Descargas de APK](https://img.shields.io/github/downloads/KuroMusic/KuroMusic/total?label=Descargas%20del%20APK&color=purple&logo=android)
+
 </div>
 
 **Overview:** KuroMusic es un cliente open-source de Music Pro para Android diseñado con Material Design 3 en tonos negro (#000000) y morado (#7B1FA2). Ofrece una experiencia musical sin anuncios, con reproducción en segundo plano, modo offline y total privacidad. No está afiliado a Google LLC ni a YouTube.
@@ -86,6 +88,14 @@ Reporta Issues, crea Forks/Branches y envía PRs. Únete a nuestro Telegram: [t.
 ## Support
 
 [![Support](https://img.shields.io/badge/Support-KuroMusic-7B1FA2?style=for-the-badge)](https://t.me/KuroMusic_chat)
+
+### 🛡️ Seguridad
+Para tu tranquilidad, cada versión de **KuroMusic** es analizada automáticamente. Puedes ver el reporte de seguridad detallado aquí:
+
+[![Análisis de VirusTotal](https://img.shields.io/badge/VirusTotal-Limpio-brightgreen?logo=virustotal)](https://www.virustotal.com/gui/file/34d72717360c7b5726129b7a83048a5394817bc7a09bb80c808f6680788b2274/details)
+
+> **Nota:** Al ser una aplicación de código abierto y no estar firmada por una organización oficial, es posible que Play Protect muestre una advertencia. El reporte de VirusTotal confirma que el archivo es seguro.
+
 
 ## License
 
