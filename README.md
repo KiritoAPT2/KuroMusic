@@ -87,7 +87,7 @@ Reporta Issues, crea Forks/Branches y envía PRs. Únete a nuestro Telegram: [t.
 
 ## Support
 
-[![Support](https://img.shields.io/badge/Support-KuroMusic-7B1FA2?style=for-the-badge)](https://t.me/KuroMusic_chat)
+[![Support](https://img.shields.io/badge/Support-KuroMusic-7B1FA2?style=for-the-badge)](https://t.me/KiritoAPT2)
 
 ### 🛡️ Seguridad
 Para tu tranquilidad, cada versión de **KuroMusic** es analizada automáticamente. Puedes ver el reporte de seguridad detallado aquí:
