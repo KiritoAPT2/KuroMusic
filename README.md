@@ -1,7 +1,7 @@
 # KuroMusic
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/KuroMusic/main/assets/banner.png" alt="KuroMusic Banner" width="100%"/>
+  <img src="https://raw.githubusercontent.com/KuroMusic/KuroMusic/main/assets/BannerKuro.png" alt="KuroMusic Banner" width="100%"/>
   
 ### Cliente Avanzado Music Pro con Material Design 3 para Android (Negro/Morado)
 
