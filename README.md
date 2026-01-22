@@ -9,7 +9,7 @@
   [![GitHub stars](https://img.shields.io/github/stars/KuroMusic/KuroMusic?style=for-the-badge&color=000000)](https://github.com/KuroMusic/KuroMusic/stargazers)
   [![GitHub downloads](https://img.shields.io/github/downloads/KuroMusic/KuroMusic/total?style=for-the-badge&color=7B1FA2)](https://github.com/KuroMusic/KuroMusic/releases)
   [![License](https://img.shields.io/github/license/KuroMusic/KuroMusic?style=for-the-badge&color=000000)](LICENSE)
-  [![Telegram](https://img.shields.io/badge/Telegram-Chat-blue?style=for-the-badge&logo=telegram)](https://t.me/KuroMusic_chat)
+  [![Telegram](https://img.shields.io/badge/Telegram-Chat-blue?style=for-the-badge&logo=telegram)](https://t.me/KiritoAPT2)
 
 </div>
 
