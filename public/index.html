@@ -2,73 +2,162 @@
 <html lang="es">
 <head>
     <title>KuroMusic</title>
-    <meta name="description" content="YouTube Music cliente Android sin ads.">
+    <meta name="description" content="Cliente YouTube Music para Android sin anuncios. Open-source, Material Design 3 negro/morado.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            background: #000;
+            background: linear-gradient(135deg, #000 0%, #1a0033 50%, #7B1FA2 100%);
             color: #fff;
-            font-family: sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
-            padding: 2rem;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
             max-width: 900px;
             margin: auto;
-            line-height: 1.6;
         }
         h1 {
-            font-size: 3rem;
+            font-size: clamp(2rem, 5vw, 3.5rem);
             text-align: center;
             color: #7B1FA2;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(123, 31, 162, 0.5);
         }
-        .btn {
-            display: block;
-            background: #7B1FA2;
-            color: #fff;
-            padding: 1.5rem 3rem;
-            font-size: 1.5rem;
-            text-decoration: none;
-            border-radius: 50px;
-            margin: 2rem auto;
+        .hero {
             text-align: center;
-            max-width: 350px;
-            box-shadow: 0 10px 30px rgba(123, 31, 162, .5);
-        }
-        .btn:hover {
-            background: #5e1785;
+            margin-bottom: 3rem;
         }
         img {
             max-width: 100%;
-            border-radius: 20px;
-            margin: 1rem 0;
+            height: auto;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            margin: 1rem auto;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #7B1FA2, #9C27B0);
+            color: #fff;
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            margin: 1rem 0.5rem;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(123, 31, 162, 0.4);
+            transition: all 0.3s ease;
+            min-width: 280px;
+        }
+        .btn:hover, .btn:focus {
+            background: linear-gradient(45deg, #5e1785, #7B1FA2);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 45px rgba(123, 31, 162, 0.6);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .feature {
+            background: rgba(255,255,255,0.05);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(123, 31, 162, 0.2);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .social {
+            text-align: center;
+            margin: 3rem 0;
+        }
+        .social a {
+            color: #9C27B0;
+            font-size: 1.2rem;
+            margin: 0 1.5rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .social a:hover {
+            color: #7B1FA2;
         }
         footer {
             text-align: center;
-            color: #7B1FA2;
+            color: #BB86FC;
             margin-top: 4rem;
             padding: 2rem 0;
-            border-top: 1px solid #333;
+            border-top: 1px solid rgba(123, 31, 162, 0.3);
         }
-        a {
-            color: #9C27B0;
-            text-decoration: none;
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .btn { display: block; margin: 1rem auto; max-width: 100%; }
+            .features { grid-template-columns: 1fr; }
         }
-        a:hover {
-            text-decoration: underline;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .feature, h1, .hero p { animation: fadeInUp 0.8s ease forwards; }
     </style>
 </head>
 <body>
-    <h1>🖤 <strong>KuroMusic</strong></h1>
-    <img src="banner.png" alt="KuroMusic Banner" loading="lazy">
-    <div style="text-align: center;">
-        <p>Cliente open-source <strong>YouTube Music</strong> para Android. Material Design 3 negro/morado, sin anuncios, descargas offline, letras sincronizadas y mucho más.</p>
+    <div class="container">
+        <h1>🖤 <strong>KuroMusic</strong></h1>
+        <div class="hero">
+            <img src="banner.png" alt="KuroMusic Banner - Material Design 3 negro/morado" loading="lazy">
+            <p>Cliente open-source <strong>YouTube Music</strong> para Android. Sin anuncios, Material Design 3 en negro/morado, descargas offline, letras sincronizadas, reproducción en segundo plano y mucho más.</p>
+            <div>
+                <a href="https://github.com/KuroMusic/KuroMusic/releases/latest" class="btn">📱 Descargar APK Última Versión</a>
+                <a href="https://github.com/KuroMusic/KuroMusic" class="btn">⭐ Ver en GitHub</a>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎵</div>
+                <h3>Sin Anuncios</h3>
+                <p>Disfruta YouTube Music completamente gratis y sin interrupciones publicitarias.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📥</div>
+                <h3>Descargas Offline</h3>
+                <p>Guarda tus canciones favoritas para escuchar sin conexión a internet.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎤</div>
+                <h3>Letras Sincronizadas</h3>
+                <p>Sigue las letras en tiempo real mientras reproduces tu música.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🚗</div>
+                <h3>Android Auto</h3>
+                <p>Compatible con Android Auto para reproducción en el coche.</p>
+            </div>
+        </div>
+        
+        <div class="social">
+            <p><strong>Únete a la comunidad:</strong></p>
+            <p>Telegram: <a href="https://t.me/KiritoAPT2">@KiritoAPT2</a> | <a href="https://github.com/KuroMusic/KuroMusic">GitHub</a></p>
+        </div>
+        
+        <footer>
+            © 2026 KuroMusic | <a href="mailto:kuromusicoficial@gmail.com">kuromusicoficial@gmail.com</a>[memory:1][memory:2][memory:4]
+        </footer>
     </div>
-    <a href="https://github.com/KuroMusic/KuroMusic/releases/latest" class="btn">📱 Descargar APK Última Versión</a>
-    <p><strong>Características clave:</strong> Background play, Android Auto, themes dinámicos, privacidad total.</p>
-    <p>Telegram: <a href="https://t.me/KuroMusic_chat">@KuroMusic_chat</a> | <a href="https://github.com/KuroMusic/KuroMusic">GitHub</a></p>
-    <footer>© 2026 KuroMusic | <a href="mailto:kuromusicoficial@gmail.com">kuromusicoficial@gmail.com</a></footer>
 </body>
 </html>
