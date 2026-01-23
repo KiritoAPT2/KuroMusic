@@ -1,15 +1,32 @@
 package com.grp2.kuromusic.ui.screens.library
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -33,7 +50,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -115,6 +131,10 @@ fun LibraryMixScreen(
             songCount = 0,
             thumbnails = emptyList(),
         )
+
+    val likedSongsCount by viewModel.likedSongsCount.collectAsState(initial = 0)
+    val downloadedSongsCount by viewModel.downloadedSongsCount.collectAsState(initial = 0)
+    val cachedSongsCount by viewModel.cachedSongsCount.collectAsState(initial = 0)
 
     val topPlaylist =
         Playlist(
@@ -259,71 +279,62 @@ fun LibraryMixScreen(
                         headerContent()
                     }
 
+
                     item(
                         key = "likedPlaylist",
                         contentType = { CONTENT_TYPE_PLAYLIST },
                     ) {
-                        PlaylistListItem(
-                            playlist = likedPlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("auto_playlist/liked")
-                                    }
-                                    .animateItem(),
+                        LibraryCategoryCard(
+                            title = stringResource(R.string.liked),
+                            subtitle = "$likedSongsCount ${stringResource(R.string.songs).lowercase()}",
+                            icon = R.drawable.favorite,
+                            gradientColors = listOf(Color(0xFFFF0D86), Color(0xFF6B11CB)),
+                            isFullWidth = true,
+                            onClick = { navController.navigate("auto_playlist/liked") },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
+
+                    item {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            LibraryCategoryCard(
+                                title = stringResource(R.string.offline),
+                                subtitle = "$downloadedSongsCount ${stringResource(R.string.songs).lowercase()}",
+                                icon = R.drawable.download,
+                                gradientColors = listOf(Color(0xFF00C9FF), Color(0xFF92FE9D)),
+                                onClick = { navController.navigate("auto_playlist/downloaded") },
+                                modifier = Modifier.weight(1f)
+                            )
+                            LibraryCategoryCard(
+                                title = stringResource(R.string.my_top) + " $topSize",
+                                subtitle = "$topSize ${stringResource(R.string.songs).lowercase()}",
+                                icon = R.drawable.trending_up,
+                                gradientColors = listOf(Color(0xFFF7971E), Color(0xFFFFD200)),
+                                onClick = { navController.navigate("top_playlist/$topSize") },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    item {
+                        LibraryCategoryCard(
+                            title = stringResource(R.string.cached_playlist),
+                            subtitle = "$cachedSongsCount ${stringResource(R.string.songs).lowercase()}",
+                            icon = R.drawable.tune,
+                            gradientColors = listOf(Color(0xFF30E8BF), Color(0xFFFF8235)),
+                            onClick = { navController.navigate("cache_playlist/cached") },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(0.5f)
                         )
                     }
 
                     item(
-                        key = "downloadedPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
+                        key = "header",
+                        contentType = CONTENT_TYPE_HEADER,
                     ) {
-                        PlaylistListItem(
-                            playlist = downloadPlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("auto_playlist/downloaded")
-                                    }
-                                    .animateItem(),
-                        )
-                    }
-
-                    item(
-                        key = "TopPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistListItem(
-                            playlist = topPlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("top_playlist/$topSize")
-                                    }
-                                    .animateItem(),
-                        )
-                    }
-                    item(
-                        key = "cachePlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistListItem(
-                            playlist = cachePlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("cache_playlist/cached")
-                                    }
-                                    .animateItem(),
-                        )
+                        headerContent()
                     }
 
                     items(
@@ -493,24 +504,20 @@ fun LibraryMixScreen(
                         headerContent()
                     }
 
+
                     item(
                         key = "likedPlaylist",
+                        span = { GridItemSpan(maxLineSpan) },
                         contentType = { CONTENT_TYPE_PLAYLIST },
                     ) {
-                        PlaylistGridItem(
-                            playlist = likedPlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("auto_playlist/liked")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
+                        LibraryCategoryCard(
+                            title = stringResource(R.string.liked),
+                            subtitle = "$likedSongsCount ${stringResource(R.string.songs).lowercase()}",
+                            icon = R.drawable.favorite,
+                            gradientColors = listOf(Color(0xFFFF0D86), Color(0xFF6B11CB)),
+                            isFullWidth = true,
+                            onClick = { navController.navigate("auto_playlist/liked") },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
 
@@ -518,20 +525,13 @@ fun LibraryMixScreen(
                         key = "downloadedPlaylist",
                         contentType = { CONTENT_TYPE_PLAYLIST },
                     ) {
-                        PlaylistGridItem(
-                            playlist = downloadPlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("auto_playlist/downloaded")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
+                        LibraryCategoryCard(
+                            title = stringResource(R.string.offline),
+                            subtitle = "$downloadedSongsCount ${stringResource(R.string.songs).lowercase()}",
+                            icon = R.drawable.download,
+                            gradientColors = listOf(Color(0xFF00C9FF), Color(0xFF92FE9D)),
+                            onClick = { navController.navigate("auto_playlist/downloaded") },
+                            modifier = Modifier.padding(start = 16.dp, end = 6.dp, top = 4.dp, bottom = 8.dp)
                         )
                     }
 
@@ -539,40 +539,26 @@ fun LibraryMixScreen(
                         key = "TopPlaylist",
                         contentType = { CONTENT_TYPE_PLAYLIST },
                     ) {
-                        PlaylistGridItem(
-                            playlist = topPlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("top_playlist/$topSize")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
+                        LibraryCategoryCard(
+                            title = stringResource(R.string.my_top) + " $topSize",
+                            subtitle = "$topSize ${stringResource(R.string.songs).lowercase()}",
+                            icon = R.drawable.trending_up,
+                            gradientColors = listOf(Color(0xFFF7971E), Color(0xFFFFD200)),
+                            onClick = { navController.navigate("top_playlist/$topSize") },
+                            modifier = Modifier.padding(start = 6.dp, end = 16.dp, top = 4.dp, bottom = 8.dp)
                         )
                     }
                     item(
                         key = "cachePlaylist",
                         contentType = { CONTENT_TYPE_PLAYLIST },
                     ) {
-                        PlaylistGridItem(
-                            playlist = cachePlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("cache_playlist/cached")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
+                        LibraryCategoryCard(
+                            title = stringResource(R.string.cached_playlist),
+                            subtitle = "$cachedSongsCount ${stringResource(R.string.songs).lowercase()}",
+                            icon = R.drawable.tune,
+                            gradientColors = listOf(Color(0xFF30E8BF), Color(0xFFFF8235)),
+                            onClick = { navController.navigate("cache_playlist/cached") },
+                            modifier = Modifier.padding(start = 16.dp, end = 6.dp, top = 4.dp, bottom = 8.dp)
                         )
                     }
 
@@ -669,5 +655,61 @@ fun LibraryMixScreen(
                     }
                 }
         }
+    }
+}
+@Composable
+fun LibraryCategoryCard(
+    title: String,
+    subtitle: String,
+    icon: Int,
+    gradientColors: List<Color>,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isFullWidth: Boolean = false
+) {
+    Box(
+        modifier = modifier
+            .height(if (isFullWidth) 140.dp else 110.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Brush.linearGradient(gradientColors))
+            .clickable(onClick = onClick)
+    ) {
+        // Glassmorphism overlay
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(Color.White.copy(alpha = 0.05f))
+        )
+        
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomStart)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            if (subtitle.isNotEmpty()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+            }
+        }
+        
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint = Color.White.copy(alpha = 0.15f),
+            modifier = Modifier
+                .size(if (isFullWidth) 100.dp else 70.dp)
+                .align(Alignment.CenterEnd)
+                .offset(x = 15.dp)
+                .rotate(15f)
+        )
     }
 }

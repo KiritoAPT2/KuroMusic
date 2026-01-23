@@ -26,7 +26,8 @@ import com.google.material.color.hct.Hct
 import com.google.material.color.scheme.SchemeTonalSpot
 import com.google.material.color.score.Score
 
-val DefaultThemeColor = Color(0xFF4285F4)
+val DefaultThemeColor = Color(0xFF8B5CF6)  // MORADO KURO ✨
+val KuroSecondaryColor = Color(0xFFEC4899) // Rosa morado
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

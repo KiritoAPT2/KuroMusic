@@ -12,6 +12,8 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -510,267 +512,89 @@ fun SettingsScreen(
             "SAPISID" in parseCookieString(innerTubeCookie)
         }
 
-        Column(
+
+        // KuroMusic Header (Stylized)
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            if (isLoggedIn) {
-                var imageLoadError by remember { mutableStateOf(false) }
-                var isImageLoading by remember { mutableStateOf(false) }
-
-                // Avatar con efecto de ondas y sombra suave
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    // Avatar principal
-                    Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .border(
-                                width = 3.dp,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.4f)
-                                    )
-                                ),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        when {
-                            currentSelection is AvatarSelection.Custom && !imageLoadError -> {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data((currentSelection as AvatarSelection.Custom).uri.toUri())
-                                        .crossfade(true)
-                                        .listener(
-                                            onStart = { isImageLoading = true },
-                                            onSuccess = { _, _ ->
-                                                isImageLoading = false
-                                                imageLoadError = false
-                                            },
-                                            onError = { _, _ ->
-                                                isImageLoading = false
-                                                imageLoadError = true
-                                            }
-                                        )
-                                        .build(),
-                                    contentDescription = "Avatar de $accountName",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-
-                                if (isImageLoading) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                                            ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(20.dp),
-                                            strokeWidth = 2.dp,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                }
-                            }
-
-                            currentSelection is AvatarSelection.DiceBear && !imageLoadError -> {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data((currentSelection as AvatarSelection.DiceBear).url)
-                                        .crossfade(true)
-                                        .listener(
-                                            onStart = { isImageLoading = true },
-                                            onSuccess = { _, _ ->
-                                                isImageLoading = false
-                                                imageLoadError = false
-                                            },
-                                            onError = { _, _ ->
-                                                isImageLoading = false
-                                                imageLoadError = true
-                                            }
-                                        )
-                                        .build(),
-                                    contentDescription = "Avatar DiceBear de $accountName",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-
-                                if (isImageLoading) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                                            ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(20.dp),
-                                            strokeWidth = 2.dp,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                val initials = remember(accountName) {
-                                    val cleanName = accountName.replace("@", "").trim()
-                                    when {
-                                        cleanName.isEmpty() -> "?"
-                                        cleanName.contains(" ") -> {
-                                            val parts = cleanName.split(" ")
-                                            "${parts.first().firstOrNull()?.uppercase() ?: ""}${
-                                                parts.last().firstOrNull()?.uppercase() ?: ""
-                                            }"
-                                        }
-                                        else -> cleanName.take(2).uppercase()
-                                    }
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            brush = Brush.linearGradient(
-                                                colors = listOf(
-                                                    MaterialTheme.colorScheme.primary,
-                                                    MaterialTheme.colorScheme.tertiary
-                                                ),
-                                                start = Offset(0f, 0f),
-                                                end = Offset(100f, 100f)
-                                            )
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = initials,
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Indicador de estado online (opcional)
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .offset(x = 32.dp, y = 32.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(3.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Nombre con animación sutil
-                AnimatedContent(
-                    targetState = accountName.replace("@", "").takeIf { it.isNotBlank() } ?: "",
-                    transitionSpec = { fadeIn() togetherWith fadeOut() },
-                    label = "username"
-                ) { name ->
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-
-            } else {
-                // Estado no logueado - más compacto y elegante
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Logo con efecto glassmorphism
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .background(
-                                brush = Brush.radialGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                    )
-                                )
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                shape = CircleShape
-                            )
-                            .padding(20.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.drawable_ic_kuro),
-                            contentDescription = "Logo de KuroMusic",
-                            modifier = Modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "KuroMusic",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                        Text(
-                            text = "∞ Sonido Sin Límites ∞ ✨",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
+             Column(
+                 modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(vertical = 24.dp),
+                 horizontalAlignment = Alignment.CenterHorizontally,
+                 verticalArrangement = Arrangement.Center
+             ) {
+                 // Logo
+                 Box(
+                     modifier = Modifier
+                         .size(80.dp)
+                         .clip(CircleShape)
+                         .background(
+                             brush = Brush.radialGradient(
+                                 colors = listOf(
+                                     MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                     MaterialTheme.colorScheme.surface
+                                 )
+                             )
+                         )
+                         .padding(16.dp),
+                     contentAlignment = Alignment.Center
+                 ) {
+                     Icon(
+                         painter = painterResource(R.drawable.drawable_ic_kuro),
+                         contentDescription = null,
+                         tint = MaterialTheme.colorScheme.primary,
+                         modifier = Modifier.fillMaxSize()
+                     )
+                 }
+                 
+                 Spacer(modifier = Modifier.height(12.dp))
+                 
+                 Text(
+                     text = "KuroMusic",
+                     style = MaterialTheme.typography.headlineMedium,
+                     fontWeight = FontWeight.Bold,
+                     color = MaterialTheme.colorScheme.onSurface
+                 )
+                 
+                 Text(
+                     text = "v${getAppVersion(context)}",
+                     style = MaterialTheme.typography.titleSmall, // Elegant small font
+                     fontWeight = FontWeight.Medium,
+                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                 )
+             }
         }
 
-        // Categoría principal de configuraciones
+        // Bloque 1: Personalización
         SettingsCategory(
-            title = stringResource(R.string.general_settings),
+            title = stringResource(R.string.appearance), // Or "Personalization" if available
             items = listOf(
                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.palette),
                     title = { Text(stringResource(R.string.appearance)) },
                     onClick = { navController.navigate("settings/appearance") }
                 ),
+                SettingsCategoryItem(
+                    icon = painterResource(R.drawable.play),
+                    title = { Text(stringResource(R.string.player_and_audio)) },
+                    onClick = { navController.navigate("settings/player") }
+                )
+            )
+        )
+        Spacer(Modifier.height(16.dp))
+
+        // Bloque 2: Gestión
+        SettingsCategory(
+            title = stringResource(R.string.general_settings), // "Management"
+            items = listOf(
                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.person),
                     title = { Text(stringResource(R.string.account)) },
@@ -782,15 +606,18 @@ fun SettingsScreen(
                     onClick = { navController.navigate("settings/content") }
                 ),
                 SettingsCategoryItem(
-                    icon = painterResource(R.drawable.play),
-                    title = { Text(stringResource(R.string.player_and_audio)) },
-                    onClick = { navController.navigate("settings/player") }
-                ),
-                SettingsCategoryItem(
                     icon = painterResource(R.drawable.storage),
                     title = { Text(stringResource(R.string.storage)) },
                     onClick = { navController.navigate("settings/storage") }
-                ),
+                )
+            )
+        )
+        Spacer(Modifier.height(16.dp))
+
+        // Bloque 3: Seguridad
+        SettingsCategory(
+            title = stringResource(R.string.privacy), // Use Privacy/Security string
+            items = listOf(
                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.security),
                     title = { Text(stringResource(R.string.privacy)) },
@@ -801,29 +628,36 @@ fun SettingsScreen(
                     title = { Text(stringResource(R.string.backup_restore)) },
                     onClick = { navController.navigate("settings/backup_restore") }
                 ),
-                SettingsCategoryItem(
+                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.info),
                     title = { Text(stringResource(R.string.about)) },
                     onClick = { navController.navigate("settings/about") }
                 )
             )
         )
-
         Spacer(Modifier.height(16.dp))
 
-        // Categoría de comunidad e información
+        // Comunidad
+        val pinkColor = Color(0xFFFF4081).copy(alpha = 0.8f) // Pinkish
+        val blueColor = Color(0xFF40C4FF).copy(alpha = 0.8f) // Cyan/Blue
+        
         SettingsCategory(
             title = stringResource(R.string.community),
             items = listOf(
                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.paypal),
                     title = { Text("Donar ❤️") },
-                    isHighlighted = true,
+                    iconTint = pinkColor,
+                    iconContainerColor = pinkColor.copy(alpha = 0.1f),
+                    borderStroke = BorderStroke(1.5.dp, pinkColor.copy(alpha = 0.3f)),
                     onClick = { uriHandler.openUri("https://paypal.me/KiritoAPT2") }
                 ),
                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.telegram),
                     title = { Text(stringResource(R.string.Telegramchanel)) },
+                    iconTint = blueColor,
+                    iconContainerColor = blueColor.copy(alpha = 0.1f),
+                    borderStroke = BorderStroke(1.5.dp, blueColor.copy(alpha = 0.3f)),
                     onClick = { uriHandler.openUri("https://t.me/KiritoAPT2") }
                 )
             )
@@ -845,8 +679,9 @@ fun SettingsScreen(
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp).fillMaxWidth()
+            modifier = Modifier.padding(bottom = 100.dp).fillMaxWidth() // Extra bottom padding for MiniPlayer
         )
+
     }
 
     // Bottom Sheet de Changelog

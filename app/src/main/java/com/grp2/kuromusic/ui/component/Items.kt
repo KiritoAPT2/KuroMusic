@@ -427,6 +427,7 @@ fun SongListItem(
                     AsyncImage(
                         model = song.song.thumbnailUrl,
                         contentDescription = null,
+                        contentScale = ContentScale.Crop,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -526,6 +527,7 @@ fun SongGridItem(
         AsyncImage(
             model = song.song.thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -601,6 +603,7 @@ fun SongSmallGridItem(
         AsyncImage(
             model = song.song.thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -686,6 +689,7 @@ fun ArtistListItem(
         AsyncImage(
             model = artist.artist.thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier =
                 Modifier
                     .size(ListThumbnailSize)
@@ -722,6 +726,7 @@ fun ArtistGridItem(
         AsyncImage(
             model = artist.artist.thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(ThumbnailCornerRadius)),
@@ -743,6 +748,7 @@ fun ArtistSmallGridItem(
         AsyncImage(
             model = artist.artist.thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
     },
@@ -851,6 +857,7 @@ fun AlbumListItem(
                     .allowHardware(false)
                     .build(),
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             onState = { state ->
                 if (album.album.themeColor == null && state is AsyncImagePainter.State.Success) {
                     coroutineScope.launch(Dispatchers.IO) {
@@ -972,6 +979,7 @@ fun AlbumGridItem(
         AsyncImage(
             model = album.album.thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
 
@@ -1060,6 +1068,7 @@ fun AlbumSmallGridItem(
             AsyncImage(
                 model = song.song.thumbnailUrl,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
 
@@ -1156,6 +1165,7 @@ fun PlaylistListItem(
                 AsyncImage(
                     model = playlist.thumbnails[0],
                     contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier =
                         Modifier
                             .size(ListThumbnailSize)
@@ -1178,6 +1188,7 @@ fun PlaylistListItem(
                         AsyncImage(
                             model = playlist.thumbnails.getOrNull(index),
                             contentDescription = null,
+                            contentScale = ContentScale.Crop,
                             modifier =
                                 Modifier
                                     .align(alignment)
@@ -1224,6 +1235,7 @@ fun PlaylistGridItem(
             AsyncImage(
                 model = thumbnailUri,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -1270,6 +1282,7 @@ fun PlaylistGridItem(
                     AsyncImage(
                         model = playlist.thumbnails[0],
                         contentDescription = null,
+                        contentScale = ContentScale.Crop,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -1349,6 +1362,7 @@ fun MediaMetadataListItem(
             AsyncImage(
                 model = mediaMetadata.thumbnailUrl,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -1514,6 +1528,7 @@ fun YouTubeListItem(
                 AsyncImage(
                     model = item.thumbnail,
                     contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -1651,6 +1666,7 @@ fun YouTubeGridItem(
             AsyncImage(
                 model = item.thumbnail,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -1824,6 +1840,7 @@ fun YouTubeSmallGridItem(
         AsyncImage(
             model = item.thumbnail,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -1919,6 +1936,7 @@ fun LocalSongsGrid(
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -2009,6 +2027,7 @@ fun LocalArtistsGrid(
             AsyncImage(
                 model = thumbnailUrl,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
 
@@ -2068,6 +2087,7 @@ fun LocalAlbumsGrid(
         AsyncImage(
             model = thumbnailUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
 

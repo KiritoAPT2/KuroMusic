@@ -28,6 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.border
 
 @Composable
 fun SettingsCategory(
@@ -44,6 +48,7 @@ fun SettingsCategory(
             Text(
                 text = it,
                 style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold, // Bold titles
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 0.dp, bottom = 8.dp, top = 8.dp)
             )
@@ -137,6 +142,9 @@ private fun Material3SettingsItemRow(
                     enabled = item.onClick != null,
                     onClick = { item.onClick?.invoke() }
                 )
+                .then(
+                    if (item.borderStroke != null) Modifier.border(item.borderStroke, RoundedCornerShape(12.dp)) else Modifier
+                )
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -147,7 +155,7 @@ private fun Material3SettingsItemRow(
                         .size(40.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(
-                            MaterialTheme.colorScheme.primary.copy(
+                            item.iconContainerColor ?: MaterialTheme.colorScheme.primary.copy(
                                 alpha = if (item.isHighlighted) 0.15f else 0.1f
                             )
                         ),
@@ -165,9 +173,9 @@ private fun Material3SettingsItemRow(
                                 painter = icon,
                                 contentDescription = null,
                                 tint = if (item.isHighlighted)
-                                    MaterialTheme.colorScheme.primary
+                                    item.iconTint ?: MaterialTheme.colorScheme.primary
                                 else
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                                    item.iconTint ?: MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -176,9 +184,9 @@ private fun Material3SettingsItemRow(
                             painter = icon,
                             contentDescription = null,
                             tint = if (item.isHighlighted)
-                                MaterialTheme.colorScheme.primary
+                                item.iconTint ?: MaterialTheme.colorScheme.primary
                             else
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                                item.iconTint ?: MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -192,7 +200,7 @@ private fun Material3SettingsItemRow(
                 modifier = Modifier.weight(1f)
             ) {
                 // Title content
-                ProvideTextStyle(MaterialTheme.typography.titleMedium) {
+                ProvideTextStyle(MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium)) {
                     item.title()
                 }
 
@@ -232,5 +240,8 @@ data class SettingsCategoryItem(
     val trailingContent: (@Composable () -> Unit)? = null,
     val showBadge: Boolean = false,
     val isHighlighted: Boolean = false,
+    val iconTint: Color? = null,
+    val iconContainerColor: Color? = null,
+    val borderStroke: BorderStroke? = null,
     val onClick: (() -> Unit)? = null
 )

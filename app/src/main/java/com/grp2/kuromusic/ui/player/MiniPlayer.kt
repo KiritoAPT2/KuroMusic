@@ -15,6 +15,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
@@ -95,12 +98,14 @@ import kotlin.math.absoluteValue
 import kotlin.math.exp
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun MiniPlayer(
     position: Long,
     duration: Long,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val isPlaying by playerConnection.isPlaying.collectAsState()
@@ -323,6 +328,16 @@ fun MiniPlayer(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .clip(currentThumbnailShape)
+                                        .then(
+                                            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                                with(sharedTransitionScope) {
+                                                    Modifier.sharedElement(
+                                                        sharedContentState = rememberSharedContentState(key = "album_art"),
+                                                        animatedVisibilityScope = animatedVisibilityScope
+                                                    )
+                                                }
+                                            } else Modifier
+                                        )
                                 )
                             }
 
