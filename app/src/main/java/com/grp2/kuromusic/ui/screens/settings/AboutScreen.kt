@@ -196,7 +196,7 @@ fun AboutScreen(
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(NavigationBarDefaults.Elevation))
         ) {
             Image(
-                painter = painterResource(R.mipmap.ic_iconofinal),
+                painter = painterResource(R.drawable.ic_launcher),
                 contentDescription = null,
                 modifier = Modifier
                     .matchParentSize()

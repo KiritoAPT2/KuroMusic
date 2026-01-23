@@ -461,6 +461,10 @@ suspend fun checkForUpdates(): String? = withContext(Dispatchers.IO) {
         val json = connection.getInputStream().bufferedReader().use { it.readText() }
         val jsonObject = JSONObject(json)
         return@withContext jsonObject.getString("tag_name")
+    } catch (e: java.io.FileNotFoundException) {
+        // Specific handling for 404/Repo not found
+        e.printStackTrace()
+        return@withContext null
     } catch (e: Exception) {
         e.printStackTrace()
         return@withContext null
