@@ -3,17 +3,23 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/KuroMusic/KuroMusic/main/assets/BannerKuro.png" alt="KuroMusic Banner" width="100%"/>
   
-### Cliente Avanzado Music Pro con Material Design 3 para Android (Negro/Morado)
+  ### Cliente Avanzado Music Pro con Material Design 3 para Android (Negro/Morado)
 
-  [![Android Version](https://img.shields.io/badge/Android-6.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://android.com)
-  [![Kotlin](https://img.shields.io/badge/Kotlin-1.9-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
-  [![License](https://img.shields.io/badge/License-GPLv3-000000?style=for-the-badge&logo=gnu-bash&logoColor=white)](LICENSE)
-  [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/KuroMusic/KuroMusic/actions)
-  [![Downloads](https://img.shields.io/badge/Downloads-15%2B-purple?style=for-the-badge&logo=google-play&logoColor=white)](https://github.com/KuroMusic/KuroMusic/releases)
-  
-  [![Telegram](https://img.shields.io/badge/Telegram-Join%20Chat-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/KiritoAPT2)
-
+  [![Android Version](...)](...) [![Kotlin](...)](...) [![License](...)](...)
+  [![Downloads](...)](...) [![Telegram](...)](...)
 </div>
+
+---
+
+## 📱 Visual Experience
+
+<p align="center">
+  <img src="screenshots/home.png" width="30%" alt="Pantalla de Inicio" />
+  <img src="screenshots/player.png" width="30%" alt="Reproductor" />
+  <img src="screenshots/settings.png" width="30%" alt="Ajustes" />
+  <br>
+  <i>Interfaz optimizada para pantallas OLED con tonos Negro Puro y Morado Vibrante.</i>
+</p>
 
 ---
 
