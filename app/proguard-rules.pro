@@ -112,3 +112,10 @@
 ## Keep Wire protobuf classes
 -keep class com.squareup.wire.** { *; }
 
+## Media3 rules (Prevent ClassCastException and reflection issues in Release)
+-keep class androidx.media3.common.** { *; }
+-keep class androidx.media3.exoplayer.** { *; }
+-keep class androidx.media3.session.** { *; }
+-keep class androidx.media3.datasource.** { *; }
+-dontwarn androidx.media3.exoplayer.**
+

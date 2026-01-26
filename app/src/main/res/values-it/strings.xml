@@ -40,7 +40,7 @@
     <string name="continuous">Continuo</string>
     <!-- Search -->
     <string name="search">Ricerca</string>
-    <string name="search_yt_music">Ricerca YouTube Music…</string>
+    <string name="search_yt_music">Ricerca KuroMusic…</string>
     <string name="search_library">Ricerca libreria…</string>
     <string name="filter_library">Libreria</string>
     <string name="filter_liked">Piaciuti</string>
@@ -75,7 +75,7 @@
     <string name="remove_download_playlist_confirm">Vuoi davvero rimuovere tutti i brani della playlist \"%s\" dallo spazio di archiviazione dei brani scaricati?</string>
     <string name="delete_playlist_confirm">Vuoi davvero eliminare la playlist \"%s\"?</string>
     <string name="elements_selected">%1$d Elementi selezionati</string>
-    <string name="allows_for_sync_witch_youtube">Nota: Questo permette la sincronizzazione con YouTube Music. Non è modificabile in seguito.</string>
+    <string name="allows_for_sync_witch_youtube">Nota: Questo permette la sincronizzazione con KuroMusic. Non è modificabile in seguito.</string>
     <!-- Button -->
     <string name="retry">Riprova</string>
     <string name="radio">Radio</string>
@@ -273,7 +273,7 @@
     <string name="token_hidden">Tocca per visualizzare il token</string>
     <string name="token_shown">Tocca ancora per copiare o modificare</string>
     <string name="token_adv_login_description">Si tratta di un metodo di login AVANZATO. In alternativa al portale web, è possibile inserire o aggiornare direttamente il token di login qui. Ad esempio, questo può accelerare il login su più dispositivi. Si prega di notare che con qualsiasi formato token non valido l\'app non riesce ad analizzarlo e non sarà accettato</string>
-    <string name="ytm_sync">Sincronizza automaticamente con il tuo account YouTube Music</string>
+    <string name="ytm_sync">Sincronizza automaticamente con il tuo account KuroMusic</string>
     <string name="general">Generale</string>
     <string name="content_language">Lingua predefinita contenuto</string>
     <string name="content_country">Paese contenuto predefinito</string>

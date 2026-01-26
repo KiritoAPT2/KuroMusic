@@ -1,0 +1,101 @@
+Reusing configuration cache.
+> Task :lrclib:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kugou:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kizzy:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :innertube:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kugou:processResources NO-SOURCE
+> Task :lrclib:processResources NO-SOURCE
+> Task :jossredconnect:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :innertube:processResources NO-SOURCE
+> Task :material-color-utilities:processResources NO-SOURCE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kizzy:processResources NO-SOURCE
+> Task :jossredconnect:processResources NO-SOURCE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :jossredconnect:compileKotlin UP-TO-DATE
+> Task :jossredconnect:compileJava NO-SOURCE
+> Task :jossredconnect:classes UP-TO-DATE
+> Task :innertube:compileKotlin UP-TO-DATE
+> Task :kugou:compileKotlin UP-TO-DATE
+> Task :kizzy:compileKotlin UP-TO-DATE
+> Task :lrclib:compileKotlin UP-TO-DATE
+> Task :kizzy:compileJava NO-SOURCE
+> Task :kugou:compileJava NO-SOURCE
+> Task :kizzy:classes UP-TO-DATE
+> Task :innertube:compileJava NO-SOURCE
+> Task :kugou:classes UP-TO-DATE
+> Task :innertube:classes UP-TO-DATE
+> Task :lrclib:compileJava NO-SOURCE
+> Task :jossredconnect:jar UP-TO-DATE
+> Task :lrclib:classes UP-TO-DATE
+> Task :kizzy:jar UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :material-color-utilities:compileJava UP-TO-DATE
+> Task :material-color-utilities:classes UP-TO-DATE
+> Task :innertube:jar UP-TO-DATE
+> Task :kugou:jar UP-TO-DATE
+> Task :lrclib:jar UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :material-color-utilities:jar UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:kspDebugKotlin
+
+> Task :app:kaptGenerateStubsDebugKotlin
+w: Support for language version 2.0+ in kapt is in Alpha and must be enabled explicitly. Falling back to 1.9.
+
+> Task :app:kaptDebugKotlin
+
+> Task :app:compileDebugKotlin
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/entities/ArtistEntity.kt:52:59 'static fun random(p0: Int, p1: Boolean, p2: Boolean): String!' is deprecated. Deprecated in Java.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/entities/PlaylistEntity.kt:35:61 'static fun random(p0: Int, p1: Boolean, p2: Boolean): String!' is deprecated. Deprecated in Java.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/component/EnhancedPreferenceEntry.kt:177:29 'fun Divider(modifier: Modifier = ..., thickness: Dp = ..., color: Color = ...): Unit' is deprecated. Renamed to HorizontalDivider.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/component/IconButton.kt:1:36 This code uses error suppression for 'INVISIBLE_REFERENCE'. While it might compile and work, the compiler behavior is UNSPECIFIED and WON'T BE PRESERVED. Please report your use case to the Kotlin issue tracker instead: https://kotl.in/issue
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/component/SearchBar.kt:1:36 This code uses error suppression for 'INVISIBLE_REFERENCE'. While it might compile and work, the compiler behavior is UNSPECIFIED and WON'T BE PRESERVED. Please report your use case to the Kotlin issue tracker instead: https://kotl.in/issue
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/component/ShapeSelector.kt:163:13 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: @Composable() ComposableFunction1<@ParameterName(...) List<TabPosition>, Unit> = ..., divider: @Composable() ComposableFunction0<Unit> = ..., tabs: @Composable() ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/component/ShareLyrics.kt:334:40 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/menu/LyricsMenu.kt:72:38 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/player/Player.kt:192:28 'val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager>' is deprecated. Use LocalClipboard instead which supports suspend functions.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/player/Queue.kt:142:28 'val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager>' is deprecated. Use LocalClipboard instead which supports suspend functions.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/player/Queue.kt:393:29 'fun rememberSwipeToDismissBoxState(initialValue: SwipeToDismissBoxValue = ..., confirmValueChange: (SwipeToDismissBoxValue) -> Boolean = ..., positionalThreshold: (@ParameterName(...) Float) -> Float = ...): SwipeToDismissBoxState' is deprecated. confirmValueChange is deprecated without replacement. Rather than relying on a callback to veto state changes, the anchor set should not include disallowed anchors. See androidx.compose.foundation.samples.AnchoredDraggableDynamicAnchorsSample for an example of using dynamic anchors over confirmValueChange.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/AccountScreen.kt:45:35 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/AlbumScreen.kt:134:33 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/ExploreScreen.kt:58:41 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HistoryScreen.kt:84:35 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HomeScreen.kt:137:32 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/NewReleaseScreen.kt:52:38 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/StatsScreen.kt:92:33 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/YouTubeBrowseScreen.kt:73:41 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/artist/ArtistItemsScreen.kt:65:39 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/artist/ArtistScreen.kt:129:34 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/artist/ArtistSongsScreen.kt:78:39 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/library/CachePlaylistScreen.kt:84:35 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/library/LibraryAlbumsScreen.kt:75:41 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/library/LibraryArtistsScreen.kt:74:42 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/library/LibraryMixScreen.kt:98:38 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/library/LibraryPlaylistsScreen.kt:82:44 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/library/LibrarySongsScreen.kt:75:40 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/playlist/AutoPlaylistScreen.kt:130:40 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/playlist/LocalPlaylistScreen.kt:163:41 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/playlist/OnlinePlaylistScreen.kt:117:42 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/playlist/TopPlaylistScreen.kt:101:39 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/search/LocalSearchScreen.kt:67:39 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/search/OnlineSearchResult.kt:75:40 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/search/OnlineSearchScreen.kt:81:50 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/settings/BackupAndRestore.kt:109:41 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/settings/StorageSettings.kt:83:35 'fun <reified VM : ViewModel> hiltViewModel(viewModelStoreOwner: ViewModelStoreOwner = ..., key: String? = ...): VM' is deprecated. Moved to package: androidx.hilt.lifecycle.viewmodel.compose.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/theme/Theme.kt:130:5 'constructor(primary: Color, onPrimary: Color, primaryContainer: Color, onPrimaryContainer: Color, inversePrimary: Color, secondary: Color, onSecondary: Color, secondaryContainer: Color, onSecondaryContainer: Color, tertiary: Color, onTertiary: Color, tertiaryContainer: Color, onTertiaryContainer: Color, background: Color, onBackground: Color, surface: Color, onSurface: Color, surfaceVariant: Color, onSurfaceVariant: Color, surfaceTint: Color, inverseSurface: Color, inverseOnSurface: Color, error: Color, onError: Color, errorContainer: Color, onErrorContainer: Color, outline: Color, outlineVariant: Color, scrim: Color, surfaceBright: Color, surfaceDim: Color, surfaceContainer: Color, surfaceContainerHigh: Color, surfaceContainerHighest: Color, surfaceContainerLow: Color, surfaceContainerLowest: Color): ColorScheme' is deprecated. Use constructor with additional 'fixed' container roles.
+w: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/utils/LazyGridSnapLayoutInfoProvider.kt:1:36 This code uses error suppression for 'INVISIBLE_REFERENCE'. While it might compile and work, the compiler behavior is UNSPECIFIED and WON'T BE PRESERVED. Please report your use case to the Kotlin issue tracker instead: https://kotl.in/issue
+
+BUILD SUCCESSFUL in 29s
+28 actionable tasks: 4 executed, 24 up-to-date
+Configuration cache entry reused.

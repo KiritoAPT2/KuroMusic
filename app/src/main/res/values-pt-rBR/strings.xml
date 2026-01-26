@@ -44,7 +44,7 @@
 
     <!-- Search -->
     <string name="search">Pesquisar</string>
-    <string name="search_yt_music">Pesquisar no YouTube Music…</string>
+    <string name="search_yt_music">Pesquisar no KuroMusic…</string>
     <string name="search_library">Pesquisar biblioteca…</string>
     <string name="filter_library">Biblioteca</string>
     <string name="filter_liked">Curtidas</string>
@@ -83,7 +83,7 @@
     <string name="remove_download_playlist_confirm">Você realmente quer remover todas as músicas da playlist \"%s\" do armazenamento de Músicas Baixadas?</string>
     <string name="delete_playlist_confirm">Você realmente quer excluir a playlist \"%s\"?</string>
     <string name="elements_selected">%1$d Elementos selecionados</string>
-    <string name="allows_for_sync_witch_youtube">Observação: Isso permite sincronizar com o YouTube Music. Isso NÃO pode ser alterado depois.</string>
+    <string name="allows_for_sync_witch_youtube">Observação: Isso permite sincronizar com o KuroMusic. Isso NÃO pode ser alterado depois.</string>
 
     <!-- Button -->
     <string name="retry">Tentar novamente</string>
@@ -300,7 +300,7 @@
     <string name="token_hidden">Toque para mostrar token</string>
     <string name="token_shown">Toque novamente para copiar ou editar</string>
     <string name="token_adv_login_description">Este é um método de login AVANÇADO. Como alternativa ao portal web, você pode inserir ou atualizar seu token de login aqui. Por exemplo, isso pode acelerar o login em vários dispositivos. Observe que qualquer token inválido que o aplicativo não consiga analisar não será aceito</string>
-    <string name="ytm_sync">Sincronizar automaticamente com sua conta do YouTube Music</string>
+    <string name="ytm_sync">Sincronizar automaticamente com sua conta do KuroMusic</string>
     <string name="general">Geral</string>
     <string name="content_language">Idioma de conteúdo padrão</string>
     <string name="content_country">País de conteúdo padrão</string>

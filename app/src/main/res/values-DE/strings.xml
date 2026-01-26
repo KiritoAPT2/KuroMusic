@@ -45,7 +45,7 @@
 
     <!-- Search -->
     <string name="search">"Suche"</string>
-    <string name="search_yt_music">"YouTube Music durchsuchen…"</string>
+    <string name="search_yt_music">"KuroMusic durchsuchen…"</string>
     <string name="search_library">"Bibliothek durchsuchen…"</string>
     <string name="filter_library">"Bibliothek"</string>
     <string name="filter_liked">"Favoriten"</string>
@@ -84,7 +84,7 @@
     <string name="remove_download_playlist_confirm">"Bist du dir sicher, dass du alle \"%s\" Lieder der Wiedergabeliste aus dem Speicher der heruntergeladenen Titel löschen willst?"</string>
     <string name="delete_playlist_confirm">"Bist du dir sicher, dass du die Wiedergabeliste \"%s\" löschen willst?"</string>
     <string name="elements_selected">"%1$d Elemente ausgewählt"</string>
-    <string name="allows_for_sync_witch_youtube">"Hinweis: Dies ermöglicht die Synchronisierung mit YouTube Music. Dies ist später NICHT änderbar."</string>
+    <string name="allows_for_sync_witch_youtube">"Hinweis: Dies ermöglicht die Synchronisierung mit KuroMusic. Dies ist später NICHT änderbar."</string>
 
     <!-- Button -->
     <string name="retry">"Wiederholen"</string>
@@ -293,7 +293,7 @@
     <string name="token_hidden">"Tippen um token anzuzeigen"</string>
     <string name="token_shown">"Nochmal tippen um zu kopieren oder zu bearbeiten"</string>
     <string name="token_adv_login_description">"Dies ist eine FORTGESCHRITTENE Anmeldemethode. Als Alternative zum Webportal kannst du dein Anmelde-Token hier direkt eingeben oder aktualisieren. Dies kann zum Beispiel das Anmelden auf mehreren Geräten beschleunigen. Bitte beachte, dass alle ungültigen Token-Formate, die von der App nicht analysiert werden können, nicht akzeptiert werden."</string>
-    <string name="ytm_sync">"Automatischer Abgleich mit deinem YouTube Music Konto"</string>
+    <string name="ytm_sync">"Automatischer Abgleich mit deinem KuroMusic Konto"</string>
     <string name="general">"Allgemein"</string>
     <string name="content_language">"Standard-Inhaltssprache"</string>
     <string name="content_country">"Standard-Inhaltsland"</string>

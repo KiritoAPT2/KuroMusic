@@ -75,7 +75,7 @@
     <string name="remove_download_playlist_confirm">Tüm indirilen şarkıları \"%s\" oynatma listesinden gerçekten kaldırmak istiyor musunuz?</string>
     <string name="delete_playlist_confirm">\"%s\" çalma listesini gerçekten silmek istiyor musunuz?</string>
     <string name="elements_selected">%1$d seçilen öğeler</string>
-    <string name="allows_for_sync_witch_youtube">Not: Bu işlem YouTube Music ile senkronizasyona izin verir. daha sonra DEĞİŞTİRİLEMEZ.</string>
+    <string name="allows_for_sync_witch_youtube">Not: Bu işlem KuroMusic ile senkronizasyona izin verir. daha sonra DEĞİŞTİRİLEMEZ.</string>
     <!-- Button -->
     <string name="retry">Tekrar dene</string>
     <string name="radio">Radyo</string>

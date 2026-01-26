@@ -41,7 +41,7 @@
     <string name="continuous">Συνεχής</string>
     <!-- Search -->
     <string name="search">Αναζήτηση</string>
-    <string name="search_yt_music">Αναζήτηση στο YouTube Music…</string>
+    <string name="search_yt_music">Αναζήτηση στο KuroMusic…</string>
     <string name="search_library">Αναζήτηση στη βιβλιοθήκη…</string>
     <string name="filter_library">Βιβλιοθήκη</string>
     <string name="filter_liked">Αγαπημένα</string>
@@ -76,7 +76,7 @@
     <string name="remove_download_playlist_confirm">Θέλετε πραγματικά να αφαιρέσετε όλα τα τραγούδια της λίστας \"%s\" από την αποθήκευση Κατεβασμένα Τραγούδια;</string>
     <string name="delete_playlist_confirm">Θέλετε πραγματικά να διαγράψετε τη λίστα \"%s\";</string>
     <string name="elements_selected">%1$d Επιλεγμένα στοιχεία</string>
-    <string name="allows_for_sync_witch_youtube">Σημείωση: Αυτό επιτρέπει το συγχρονισμό με το YouTube Music. Αυτό ΔΕΝ μπορεί να αλλάξει αργότερα.</string>
+    <string name="allows_for_sync_witch_youtube">Σημείωση: Αυτό επιτρέπει το συγχρονισμό με το KuroMusic. Αυτό ΔΕΝ μπορεί να αλλάξει αργότερα.</string>
     <!-- Button -->
     <string name="retry">Επανάληψη</string>
     <string name="radio">Ραδιόφωνο</string>
@@ -272,7 +272,7 @@
     <string name="token_hidden">Πατήστε για να εμφανιστεί το διακριτικό</string>
     <string name="token_shown">Πατήστε ξανά για αντιγραφή ή επεξεργασία</string>
     <string name="token_adv_login_description">Αυτή είναι μια ΠΡΟΗΓΜΕΝΗ μέθοδος σύνδεσης. Ως εναλλακτική της πύλης Ιστού, μπορείτε να εισαγάγετε ή να ενημερώσετε απευθείας το διακριτικό σύνδεσής σας εδώ. Για παράδειγμα, αυτό μπορεί να επιταχύνει τη σύνδεση σε πολλές συσκευές. Λάβετε υπόψη ότι τυχόν μη έγκυρες μορφές διακριτικών που η εφαρμογή αποτυγχάνει να αναλύσει δεν θα γίνουν αποδεκτές</string>
-    <string name="ytm_sync">Αυτόματος συγχρονισμός με τον λογαριασμό σας στο YouTube Music</string>
+    <string name="ytm_sync">Αυτόματος συγχρονισμός με τον λογαριασμό σας στο KuroMusic</string>
     <string name="general">Γενικά</string>
     <string name="content_language">Προεπιλεγμένη γλώσσα περιεχομένου</string>
     <string name="content_country">Προεπιλεγμένη χώρα περιεχομένου</string>

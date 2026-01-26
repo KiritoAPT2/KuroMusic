@@ -4,19 +4,18 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("plugin.serialization") version "2.1.0"
-    kotlin("kapt")
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace = "com.grp2.kuromusic"
+    namespace = "com.kuromusic"
     //noinspection GradleDependency
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.grp2.kuromusic"
+        applicationId = "com.kuromusic"
         minSdk = 24
         targetSdk = 35
         versionCode = 3
@@ -25,26 +24,17 @@ android {
         setProperty("archivesBaseName", "KuroMusic-Master")
     }
 
-    sourceSets {
-        getByName("debug") {
-            java.srcDirs("src/main/java")
-            res.srcDirs("src/main/res")
-            manifest.srcFile("src/main/AndroidManifest.xml")
-        }
-    }
-
     buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+        getByName("release") {
+            isMinifyEnabled = true  // Activa R8 para reducir el tamaño y optimizar
+            isShrinkResources = true // Elimina recursos (imágenes/layouts) que no uses
             isCrunchPngs = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro" // Aquí es donde pusimos las reglas de Media3
             )
         }
         debug {
-            applicationIdSuffix = ".debug"
         }
     }
 
@@ -164,7 +154,7 @@ dependencies {
 
     implementation(libs.hilt)
     implementation("org.jsoup:jsoup:1.18.1")
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     implementation(projects.innertube)
     implementation(projects.kugou)
@@ -177,4 +167,5 @@ dependencies {
     coreLibraryDesugaring(libs.desugaring)
 
     implementation(libs.timber)
+    implementation("org.slf4j:slf4j-nop:2.0.7")
 }

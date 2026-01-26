@@ -44,7 +44,7 @@
 
     <!-- Search -->
     <string name="search">"Tìm kiếm"</string>
-    <string name="search_yt_music">"Tìm kiếm Youtube Music"</string>
+    <string name="search_yt_music">"Tìm kiếm KuroMusic"</string>
     <string name="search_library">"Thư viện tìm kiếm"</string>
     <string name="filter_library">"Thư viện"</string>
     <string name="filter_liked">"Đã thích"</string>
@@ -83,7 +83,7 @@
     <string name="remove_download_playlist_confirm">"Bạn có thật sự muốn xoá tất cả \"%s\" danh sách phát nhạc từ Nhạc đã tải xuống?"</string>
     <string name="delete_playlist_confirm">"Bạn có thật sự muốn xoá danh sách phát \"%s\"?"</string>
     <string name="elements_selected">"%1$d Các yếu tố được chọn"</string>
-    <string name="allows_for_sync_witch_youtube">"Lưu ý: Tính năng này cho phép đồng bộ hóa với YouTube Music. Tính năng này KHÔNG thể thay đổi sau này."</string>
+    <string name="allows_for_sync_witch_youtube">"Lưu ý: Tính năng này cho phép đồng bộ hóa với KuroMusic. Tính năng này KHÔNG thể thay đổi sau này."</string>
 
     <!-- Button -->
     <string name="retry">"Thử lại"</string>
@@ -282,7 +282,7 @@
     <string name="token_hidden">"Chạm để hiện token"</string>
     <string name="token_shown">"Chạm lần nữa để sao chép hoặc chỉnh sửa"</string>
     <string name="token_adv_login_description">"Đây là phương thức đăng nhập NÂNG CAO. Thay vì sử dụng cổng thông tin web, bạn có thể nhập trực tiếp hoặc cập nhật login token tại đây. Ví dụ, điều này có thể tăng tốc độ đăng nhập trên nhiều thiết bị. Xin lưu ý rằng bất kỳ định dạng token không hợp lệ nào mà ứng dụng không phân tích được sẽ không được chấp nhận"</string>
-    <string name="ytm_sync">"Tự động đồng bộ với tài khoản YouTube Music"</string>
+    <string name="ytm_sync">"Tự động đồng bộ với tài khoản KuroMusic"</string>
     <string name="general">"Tổng quát"</string>
     <string name="content_language">"Ngôn ngữ nội dung mặc định"</string>
     <string name="content_country">"Quốc gia nội dung mặc định"</string>

@@ -1,0 +1,276 @@
+Reusing configuration cache.
+> Task :innertube:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :lrclib:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kizzy:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kugou:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :innertube:processResources NO-SOURCE
+> Task :kugou:processResources NO-SOURCE
+> Task :jossredconnect:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :lrclib:processResources NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :kizzy:processResources NO-SOURCE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :jossredconnect:processResources NO-SOURCE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :material-color-utilities:processResources NO-SOURCE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:l8DexDesugarLibDebug UP-TO-DATE
+> Task :innertube:compileKotlin UP-TO-DATE
+> Task :kizzy:compileKotlin UP-TO-DATE
+> Task :kizzy:compileJava NO-SOURCE
+> Task :innertube:compileJava NO-SOURCE
+> Task :kizzy:classes UP-TO-DATE
+> Task :innertube:classes UP-TO-DATE
+> Task :kugou:compileKotlin UP-TO-DATE
+> Task :lrclib:compileKotlin UP-TO-DATE
+> Task :jossredconnect:compileKotlin UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :material-color-utilities:compileJava UP-TO-DATE
+> Task :material-color-utilities:classes UP-TO-DATE
+> Task :jossredconnect:compileJava NO-SOURCE
+> Task :jossredconnect:classes UP-TO-DATE
+> Task :innertube:jar UP-TO-DATE
+> Task :kizzy:jar UP-TO-DATE
+> Task :material-color-utilities:jar UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :kugou:compileJava NO-SOURCE
+> Task :lrclib:compileJava NO-SOURCE
+> Task :kugou:classes UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :lrclib:classes UP-TO-DATE
+> Task :jossredconnect:jar UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :kugou:jar UP-TO-DATE
+> Task :lrclib:jar UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+
+> Task :app:kspDebugKotlin FAILED
+e: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt: (123, 25): Function declaration must have a name
+e: Error occurred in KSP, check log for detail
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:19 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:26 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:28 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:36 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:37 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:47 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:104:48 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:13 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:14 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:19 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:20 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:21 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:22 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:30 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:31 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:32 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:33 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:37 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:38 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:105:40 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:27 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:34 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:36 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:44 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:45 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:63 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:107:64 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:13 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:14 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:19 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:20 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:21 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:22 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:30 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:31 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:32 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:33 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:37 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:38 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:108:40 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:118:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:118:22 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:118:29 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:13 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:14 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:33 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:35 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:55 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:57 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:77 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:78 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:79 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:87 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:119:88 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:121:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:121:22 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:121:29 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:13 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:14 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:24 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:30 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:31 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:38 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:39 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:41 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:43 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:61 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:67 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:68 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:75 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:76 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:78 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:80 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:93 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:99 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:100 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:107 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:108 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:122:109 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:123:17 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:123:18 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:123:25 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:12 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:13 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:20 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:21 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:28 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:31 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:35 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:125:37 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:31 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:38 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:40 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:41 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:63 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:65 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:84 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:85 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:86 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:94 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:172:95 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:16 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:17 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:21 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:22 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:23 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:24 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:34 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:174:41 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:176:10 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:176:11 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:176:21 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:16 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:17 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:24 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:25 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:26 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:27 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:37 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:180:44 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:198:10 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:198:11 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:198:21 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:19 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:26 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:28 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:50 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:56 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:58 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:66 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:78 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:79 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:86 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:87 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:202:89 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:17 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:25 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:31 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:33 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:41 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:43 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:51 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:63 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:64 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:71 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:72 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:203:74 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:17 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:28 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:34 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:36 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:52 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:53 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:60 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:204:61 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:16 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:17 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:23 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:24 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:25 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:37 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:38 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:40 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:47 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:49 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:50 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:58 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:59 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:60 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:61 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:71 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:207:80 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:211:9 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:211:18 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:211:25 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:211:27 Expecting member declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:223:5 Expecting a top level declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:223:10 Expecting a top level declaration
+e: file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/viewmodels/HomeViewModel.kt:236:1 Expecting a top level declaration
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:kspDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1s
+40 actionable tasks: 1 executed, 39 up-to-date
+Configuration cache entry reused.

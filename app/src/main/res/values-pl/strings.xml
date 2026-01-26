@@ -47,7 +47,7 @@
 
     <!-- Search -->
     <string name="search">"Szukaj"</string>
-    <string name="search_yt_music">"Szukaj w YouTube Music"</string>
+    <string name="search_yt_music">"Szukaj w KuroMusic"</string>
     <string name="search_library">"Szukaj w bibliotece"</string>
     <string name="filter_library">"Biblioteka"</string>
     <string name="filter_liked">"Polubione"</string>
@@ -86,7 +86,7 @@
     <string name="remove_download_playlist_confirm">"Czy na pewno chcesz usunąć z urządzenia wszystkie pobrane utwory z playlisty \"%s\"?"</string>
     <string name="delete_playlist_confirm">"Czy na pewno chcesz usunąć playlistę \"%s\"?"</string>
     <string name="elements_selected">"Wybrano %1$d elementów"</string>
-    <string name="allows_for_sync_witch_youtube">"Uwaga: To pozwala na synchronizację z YouTube Music. Później NIE można tego zmienić."</string>
+    <string name="allows_for_sync_witch_youtube">"Uwaga: To pozwala na synchronizację z KuroMusic. Później NIE można tego zmienić."</string>
 
     <!-- Button -->
     <string name="retry">"Spróbuj ponownie"</string>
@@ -315,7 +315,7 @@
     <string name="token_hidden">"Kliknij aby pokazać token"</string>
     <string name="token_shown">"Kliknij ponownie, aby skopiować lub edytować"</string>
     <string name="token_adv_login_description">"To jest ZAAWANSOWANA metoda logowania. Jako alternatywa do portalu w sieci, możesz tu bezpośrednio podać lub zaktualizować swój token logowania. Na przykład ta metoda może przyspieszyć logowanie na wielu urządzeniach. Miej na uwadze, że aplikacja nie zatwierdzi żadnego nieprawidłowego formatu tokenu"</string>
-    <string name="ytm_sync">"Automatycznie zsynchronizuj ze swoim kontem YouTube Music"</string>
+    <string name="ytm_sync">"Automatycznie zsynchronizuj ze swoim kontem KuroMusic"</string>
     <string name="general">"Ogólne"</string>
     <string name="content_language">"Domyślny język treści"</string>
     <string name="content_country">"Domyślny kraj treści"</string>
@@ -523,7 +523,7 @@
 Aplikacja zrestartuje się automatycznie."</string>
     <string name="visitor_data_reset_confirm">"Resetuj"</string>
     <string name="visitor_data_reset_cancel">"Anuluj"</string>
-    <string name="widget_title">"Odtwarzacz Opentune"</string>
+    <string name="widget_title">"Odtwarzacz KuroMusic"</string>
     <string name="error_saving_image">"Błąd zapisywania obrazu"</string>
     <string name="processing">"przetwarzanie"</string>
     <string name="subscribed">"subskrybujesz"</string>

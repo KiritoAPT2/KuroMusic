@@ -1,33 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
-    <shortcut
-        android:enabled="true"
-        android:icon="@drawable/search"
-        android:shortcutId="search"
-        android:shortcutShortLabel="@string/search">
-        <intent
-            android:action="com.grp2.kuromusic.action.SEARCH"
-            android:targetClass="com.grp2.kuromusic.MainActivity"
-            android:targetPackage="com.Arturo254.kuromusic" />
+    <shortcut android:enabled="true" android:icon="@drawable/search" android:shortcutId="search" android:shortcutShortLabel="@string/search">
+        <intent android:action="com.kuromusic.action.SEARCH" android:targetClass="com.kuromusic.MainActivity" android:targetPackage="com.kuromusic" />
     </shortcut>
-    <shortcut
-        android:enabled="true"
-        android:icon="@drawable/explore"
-        android:shortcutId="explore"
-        android:shortcutShortLabel="@string/explore">
-        <intent
-            android:action="com.grp2.kuromusic.action.EXPLORE"
-            android:targetClass="com.grp2.kuromusic.MainActivity"
-            android:targetPackage="com.Arturo254.kuromusic" />
+    <shortcut android:enabled="true" android:icon="@drawable/explore" android:shortcutId="explore" android:shortcutShortLabel="@string/explore">
+        <intent android:action="com.kuromusic.action.EXPLORE" android:targetClass="com.kuromusic.MainActivity" android:targetPackage="com.kuromusic" />
     </shortcut>
-    <shortcut
-        android:enabled="true"
-        android:icon="@drawable/library_music"
-        android:shortcutId="library"
-        android:shortcutShortLabel="@string/filter_library">
-        <intent
-            android:action="com.grp2.kuromusic.action.LIBRARY"
-            android:targetClass="com.grp2.kuromusic.MainActivity"
-            android:targetPackage="com.Arturo254.kuromusic" />
+    <shortcut android:enabled="true" android:icon="@drawable/library_music" android:shortcutId="library" android:shortcutShortLabel="@string/filter_library">
+        <intent android:action="com.kuromusic.action.LIBRARY" android:targetClass="com.kuromusic.MainActivity" android:targetPackage="com.kuromusic" />
     </shortcut>
 </shortcuts>

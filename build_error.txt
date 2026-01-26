@@ -1,0 +1,144 @@
+﻿Reusing configuration cache.
+> Task :innertube:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :jossredconnect:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :kugou:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :kizzy:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :lrclib:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :material-color-utilities:processResources NO-SOURCE
+> Task :innertube:processResources NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :kizzy:processResources NO-SOURCE
+> Task :jossredconnect:processResources NO-SOURCE
+> Task :kugou:processResources NO-SOURCE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :lrclib:processResources NO-SOURCE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :jossredconnect:compileKotlin UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :jossredconnect:compileJava NO-SOURCE
+> Task :jossredconnect:classes UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :jossredconnect:jar UP-TO-DATE
+> Task :lrclib:compileKotlin UP-TO-DATE
+> Task :app:l8DexDesugarLibDebug UP-TO-DATE
+> Task :lrclib:compileJava NO-SOURCE
+> Task :innertube:compileKotlin UP-TO-DATE
+> Task :kugou:compileKotlin UP-TO-DATE
+> Task :lrclib:classes UP-TO-DATE
+> Task :kugou:compileJava NO-SOURCE
+> Task :innertube:compileJava NO-SOURCE
+> Task :kizzy:compileKotlin UP-TO-DATE
+> Task :kugou:classes UP-TO-DATE
+> Task :innertube:classes UP-TO-DATE
+> Task :kizzy:compileJava NO-SOURCE
+> Task :kizzy:classes UP-TO-DATE
+> Task :lrclib:jar UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :kugou:jar UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :innertube:jar UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :kizzy:jar UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :material-color-utilities:compileJava UP-TO-DATE
+> Task :material-color-utilities:classes UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :material-color-utilities:jar UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+
+> Task :app:kspDebugKotlin
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:243:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:391: The query returns some columns [songCountListened, timeListened] which are not used by com.kuromusic.db.entities.Song. You can use @ColumnInfo annotation on the fields to specify the mapping. You can annotate the method with @RewriteQueriesToDropUnusedColumns to direct Room to rewrite your query to avoid fetching unused columns.  You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, title, duration, thumbnailUrl, albumId, albumName, year, date, dateModified, liked, likedDate, totalPlayTime, inLibrary, dateDownload, genre, songCountListened, timeListened.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:468: The query returns some columns [downloadCount] which are not used by com.kuromusic.db.entities.Album. You can use @ColumnInfo annotation on the fields to specify the mapping. You can annotate the method with @RewriteQueriesToDropUnusedColumns to direct Room to rewrite your query to avoid fetching unused columns.  You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary, downloadCount, songCountListened, timeListened.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:573:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:607:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:613:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:619:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:625:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:647:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:653:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:659:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:665:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:687:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:748:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:763:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:767:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:771:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:775:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:779:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:783:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:797:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:801:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:805:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:809:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:813:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:817:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:831:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:885:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:981:  com.kuromusic.db.entities.Artist has some fields [timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, name, thumbnailUrl, channelId, songCount, lastUpdateTime, bookmarkedAt, songCount.
+w: [ksp] C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/db/DatabaseDao.kt:990:  com.kuromusic.db.entities.Album has some fields [songCountListened, timeListened] which are not returned by the query. If they are not supposed to be read from the result, you can mark them with @Ignore annotation. You can suppress this warning by annotating the method with @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH). Columns returned by the query: id, playlistId, title, year, thumbnailUrl, themeColor, songCount, duration, lastUpdateTime, bookmarkedAt, likedDate, inLibrary.
+
+> Task :app:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :app:kaptDebugKotlin UP-TO-DATE
+
+> Task :app:compileDebugKotlin FAILED
+.\gradlew.bat : e: 
+file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HomeScreen.kt:1557:29 
+Unresolved reference 'Icons'.
+En línea: 1 Carácter: 1
++ .\gradlew.bat :app:assembleDebug --console=plain 2>&1 | Out-File -Fil ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (e: file:///C:/U...erence 'Icons'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+e: 
+file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HomeScreen.kt:1559:29 
+Unresolved reference 'Icons'.
+e: 
+file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HomeScreen.kt:1583:24 
+Unresolved reference 'makeTimeString'.
+e: 
+file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HomeScreen.kt:1676:29 
+Unresolved reference 'Icons'.
+e: 
+file:///C:/Users/Admin/Desktop/KuroMusic/app/src/main/java/com/kuromusic/ui/screens/HomeScreen.kt:1678:29 
+Unresolved reference 'Icons'.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugKotlin'.
+> A failure occurred while executing 
+org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 8s
+43 actionable tasks: 2 executed, 41 up-to-date
+Configuration cache entry reused.

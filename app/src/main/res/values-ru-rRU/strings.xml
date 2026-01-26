@@ -47,7 +47,7 @@
 
     <!-- Search -->
     <string name="search">"Поиск"</string>
-    <string name="search_yt_music">"Поиск в YouTube Music…"</string>
+    <string name="search_yt_music">"Поиск в KuroMusic…"</string>
     <string name="search_library">"Поиск в библиотеке…"</string>
     <string name="filter_library">"Библиотека"</string>
     <string name="filter_liked">"Нравится"</string>
@@ -86,7 +86,7 @@
     <string name="remove_download_playlist_confirm">"Вы действительно хотите удалить все треки плейлиста «%s» из хранилища?"</string>
     <string name="delete_playlist_confirm">"Вы действительно хотите удалить плейлист «%s»?"</string>
     <string name="elements_selected">"%1$d выбрано"</string>
-    <string name="allows_for_sync_witch_youtube">"Синхронизация плейлиста с YouTube Music. Это не изменить позже."</string>
+    <string name="allows_for_sync_witch_youtube">"Синхронизация плейлиста с KuroMusic. Это не изменить позже."</string>
 
     <!-- Button -->
     <string name="retry">"Повторить"</string>
@@ -315,7 +315,7 @@
     <string name="token_hidden">"Нажмите, чтобы показать токен"</string>
     <string name="token_shown">"Нажмите снова, чтобы скопировать или изменить"</string>
     <string name="token_adv_login_description">"Это расширенный метод авторизации. В качестве альтернативы вы можете напрямую ввести или обновить здесь свой токен для входа. К примеру, это может ускорить авторизацию на нескольких устройствах. Обратите внимание, что некорректные токены не будут применены."</string>
-    <string name="ytm_sync">"Автоматическая синхронизация с вашим аккаунтом YouTube Music"</string>
+    <string name="ytm_sync">"Автоматическая синхронизация с вашим аккаунтом KuroMusic"</string>
     <string name="general">"Основные"</string>
     <string name="content_language">"Язык контента"</string>
     <string name="content_country">"Страна контента"</string>

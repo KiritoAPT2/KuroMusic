@@ -45,7 +45,7 @@
 
     <!-- Search -->
     <string name="search">"खोज्नुहोस्"</string>
-    <string name="search_yt_music">"YouTube Music खोज्नुहोस्…"</string>
+    <string name="search_yt_music">"KuroMusic खोज्नुहोस्…"</string>
     <string name="search_library">"पुस्तकालय खोज्नुहोस्..."</string>
     <string name="filter_library">"पुस्तकालय"</string>
     <string name="filter_liked">"मन पर्यो"</string>
@@ -84,7 +84,7 @@
     <string name="remove_download_playlist_confirm">"के तपाईं साँच्चै डाउनलोड गरिएका गीतहरूको भण्डारणबाट सबै \"%s\" प्लेलिस्ट गीतहरू हटाउन चाहनुहुन्छ?"</string>
     <string name="delete_playlist_confirm">"के तपाईं साँच्चै \"%s\" प्लेलिस्ट मेटाउन चाहनुहुन्छ?"</string>
     <string name="elements_selected">"%1$d तत्वहरू चयन गरियो"</string>
-    <string name="allows_for_sync_witch_youtube">"नोट: यसले YouTube Music सँग सिंक गर्न अनुमति दिन्छ। यो पछि परिवर्तन गर्न सकिँदैन।"</string>
+    <string name="allows_for_sync_witch_youtube">"नोट: यसले KuroMusic सँग सिंक गर्न अनुमति दिन्छ। यो पछि परिवर्तन गर्न सकिँदैन।"</string>
 
     <!-- Button -->
     <string name="retry">"पुन: प्रयास गर्नुहोस्"</string>
@@ -293,7 +293,7 @@
     <string name="token_hidden">"टोकन देखाउन ट्याप गर्नुहोस्"</string>
     <string name="token_shown">"प्रतिलिपि गर्न वा सम्पादन गर्न फेरि ट्याप गर्नुहोस्"</string>
     <string name="token_adv_login_description">"यो एक उन्नत लगइन विधि हो। वेब पोर्टलको विकल्पको रूपमा, तपाईंले यहाँ आफ्नो लगइन टोकन सिधै प्रविष्ट गर्न वा अद्यावधिक गर्न सक्नुहुन्छ। उदाहरणका लागि, यसले धेरै उपकरणहरूमा लगइन गर्ने गति बढाउन सक्छ। कृपया ध्यान दिनुहोस् कि एपले पार्स गर्न असफल भएका कुनै पनि अवैध टोकन ढाँचाहरू स्वीकार गरिने छैन।"</string>
-    <string name="ytm_sync">"तपाईंको YouTube Music खातासँग स्वतः सिंक गर्नुहोस्"</string>
+    <string name="ytm_sync">"तपाईंको KuroMusic खातासँग स्वतः सिंक गर्नुहोस्"</string>
     <string name="general">"सामान्य जानकारी"</string>
     <string name="content_language">"पूर्वनिर्धारित सामग्री भाषा"</string>
     <string name="content_country">"पूर्वनिर्धारित सामग्री देश"</string>

@@ -33,7 +33,7 @@
 
     <!-- Search -->
     <string name="search">검색</string>
-    <string name="search_yt_music">YouTube Music 검색…</string>
+    <string name="search_yt_music">KuroMusic 검색…</string>
     <string name="search_library">라이브러리 검색…</string>
     <string name="filter_library">라이브러리</string>
     <string name="filter_liked">좋아요 표시함</string>

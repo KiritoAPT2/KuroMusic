@@ -45,7 +45,7 @@
 
     <!-- Search -->
     <string name="search">"Sök"</string>
-    <string name="search_yt_music">"Sök på YouTube Music..."</string>
+    <string name="search_yt_music">"Sök på KuroMusic..."</string>
     <string name="search_library">"Sök i biblioteket"</string>
     <string name="filter_library">"Bibliotek"</string>
     <string name="filter_liked">"Gillade"</string>
@@ -84,7 +84,7 @@
     <string name="remove_download_playlist_confirm">"Vill du verkligen ta bort alla \"%s\" låtar i spellistan från lagringsutrymmet för nedladdade låtar?"</string>
     <string name="delete_playlist_confirm">"Vill du verkligen ta bort spellistan \"%s\"?"</string>
     <string name="elements_selected">"%1$d objekt markerade"</string>
-    <string name="allows_for_sync_witch_youtube">"Obs! Detta möjliggör synkronisering med YouTube Music. Det kan inte ändras i efterhand."</string>
+    <string name="allows_for_sync_witch_youtube">"Obs! Detta möjliggör synkronisering med KuroMusic. Det kan inte ändras i efterhand."</string>
 
     <!-- Button -->
     <string name="retry">"Försök igen"</string>
@@ -293,7 +293,7 @@
     <string name="token_hidden">"Tryck för att visa token"</string>
     <string name="token_shown">"Tryck igen för att kopiera eller redigera"</string>
     <string name="token_adv_login_description">"Detta är en AVANCERAD inloggningsmetod. Som alternativ till webbportalen kan du ange eller uppdatera din inloggningstoken direkt här. Detta kan till exempel påskynda inloggning på flera enheter. Observera att appen avvisar ogiltiga tokenformat som den inte kan tolka."</string>
-    <string name="ytm_sync">"Automatisk synk med ditt YouTube Music-konto"</string>
+    <string name="ytm_sync">"Automatisk synk med ditt KuroMusic-konto"</string>
     <string name="general">"Allmänt"</string>
     <string name="content_language">"Standardinnehållsspråk"</string>
     <string name="content_country">"Standardinnehållsland"</string>

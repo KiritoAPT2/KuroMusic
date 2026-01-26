@@ -23,6 +23,7 @@
     <string name="forgotten_favorites">Forgotten favorites</string>
     <string name="similar_to">Similar to</string>
     <string name="keep_listening">Keep listening</string>
+    <string name="for_you">For You</string>
     <string name="your_ytb_playlists">Your Servicios account</string>
     <string name="animax_l_music_recommendations">🔥 Animax L Music Recomendaciones</string>
 
@@ -45,10 +46,11 @@
 
     <!-- Search -->
     <string name="search">Search</string>
-    <string name="search_yt_music">Search Música…</string>
+    <string name="search_yt_music">Search KuroMusic...</string>
     <string name="search_library">Search library…</string>
     <string name="filter_library">Library</string>
     <string name="filter_liked">Liked</string>
+    <string name="filter_downloads">Downloads</string>
     <string name="filter_downloaded">Downloaded</string>
     <string name="filter_all">All</string>
     <string name="filter_songs">Songs</string>

@@ -46,7 +46,7 @@
 
     <!-- Search -->
     <string name="search">"Recherche"</string>
-    <string name="search_yt_music">"Rechercher sur YouTube Music…"</string>
+    <string name="search_yt_music">"Rechercher sur KuroMusic…"</string>
     <string name="search_library">"Rechercher dans la Bibliothèque…"</string>
     <string name="filter_library">"Bibliothèque"</string>
     <string name="filter_liked">"Aimés"</string>
@@ -85,7 +85,7 @@
     <string name="remove_download_playlist_confirm">"Voulez-vous vraiment supprimer tous les titres de la playlist « %s » du stockage des titres téléchargés ?"</string>
     <string name="delete_playlist_confirm">"Voulez-vous vraiment supprimer la playlist « %s » ?"</string>
     <string name="elements_selected">"%1$d Éléments sélectionnés"</string>
-    <string name="allows_for_sync_witch_youtube">"Remarque : Ceci permet la synchronisation avec YouTube Music. Ce paramètre ne peut pas être modifié ultérieurement."</string>
+    <string name="allows_for_sync_witch_youtube">"Remarque : Ceci permet la synchronisation avec KuroMusic. Ce paramètre ne peut pas être modifié ultérieurement."</string>
 
     <!-- Button -->
     <string name="retry">"Réessayer"</string>
@@ -304,7 +304,7 @@
     <string name="token_hidden">"Appuyez pour afficher le jeton"</string>
     <string name="token_shown">"Appuyez à nouveau pour copier ou modifier"</string>
     <string name="token_adv_login_description">"Il s'agit d'une méthode de connexion avancée. Au lieu du portail web, vous pouvez saisir ou mettre à jour directement votre jeton de connexion ici. Cela peut par exemple accélérer la connexion sur plusieurs appareils. Veuillez noter que tout format de jeton non valide que l'application ne parvient pas à analyser ne sera pas accepté."</string>
-    <string name="ytm_sync">"Synchronisation automatique avec votre compte YouTube Music"</string>
+    <string name="ytm_sync">"Synchronisation automatique avec votre compte KuroMusic"</string>
     <string name="general">"Général"</string>
     <string name="content_language">"Langue du contenu par défaut"</string>
     <string name="content_country">"Pays de contenu par défaut"</string>

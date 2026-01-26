@@ -42,7 +42,7 @@
     <string name="continuous">Безперервно</string>
     <!-- Search -->
     <string name="search">Пошук</string>
-    <string name="search_yt_music">Пошук в YouTube Music…</string>
+    <string name="search_yt_music">Пошук в KuroMusic…</string>
     <string name="search_library">Пошук в бібліотеці…</string>
     <string name="filter_library">Бібліотека</string>
     <string name="filter_liked">Вподобані</string>
@@ -77,7 +77,7 @@
     <string name="remove_download_playlist_confirm">Ви справді бажаєте видалити всі пісні плейлиста \"%s\" зі сховища завантажених пісень?</string>
     <string name="delete_playlist_confirm">Ви справді бажаєте видалити плейлист \"%s\"?</string>
     <string name="elements_selected">%1$d Вибрано</string>
-    <string name="allows_for_sync_witch_youtube">Примітка: це дозволяє синхронізувати з YouTube Music. Цей параметр НЕ можна буде змінити пізніше.</string>
+    <string name="allows_for_sync_witch_youtube">Примітка: це дозволяє синхронізувати з KuroMusic. Цей параметр НЕ можна буде змінити пізніше.</string>
     <!-- Button -->
     <string name="retry">Повторити</string>
     <string name="radio">Радіо</string>
@@ -295,7 +295,7 @@
     <string name="token_hidden">Натисніть, щоб показати токен</string>
     <string name="token_shown">Натисніть ще раз, щоб скопіювати або редагувати</string>
     <string name="token_adv_login_description">Це РОЗШИРЕНИЙ метод входу. Як альтернативу вебпорталу, ви можете безпосередньо ввести або оновити свій токен для входу тут. Наприклад, це може прискорити вхід на кількох пристроях. Будь ласка, зауважте, що будь-які недійсні формати токенів, які додаток не зможе розпізнати, не будуть прийняті</string>
-    <string name="ytm_sync">Автоматично синхронізувати з вашим акаунтом YouTube Music</string>
+    <string name="ytm_sync">Автоматично синхронізувати з вашим акаунтом KuroMusic</string>
     <string name="general">Загальне</string>
     <string name="content_language">Мова контенту</string>
     <string name="content_country">Країна контенту</string>

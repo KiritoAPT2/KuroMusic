@@ -45,7 +45,7 @@
 
     <!-- Search -->
     <string name="search">"Cerca"</string>
-    <string name="search_yt_music">"Cerca al Youtube Music"</string>
+    <string name="search_yt_music">"Cerca al KuroMusic"</string>
     <string name="search_library">"Cerca a la biblioteca..."</string>
     <string name="filter_library">"Biblioteca"</string>
     <string name="filter_liked">"Agradat"</string>
@@ -84,7 +84,7 @@
     <string name="remove_download_playlist_confirm">"Segur que vols eliminar totes les \"%s\" cançons de l'emmagatzematge de cançons baixades?"</string>
     <string name="delete_playlist_confirm">"Segur que vols esborrar la llista de reproducció \"%s\"?"</string>
     <string name="elements_selected">"S'han seleccionat %1$d elements"</string>
-    <string name="allows_for_sync_witch_youtube">"Nota: això permet sincronitzar amb el Youtube Music i NO es pot modificar després."</string>
+    <string name="allows_for_sync_witch_youtube">"Nota: això permet sincronitzar amb el KuroMusic i NO es pot modificar després."</string>
 
     <!-- Button -->
     <string name="retry">"Torna a provar"</string>
@@ -294,7 +294,7 @@ Treu el m'agrada a tot"</string>
     <string name="token_hidden">"Toqueu per mostrar el token"</string>
     <string name="token_shown">"Torneu a tocar per a copiar o editar"</string>
     <string name="token_adv_login_description">"Aquest és un mètode d'inici de sessió AVANÇAT. Com a alternativa al portal web, podeu introduir o actualitzar directament el vostre token d'inici de sessió aquí. Per exemple, això pot accelerar l'inici de sessió en diversos dispositius. Tingueu en compte que no s'acceptaran els formats de token no vàlids que l'aplicació no pugui analitzar"</string>
-    <string name="ytm_sync">"Sincronitza automàticament amb el vostre compte de YouTube Music"</string>
+    <string name="ytm_sync">"Sincronitza automàticament amb el vostre compte de KuroMusic"</string>
     <string name="general">"General"</string>
     <string name="content_language">"Idioma predeterminat del contingut"</string>
     <string name="content_country">"País predeterminat del contingut"</string>

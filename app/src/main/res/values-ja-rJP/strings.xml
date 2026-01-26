@@ -44,7 +44,7 @@
 
     <!-- Search -->
     <string name="search">"検索"</string>
-    <string name="search_yt_music">"youtube musicを検索…"</string>
+    <string name="search_yt_music">"KuroMusicを検索…"</string>
     <string name="search_library">"ライブラリを検索…"</string>
     <string name="filter_library">"ライブラリ"</string>
     <string name="filter_liked">"いいねした"</string>
@@ -83,7 +83,7 @@
     <string name="remove_download_playlist_confirm">"ダウンロード済み楽曲のストレージからプレイリスト \"%s\" の楽曲をすべて削除しますか？"</string>
     <string name="delete_playlist_confirm">"プレイリスト \"%s\" を削除しますか？"</string>
     <string name="elements_selected">"%1$d個 選択済み"</string>
-    <string name="allows_for_sync_witch_youtube">"注意 : これを行うと Youtube Music と同期が行われます。この設定は後から変更できません。"</string>
+    <string name="allows_for_sync_witch_youtube">"注意 : これを行うと KuroMusic と同期が行われます。この設定は後から変更できません。"</string>
 
     <!-- Button -->
     <string name="retry">"再試行"</string>
@@ -282,7 +282,7 @@
     <string name="token_hidden">"タップしてトークンを表示します"</string>
     <string name="token_shown">"もう一度タップしてコピーもしくは編集します"</string>
     <string name="token_adv_login_description">"これは高度なログイン方法で、ウェブからログインする代わりに、ここでログインのトークンを直接入力することもできます。例えば、複数のデバイスからログインするときに使用できます。正しいトークンの形式でないと認識されません。"</string>
-    <string name="ytm_sync">"Youtube Musicと自動で同期します"</string>
+    <string name="ytm_sync">"KuroMusicと自動で同期します"</string>
     <string name="general">"一般"</string>
     <string name="content_language">"デフォルトの言語"</string>
     <string name="content_country">"デフォルトの国"</string>

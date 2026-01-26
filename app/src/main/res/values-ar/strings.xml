@@ -86,7 +86,7 @@
     <string name="playlist_is_empty">قائمة التشغيل فارغة</string>
     <string name="remove_download_playlist_confirm">هل تريد حقًا إزالة جميع أغاني قائمة التشغيل "%s" من مساحة الأغاني المحملة؟</string>
     <string name="delete_playlist_confirm">هل تريد حقًا حذف قائمة التشغيل "%s"؟</string>
-    <string name="allows_for_sync_witch_youtube">ملاحظة: يسمح هذا بالمزامنة مع YouTube Music. لا يمكن تغيير هذا لاحقًا.</string>
+    <string name="allows_for_sync_witch_youtube">ملاحظة: يسمح هذا بالمزامنة مع KuroMusic. لا يمكن تغيير هذا لاحقًا.</string>
     <string name="elements_selected">%1$d عنصر محدد</string>
 
     <!-- الازرار -->
@@ -356,7 +356,7 @@
     <string name="token_hidden">اضغط لعرض ال Token</string>
     <string name="token_shown">اضغط مرة أخرى للنسخ أو التعديل</string>
     <string name="token_adv_login_description">هذه طريقة تسجيل دخول متقدمة. كبديل للبوابة الإلكترونية، يمكنك إدخال أو تحديث رمز تسجيل الدخول الخاص بك هنا مباشرة. على سبيل المثال، يمكن أن يسرع ذلك عملية تسجيل الدخول على أجهزة متعددة. يرجى ملاحظة أن أي صيغة رمز غير صالحة لا يستطيع التطبيق تحليلها لن يتم قبولها</string>
-    <string name="ytm_sync">مزامنة تلقائية مع حساب YouTube Music الخاص بك</string>
+    <string name="ytm_sync">مزامنة تلقائية مع حساب KuroMusic الخاص بك</string>
     <string name="general">عام</string>
     <string name="content_language">لغة المحتوى الافتراضية</string>
     <string name="content_country">بلد المحتوى الافتراضي</string>
