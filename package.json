@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@np-dev/youtubei-js": "^8.0.0"
+  }
+}
