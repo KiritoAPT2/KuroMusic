@@ -9,7 +9,7 @@
   [![Kotlin](https://img.shields.io/badge/Kotlin-1.9-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
   [![License](https://img.shields.io/badge/License-GPLv3-000000?style=for-the-badge&logo=gnu-bash&logoColor=white)](LICENSE)
   [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/KuroMusic/KuroMusic/actions)
-  [![Downloads](https://img.shields.io/badge/Downloads-15%2B-purple?style=for-the-badge&logo=google-play&logoColor=white)](https://github.com/KuroMusic/KuroMusic/releases)
+  [![Downloads](https://img.shields.io/badge/Downloads-300%2B-purple?style=for-the-badge&logo=google-play&logoColor=white)](https://github.com/KuroMusic/KuroMusic/releases)
   
   [![Telegram](https://img.shields.io/badge/Telegram-Join%20Chat-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/KiritoAPT2)
 
