@@ -2,11 +2,10 @@ package com.kuromusic.innertube.models.response
 
 import com.kuromusic.innertube.models.ResponseContext
 import com.kuromusic.innertube.models.Thumbnails
-import androidx.annotation.Keep
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Keep
 @Serializable
 data class PlayerResponse(
     val responseContext: ResponseContext,

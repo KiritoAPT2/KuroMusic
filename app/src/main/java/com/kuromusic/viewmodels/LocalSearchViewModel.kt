@@ -58,11 +58,9 @@ class LocalSearchViewModel @Inject constructor(
             MediaStore.Audio.Media.ALBUM
         )
         // Strict filters + Search query
-        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0 AND " +
-                "${MediaStore.Audio.Media.DURATION} >= 45000 AND (" +
-                "${MediaStore.Audio.Media.MIME_TYPE} = 'audio/mpeg' OR " +
-                "${MediaStore.Audio.Media.MIME_TYPE} = 'audio/mp4' OR " +
-                "${MediaStore.Audio.Media.MIME_TYPE} = 'audio/x-m4a') AND (" +
+        val selection = "(${MediaStore.Audio.Media.IS_MUSIC} != 0 OR " +
+                "${MediaStore.Audio.Media.MIME_TYPE} LIKE 'audio/%') AND " +
+                "${MediaStore.Audio.Media.DURATION} >= 15000 AND (" +
                 "${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)"
 
         val searchArg = "%$query%"
@@ -179,7 +177,7 @@ class LocalSearchViewModel @Inject constructor(
         )
 
     companion object {
-        const val PREVIEW_SIZE = 3
+        const val PREVIEW_SIZE = 8
     }
 }
 

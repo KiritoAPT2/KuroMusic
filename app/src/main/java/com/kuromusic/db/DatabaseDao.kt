@@ -990,7 +990,7 @@ interface DatabaseDao {
     fun clearListenHistory()
 
     @Transaction
-    @Query("SELECT * FROM search_history WHERE `query` LIKE :query || '%' ORDER BY id DESC")
+    @Query("SELECT * FROM search_history WHERE `query` LIKE '%' || :query || '%' ORDER BY id DESC")
     fun searchHistory(query: String = ""): Flow<List<SearchHistory>>
 
     @Transaction

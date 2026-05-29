@@ -18,6 +18,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.kuromusic.BuildConfig
+import com.kuromusic.LocalPlayerConnection
+import com.kuromusic.ui.component.Lyrics
 import com.kuromusic.ui.screens.artist.ArtistItemsScreen
 import com.kuromusic.ui.screens.artist.ArtistScreen
 import com.kuromusic.ui.screens.artist.ArtistSongsScreen
@@ -243,6 +245,13 @@ fun NavGraphBuilder.navigationBuilder(
         YouTubeBrowseScreen(navController)
     }
 
+    composable("lyrics") {
+        val playerConnection = LocalPlayerConnection.current ?: return@composable
+        Lyrics(
+            sliderPositionProvider = { playerConnection.player.currentPosition },
+            onNavigateBack = { navController.popBackStack() }
+        )
+    }
 
     composable("settings") {
         val latestVersion by mutableLongStateOf(BuildConfig.VERSION_CODE.toLong())

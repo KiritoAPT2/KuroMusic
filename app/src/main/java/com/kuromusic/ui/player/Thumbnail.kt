@@ -69,6 +69,7 @@ import androidx.media3.common.Player
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import coil.size.Size
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.R
 import com.kuromusic.constants.PlayerBackgroundStyle
@@ -384,8 +385,7 @@ private fun AlbumArtItem(
             val imageModel = remember(item.mediaId) {
                 ImageRequest.Builder(context)
                     .data(item.mediaMetadata.artworkUri?.toString())
-                    .size(600)
-                    .precision(coil.size.Precision.EXACT)
+                    .size(Size.ORIGINAL)  // Let the CDN URL determine resolution (576×576 max quality)
                     .crossfade(true)
                     .memoryCachePolicy(CachePolicy.ENABLED)
                     .diskCachePolicy(CachePolicy.ENABLED)

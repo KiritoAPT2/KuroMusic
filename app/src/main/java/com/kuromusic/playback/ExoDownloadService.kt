@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Icon
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.offline.Download
@@ -45,31 +44,29 @@ class ExoDownloadService : DownloadService(
     override fun getForegroundNotification(
         downloads: MutableList<Download>,
         notMetRequirements: Int
-    ): Notification =
-        Notification.Builder.recoverBuilder(
-            this, downloadUtil.downloadNotificationHelper.buildProgressNotification(
-                this,
-                R.drawable.download,
-                null,
-                if (downloads.size == 1) Util.fromUtf8Bytes(downloads[0].request.data)
-                else resources.getQuantityString(R.plurals.n_song, downloads.size, downloads.size),
-                downloads,
-                notMetRequirements
-            )
-        ).addAction(
-            Notification.Action.Builder(
-                Icon.createWithResource(this, R.drawable.close),
-                getString(android.R.string.cancel),
-                PendingIntent.getService(
-                    this,
-                    0,
-                    Intent(this, ExoDownloadService::class.java).setAction(
-                        REMOVE_ALL_PENDING_DOWNLOADS
-                    ),
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-            ).build()
-        ).build()
+    ): Notification {
+        val contentText =
+            if (downloads.size == 1) Util.fromUtf8Bytes(downloads[0].request.data)
+            else resources.getQuantityString(R.plurals.n_song, downloads.size, downloads.size)
+
+        val cancelIntent = PendingIntent.getService(
+            this,
+            0,
+            Intent(this, ExoDownloadService::class.java).setAction(REMOVE_ALL_PENDING_DOWNLOADS),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Build using the helper, which already sets the proper notification channel,
+        // progress bar, and ongoing state required by FGS on Android 12+.
+        return downloadUtil.downloadNotificationHelper.buildProgressNotification(
+            this,
+            R.drawable.download,
+            cancelIntent,   // pass cancel intent directly as the notification action
+            contentText,
+            downloads,
+            notMetRequirements
+        )
+    }
 
 
     /**

@@ -47,7 +47,7 @@ constructor(
                         val result = YouTube.searchSuggestions(query).getOrNull()
                         database
                             .searchHistory(query)
-                            .map { it.take(3) }
+                            .map { it.take(5) }
                             .map { history ->
                                 SearchSuggestionViewState(
                                     history = history,

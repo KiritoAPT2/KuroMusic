@@ -151,6 +151,7 @@ import com.kuromusic.constants.ShowLyricsKey
 import com.kuromusic.constants.SliderStyle
 import com.kuromusic.constants.SliderStyleKey
 import com.kuromusic.constants.SmallButtonsShapeKey
+import me.saket.squiggles.SquigglySlider
 import com.kuromusic.extensions.togglePlayPause
 import com.kuromusic.extensions.toggleRepeatMode
 import com.kuromusic.models.MediaMetadata
@@ -176,7 +177,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import me.saket.squiggles.SquigglySlider
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
@@ -1238,40 +1238,105 @@ fun PlayerSlider(
         val sliderInteractionSource = remember { MutableInteractionSource() }
         val isSliderPressed by sliderInteractionSource.collectIsPressedAsState()
         
-        Slider(
-            value = progress,
-            valueRange = 0f..1f,
-            onValueChange = {
-                sliderPosition = (it * durationState.longValue).toLong()
-            },
-            onValueChangeFinished = {
-                sliderPosition?.let {
-                    playerConnection.player.seekTo(it)
-                    positionState.longValue = it
-                }
-                sliderPosition = null
-            },
-            interactionSource = sliderInteractionSource,
-            thumb = {
-                if (isSliderPressed) {
-                    SliderDefaults.Thumb(
-                        interactionSource = sliderInteractionSource,
-                        colors = SliderDefaults.colors(thumbColor = onBackgroundColor)
-                    )
-                }
-            },
-            track = { sliderState ->
-                SliderDefaults.Track(
-                    sliderState = sliderState,
-                    modifier = Modifier.height(2.dp),
+        when (sliderStyle) {
+            SliderStyle.DEFAULT -> {
+                Slider(
+                    value = progress,
+                    valueRange = 0f..1f,
+                    onValueChange = {
+                        sliderPosition = (it * durationState.longValue).toLong()
+                    },
+                    onValueChangeFinished = {
+                        sliderPosition?.let {
+                            playerConnection.player.seekTo(it)
+                            positionState.longValue = it
+                        }
+                        sliderPosition = null
+                    },
+                    interactionSource = sliderInteractionSource,
+                    thumb = {
+                        SliderDefaults.Thumb(
+                            interactionSource = sliderInteractionSource,
+                            colors = SliderDefaults.colors(thumbColor = onBackgroundColor)
+                        )
+                    },
+                    track = { sliderState ->
+                        SliderDefaults.Track(
+                            sliderState = sliderState,
+                            modifier = Modifier.height(4.dp),
+                            colors = SliderDefaults.colors(
+                                activeTrackColor = onBackgroundColor,
+                                inactiveTrackColor = onBackgroundColor.copy(alpha = 0.2f)
+                            ),
+                            thumbTrackGapSize = 0.dp
+                        )
+                    }
+                )
+            }
+            SliderStyle.SQUIGGLY -> {
+                val isPlaying by playerConnection.isPlaying.collectAsState()
+                SquigglySlider(
+                    value = progress,
+                    valueRange = 0f..1f,
+                    onValueChange = {
+                        sliderPosition = (it * durationState.longValue).toLong()
+                    },
+                    onValueChangeFinished = {
+                        sliderPosition?.let {
+                            playerConnection.player.seekTo(it)
+                            positionState.longValue = it
+                        }
+                        sliderPosition = null
+                    },
+                    interactionSource = sliderInteractionSource,
                     colors = SliderDefaults.colors(
                         activeTrackColor = onBackgroundColor,
-                        inactiveTrackColor = onBackgroundColor.copy(alpha = 0.2f)
+                        inactiveTrackColor = onBackgroundColor.copy(alpha = 0.2f),
+                        thumbColor = onBackgroundColor
                     ),
-                    thumbTrackGapSize = 0.dp
+                    squigglesSpec = SquigglySlider.SquigglesSpec(
+                        amplitude = if (isPlaying && !isSliderPressed) 3.dp else 0.dp,
+                        strokeWidth = 4.dp
+                    )
                 )
-            },
-        )
+            }
+            SliderStyle.SLIM -> {
+                Slider(
+                    value = progress,
+                    valueRange = 0f..1f,
+                    onValueChange = {
+                        sliderPosition = (it * durationState.longValue).toLong()
+                    },
+                    onValueChangeFinished = {
+                        sliderPosition?.let {
+                            playerConnection.player.seekTo(it)
+                            positionState.longValue = it
+                        }
+                        sliderPosition = null
+                    },
+                    interactionSource = sliderInteractionSource,
+                    thumb = {
+                        if (isSliderPressed) {
+                            SliderDefaults.Thumb(
+                                interactionSource = sliderInteractionSource,
+                                colors = SliderDefaults.colors(thumbColor = onBackgroundColor)
+                            )
+                        }
+                    },
+                    track = { sliderState ->
+                        SliderDefaults.Track(
+                            sliderState = sliderState,
+                            modifier = Modifier.height(2.dp),
+                            colors = SliderDefaults.colors(
+                                activeTrackColor = onBackgroundColor,
+                                inactiveTrackColor = onBackgroundColor.copy(alpha = 0.2f)
+                            ),
+                            thumbTrackGapSize = 0.dp
+                        )
+                    }
+                )
+            }
+        }
 
         Spacer(Modifier.height(4.dp))
 

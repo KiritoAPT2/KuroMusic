@@ -221,7 +221,7 @@ fun AboutScreen(
         )
 
         Text(
-            text = "v1.0.3-stable \uD83D\uDC8E",
+            text = "v1.0.5-stable \uD83D\uDC8E",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.tertiary
         )
@@ -308,7 +308,7 @@ fun AboutScreen(
 
         // Footer
         Text(
-            text = "KuroMusic v1.0.3-stable | Team Animax \u2764\ufe0f",
+            text = "KuroMusic v1.0.5-stable | Team Animax \u2764\ufe0f",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,

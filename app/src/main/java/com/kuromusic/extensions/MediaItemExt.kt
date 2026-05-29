@@ -5,6 +5,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
 import androidx.media3.common.MimeTypes
 import com.kuromusic.innertube.models.SongItem
+import com.kuromusic.innertube.models.upgradeToMaxQualityThumbnail
 import com.kuromusic.db.entities.Song
 import com.kuromusic.models.MediaMetadata
 import com.kuromusic.models.toMediaMetadata
@@ -23,7 +24,7 @@ fun Song.toMediaItem() =
                 .setTitle(this@toMediaItem.title)
                 .setSubtitle(this@toMediaItem.artists.joinToString { it.name })
                 .setArtist(this@toMediaItem.artists.joinToString { it.name })
-                .setArtworkUri(this@toMediaItem.thumbnailUrl?.toUri())
+                .setArtworkUri(this@toMediaItem.thumbnailUrl?.upgradeToMaxQualityThumbnail()?.toUri())
                 .setAlbumTitle(this@toMediaItem.album?.title)
                 .setMediaType(MEDIA_TYPE_MUSIC)
                 .apply {
@@ -47,7 +48,7 @@ fun SongItem.toMediaItem() =
                 .setTitle(this@toMediaItem.title)
                 .setSubtitle(this@toMediaItem.artists.joinToString { it.name })
                 .setArtist(this@toMediaItem.artists.joinToString { it.name })
-                .setArtworkUri(this@toMediaItem.thumbnail.toUri())
+                .setArtworkUri(this@toMediaItem.thumbnail.upgradeToMaxQualityThumbnail().toUri())
                 .setAlbumTitle(this@toMediaItem.album?.name)
                 .build()
         )
@@ -65,10 +66,11 @@ fun MediaMetadata.toMediaItem() =
                 .setTitle(this@toMediaItem.title)
                 .setSubtitle(this@toMediaItem.artists.joinToString { it.name })
                 .setArtist(this@toMediaItem.artists.joinToString { it.name })
-                .setArtworkUri(this@toMediaItem.thumbnailUrl?.toUri())
+                .setArtworkUri(this@toMediaItem.thumbnailUrl?.upgradeToMaxQualityThumbnail()?.toUri())
                 .setAlbumTitle(this@toMediaItem.album?.title)
                 .setMediaType(MEDIA_TYPE_MUSIC)
                 .build()
         )
         .setMimeType(if (this@toMediaItem.id.endsWith(".m4a", true)) MimeTypes.AUDIO_MP4 else null)
         .build()
+

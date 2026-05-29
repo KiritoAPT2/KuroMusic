@@ -431,6 +431,8 @@ class MusicService :
                                 launch { // Concurrent launch
                                     try {
                                         val nextId = item.mediaId
+                                        // Skip local files — no YouTube resolution needed
+                                        if (nextId.startsWith("content://") || nextId.startsWith("file://")) return@launch
                                         Timber.d("🚀 Pre-fetching next song ($nextId) in background")
                                         val result = YTPlayerUtils.playerResponseForPlayback(
                                             videoId = nextId,
@@ -675,6 +677,7 @@ class MusicService :
         mediaId: String,
         playbackData: YTPlayerUtils.PlaybackData? = null
     ) {
+        if (mediaId.startsWith("content://") || mediaId.startsWith("file://")) return
         val song = database.song(mediaId).first()
         val mediaMetadata = withContext(Dispatchers.Main.immediate) {
             player.findNextMediaItemById(mediaId)?.metadata
@@ -796,7 +799,10 @@ class MusicService :
 
         scope.launch(SilentHandler) {
             val radioQueue = YouTubeQueue(
-                endpoint = WatchEndpoint(videoId = currentMediaMetadata.id)
+                endpoint = WatchEndpoint(
+                    videoId = currentMediaMetadata.id,
+                    playlistId = "RDAMVM${currentMediaMetadata.id}"
+                )
             )
             val initialStatus = radioQueue.getInitialStatus()
 
@@ -1171,21 +1177,23 @@ class MusicService :
                     val lastItem = player.getMediaItemAt(player.mediaItemCount - 1)
                     val lastMetadata = lastItem.metadata
                     lastMetadata?.id?.let { videoId ->
-                        val nextResult = YouTube.next(WatchEndpoint(videoId = videoId)).getOrNull()
-                        nextResult?.items?.let { items ->
-                            val mediaItems = items.map { it.toMediaItem() }
-                                .filterExplicit(dataStore.get(HideExplicitKey, false))
-                            if (player.playbackState != STATE_IDLE) {
-                                // Add to player
-                                player.addMediaItems(mediaItems)
-                                // Note: currentQueue is still the old queue, future pages won't load unless we switch queue or keep doing this.
-                                // Ideal: switch to YouTubeQueue(endpoint = nextResult.endpoint).
-                                // But changing currentQueue reference might be tricky here.
-                                // For now this ensures "infinite" for at least one batch.
-                                // If we want true infinite, we should update currentQueue?
-                                // currentQueue is likely a var in Service.
-                                // I'll check if I can assign it.
-                                // If I can't seeing the code, I'll stick to appending.
+                        if (!videoId.startsWith("content://") && !videoId.startsWith("file://")) {
+                            // Use RDAMVM playlist ID to get genre-aware recommendations instead of random songs
+                            val radioEndpoint = WatchEndpoint(
+                                videoId = videoId,
+                                playlistId = "RDAMVM$videoId"
+                            )
+                            val nextResult = YouTube.next(radioEndpoint).getOrNull()
+                            nextResult?.items?.let { items ->
+                                val mediaItems = items.drop(1).map { it.toMediaItem() }
+                                    .filterExplicit(dataStore.get(HideExplicitKey, false))
+                                if (player.playbackState != STATE_IDLE) {
+                                    player.addMediaItems(mediaItems)
+                                    // Switch to a proper YouTubeQueue so future pages keep loading related songs
+                                    currentQueue = YouTubeQueue(
+                                        endpoint = nextResult.endpoint ?: radioEndpoint
+                                    )
+                                }
                             }
                         }
                     }
@@ -1365,10 +1373,11 @@ class MusicService :
 
 
     private suspend fun preparePlayback(mediaId: String): YTPlayerUtils.PlaybackData? {
+        // Skip local files — they don't need YouTube stream resolution
+        if (mediaId.startsWith("content://") || mediaId.startsWith("file://")) return null
         return withContext(Dispatchers.IO) {
             try {
-                // Check cache first
-                 // Check cache first (including expiry)
+                // Check cache first (including expiry)
                 playbackCache[mediaId]?.let { cached ->
                     if (cached.streamExpiresInSeconds * 1000L > System.currentTimeMillis()) {
                         return@withContext cached
@@ -1449,8 +1458,16 @@ class MusicService :
                 .build()
         ).setDefaultRequestProperties(mapOf("User-Agent" to "Kuromusic/1.0"))
 
-        return ResolvingDataSource.Factory(okHttpFactory) { dataSpec ->
+        val defaultFactory = DefaultDataSource.Factory(this, okHttpFactory)
+
+        val resolvingFactory = ResolvingDataSource.Factory(defaultFactory) { dataSpec ->
             val mediaId = dataSpec.key ?: return@Factory dataSpec
+
+            // Bypass YouTube stream resolution for local media
+            if (mediaId.startsWith("content://") || mediaId.startsWith("file://")) {
+                return@Factory dataSpec
+            }
+
             var cached = playbackCache[mediaId]
             
             // Proactive resolution if not in cache or expired
@@ -1468,9 +1485,76 @@ class MusicService :
             }
 
             if (cached != null) {
-                 return@Factory dataSpec.withUri(cached.streamUrl.toUri())
+                 val contentLen = cached.format.contentLength
+                 val builder = dataSpec.buildUpon().setUri(cached.streamUrl.toUri())
+                 if (dataSpec.length == -1L && contentLen != null && contentLen > 0) {
+                     builder.setLength(contentLen)
+                 }
+                 return@Factory builder.build()
             }
             dataSpec
+        }
+
+        // Cache for general playback streaming (temporary cache)
+        val playerCacheFactory = CacheDataSource.Factory()
+            .setCache(playerCache)
+            .setUpstreamDataSourceFactory(resolvingFactory)
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+
+        // Cache for downloaded songs (persistent cache, read-only during playback)
+        val downloadCacheFactory = CacheDataSource.Factory()
+            .setCache(downloadCache)
+            .setUpstreamDataSourceFactory(resolvingFactory) // Use resolvingFactory as upstream directly!
+            .setCacheWriteDataSinkFactory(null) // Prevent writing streaming audio to downloads
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+
+        // Composite / Hybrid Factory to prevent nested CacheDataSource issues
+        return DataSource.Factory {
+            val downloadDataSource = downloadCacheFactory.createDataSource()
+            val playerDataSource = playerCacheFactory.createDataSource()
+            
+            object : DataSource {
+                private var activeDataSource: DataSource? = null
+                
+                override fun addTransferListener(transferListener: androidx.media3.datasource.TransferListener) {
+                    downloadDataSource.addTransferListener(transferListener)
+                    playerDataSource.addTransferListener(transferListener)
+                }
+                
+                override fun open(dataSpec: androidx.media3.datasource.DataSpec): Long {
+                    val mediaId = dataSpec.key
+                    val isDownloaded = if (mediaId != null) {
+                        downloadCache.keys.contains(mediaId)
+                    } else {
+                        false
+                    }
+                    
+                    val dataSource = if (isDownloaded) {
+                        downloadDataSource
+                    } else {
+                        playerDataSource
+                    }
+                    activeDataSource = dataSource
+                    return dataSource.open(dataSpec)
+                }
+                
+                override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+                    return activeDataSource!!.read(buffer, offset, length)
+                }
+                
+                override fun getUri(): android.net.Uri? {
+                    return activeDataSource?.getUri()
+                }
+                
+                override fun getResponseHeaders(): Map<String, List<String>> {
+                    return activeDataSource?.getResponseHeaders() ?: emptyMap()
+                }
+                
+                override fun close() {
+                    activeDataSource?.close()
+                    activeDataSource = null
+                }
+            }
         }
     }
 

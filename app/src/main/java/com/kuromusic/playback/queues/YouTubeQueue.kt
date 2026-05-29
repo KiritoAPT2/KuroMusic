@@ -14,6 +14,13 @@ class YouTubeQueue(
 ) : Queue {
     private var continuation: String? = null
 
+    init {
+        if (endpoint.playlistId.isNullOrEmpty() && !endpoint.videoId.isNullOrEmpty()) {
+            endpoint = endpoint.copy(playlistId = "RDAMVM${endpoint.videoId}")
+        }
+    }
+
+
     override suspend fun getInitialStatus(): Queue.Status {
         val nextResult =
             withContext(IO) {
@@ -41,6 +48,12 @@ class YouTubeQueue(
     }
 
     companion object {
-        fun radio(song: MediaMetadata) = YouTubeQueue(WatchEndpoint(song.id), song)
+        fun radio(song: MediaMetadata) = YouTubeQueue(
+            WatchEndpoint(
+                videoId = song.id,
+                playlistId = "RDAMVM${song.id}"
+            ),
+            song
+        )
     }
 }

@@ -679,7 +679,7 @@ fun SettingsScreen(
 
         // Footer
         Text(
-            text = "KuroMusic v1.0.3-stable | Team Animax ❤️",
+            text = "KuroMusic v1.0.5-stable | Team Animax ❤️",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,

@@ -19,7 +19,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import java.net.Proxy
 import java.util.*
-import com.kuromusic.BuildConfig
+
 
 class InnerTube {
     private var httpClient = createClient()
@@ -244,7 +244,7 @@ class InnerTube {
         client: YouTubeClient,
         videoId: String,
     ) = httpClient.post("https://music.youtube.com/youtubei/v1/get_transcript") {
-        parameter("key", BuildConfig.INNER_TUBE_API_KEY)
+        parameter("key", "***REDACTED_API_KEY***")
         headers {
             append("Content-Type", "application/json")
         }

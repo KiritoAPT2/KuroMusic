@@ -1242,17 +1242,20 @@ class MainActivity : ComponentActivity() {
                     }
 
                         // BottomSheetPlayer - DEBE SER EL ÚLTIMO ELEMENTO DEL BoxWithConstraints
-                        BottomSheetPlayer(
-                            state = playerBottomSheetState,
-                            navController = navController,
-                            onOpenFullscreenLyrics = {
-                                navController.navigate("lyrics")
-                            },
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .zIndex(15f),
-                            dynamicColor = animatedDynamicColor
-                        )
+                        if (navBackStackEntry?.destination?.route != "lyrics") {
+                            BottomSheetPlayer(
+                                state = playerBottomSheetState,
+                                navController = navController,
+                                onOpenFullscreenLyrics = {
+                                    playerBottomSheetState.collapseSoft()
+                                    navController.navigate("lyrics")
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .zIndex(15f),
+                                dynamicColor = animatedDynamicColor
+                            )
+                        }
 
                         // DARK GRADIENT PROTECTION for NavigationBar (Premium bottom scrim - Visually tied to NavBar)
                         AnimatedVisibility(

@@ -1011,6 +1011,25 @@ fun Lyrics(
                             }
                         }
                     }
+
+                    if (isFullscreen) {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 8.dp, top = 8.dp)
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(textBackgroundColor.copy(alpha = 0.1f))
+                                .clickable { onNavigateBack?.invoke() },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.arrow_back),
+                                contentDescription = null,
+                                tint = textBackgroundColor,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 }
             }
             Column(

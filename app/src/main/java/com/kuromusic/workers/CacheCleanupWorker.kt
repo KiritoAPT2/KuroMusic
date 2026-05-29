@@ -22,6 +22,11 @@ class CacheCleanupWorker(
             var reclaimedBytes = 0L
 
             cacheDir.walkTopDown().forEach { file ->
+                // Avoid deleting files inside ExoPlayer or Media cache to prevent corrupting ExoPlayer's SimpleCache
+                if (file.absolutePath.contains("/media/") || file.absolutePath.contains("\\media\\") ||
+                    file.absolutePath.contains("/exoplayer/") || file.absolutePath.contains("\\exoplayer\\")) {
+                    return@forEach
+                }
                 if (file.isFile && file.lastModified() < cutoff) {
                     val size = file.length()
                     if (file.delete()) {
