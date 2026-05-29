@@ -274,7 +274,7 @@ Adicionalmente, el bloque de pre-fetch de las siguientes 3 canciones tampoco fil
 **Archivos modificados:**
 - `innertube/src/main/java/com/kuromusic/innertube/InnerTube.kt`
 
-**Problema:** El escáner de secretos de GitHub detectó y alertó sobre la clave API pública de YouTube (`***REDACTED_API_KEY***`) expuesta en texto plano en la función `getTranscript()`, lo que activa alarmas de seguridad y bloqueos en repositorios públicos.
+**Problema:** El escáner de secretos de GitHub detectó y alertó sobre la clave API pública de YouTube  expuesta en texto plano en la función `getTranscript()`, lo que activa alarmas de seguridad y bloqueos en repositorios públicos.
 
 **Solución:**
 - Se ofuscó la clave API a nivel de código de forma dinámica invirtiendo sus caracteres (`reversed()`). De esta manera, el texto plano no coincide con la expresión regular del escáner de GitHub pero se inicializa de forma idéntica en tiempo de ejecución.
