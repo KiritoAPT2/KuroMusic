@@ -160,15 +160,13 @@ dependencies {
     implementation(libs.graphics.shapes)
     implementation(libs.work.runtime.ktx)
     implementation(libs.constraintlayout)
-    implementation(libs.itextg)
-    implementation(libs.mpandroidchart)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 
     implementation(libs.apache.lang3)
 
     implementation(libs.hilt)
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation("org.jsoup:jsoup:1.22.2")
     ksp(libs.hilt.compiler)
 
     implementation(projects.innertube)
@@ -182,5 +180,4 @@ dependencies {
     coreLibraryDesugaring(libs.desugaring)
 
     implementation(libs.timber)
-    implementation("org.slf4j:slf4j-nop:2.0.7")
 }
