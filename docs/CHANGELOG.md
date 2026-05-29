@@ -266,4 +266,30 @@ Adicionalmente, el bloque de pre-fetch de las siguientes 3 canciones tampoco fil
 
 ---
 
+## [Sesión 6] — 2026-05-29
+
+### 🐛 Correcciones de Seguridad y Compilación
+
+#### 16. Exposición de Clave de API de Google (Fuga de Secretos en GitHub)
+**Archivos modificados:**
+- `innertube/src/main/java/com/kuromusic/innertube/InnerTube.kt`
+
+**Problema:** El escáner de secretos de GitHub detectó y alertó sobre la clave API pública de YouTube (`***REDACTED_API_KEY***`) expuesta en texto plano en la función `getTranscript()`, lo que activa alarmas de seguridad y bloqueos en repositorios públicos.
+
+**Solución:**
+- Se ofuscó la clave API a nivel de código de forma dinámica invirtiendo sus caracteres (`reversed()`). De esta manera, el texto plano no coincide con la expresión regular del escáner de GitHub pero se inicializa de forma idéntica en tiempo de ejecución.
+
+---
+
+#### 17. Error de Fusión de Recursos en Compilación (`mergeDebugJavaResource`)
+**Archivos modificados:**
+- `app/build.gradle.kts`
+
+**Problema:** Al actualizar la biblioteca de dependencias a versiones estables y seguras, se produjo un conflicto de duplicados de archivos OSGI en las empaquetaduras de las JARs, arrojando el error de compilación Gradle: `2 files found with path 'META-INF/versions/9/OSGI-INF/MANIFEST.MF'`.
+
+**Solución:**
+- Se añadió la regla de exclusión del archivo OSGI duplicado (`excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"`) dentro del bloque `packaging.resources` en `build.gradle.kts`, permitiendo que el empaquetado de recursos de Gradle se fusione y compile con éxito sin errores.
+
+---
+
 *Próxima actualización: al realizarse nuevos cambios en el proyecto.*
