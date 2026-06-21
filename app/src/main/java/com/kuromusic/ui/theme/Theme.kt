@@ -42,28 +42,30 @@ fun KuroMusicTheme(
     val context = LocalContext.current
 
     val colorScheme = remember(darkTheme, pureBlack, themeColor, enableDynamicTheme) {
-        val baseScheme = if (enableDynamicTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (darkTheme) {
-                dynamicDarkColorScheme(context)
-            } else {
-                dynamicLightColorScheme(context)
-            }
+        val baseScheme = if (enableDynamicTheme && themeColor != DefaultThemeColor) {
+            // Album art disponible: generar scheme completo desde la carátula (textos incluidos)
+            SchemeTonalSpot(Hct.fromInt(themeColor.toArgb()), darkTheme, 0.0)
+                .toColorScheme()
+        } else if (enableDynamicTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Fallback: wallpaper del sistema mientras no hay carátula
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         } else {
+            // No dinámico: usar themeColor normalmente
             SchemeTonalSpot(Hct.fromInt(themeColor.toArgb()), darkTheme, 0.0)
                 .toColorScheme()
         }
 
-        // Equilibrar colores para que no sean azules, sino que tiendan al púrpura si no es dinámico
-        val balancedScheme = if (!enableDynamicTheme || themeColor != DefaultThemeColor) {
+        // Si el scheme ya viene del album art, dejar que los colores fluyan sin forzar púrpura
+        val balancedScheme = if (enableDynamicTheme && themeColor != DefaultThemeColor) {
+            baseScheme
+        } else {
             baseScheme.copy(
                 secondary = if (darkTheme) Color(0xFFD0BCFF) else Color(0xFF6750A4),
                 tertiary = if (darkTheme) Color(0xFFEFB8C8) else Color(0xFF7D5260),
                 outline = if (darkTheme) Color(0xFF938F99) else Color(0xFF79747E),
-                onSurfaceVariant = if (darkTheme) Color(0xFFD0BCFF) else Color(0xFF6750A4), // Textos secundarios en Púrpura
+                onSurfaceVariant = if (darkTheme) Color(0xFFD0BCFF) else Color(0xFF6750A4),
                 surfaceVariant = if (darkTheme) Color(0xFF49454F) else Color(0xFFE7E0EC)
             )
-        } else {
-            baseScheme
         }
 
         balancedScheme.pureBlack(pureBlack, darkTheme)

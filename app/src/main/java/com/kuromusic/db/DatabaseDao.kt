@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.RewriteQueriesToDropUnusedColumns
-import androidx.room.RoomWarnings
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
@@ -60,7 +59,6 @@ import java.time.ZoneOffset
 import java.util.Locale
 
 @Dao
-@SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
 interface DatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(songHistory: SongHistory)
@@ -74,6 +72,9 @@ interface DatabaseDao {
 
     @Query("DELETE FROM song_history WHERE songId = :songId")
     suspend fun deleteSongHistory(songId: String)
+
+    @Query("DELETE FROM song_history WHERE timestamp < :cutoffTimestamp")
+    suspend fun deleteSongHistoryOlderThan(cutoffTimestamp: Long)
 
     @Transaction
     @Query("DELETE FROM song_history WHERE songId NOT IN (SELECT id FROM song)")
@@ -667,6 +668,31 @@ interface DatabaseDao {
 
     @Query("SELECT genre FROM song WHERE genre IS NOT NULL GROUP BY genre ORDER BY COUNT(*) DESC LIMIT :limit")
     fun getTopGenres(limit: Int = 3): Flow<List<String>>
+
+    @Query("SELECT DISTINCT songId FROM event ORDER BY timestamp DESC LIMIT :limit")
+    fun getRecentPlayedIds(limit: Int = 100): Flow<List<String>>
+
+    @Transaction
+    @Query("""
+        SELECT DISTINCT song.* FROM song 
+        WHERE song.genre IN (:genres)
+        AND song.id NOT IN (:excludeIds)
+        AND song.genre IS NOT NULL AND song.genre != ''
+        ORDER BY song.totalPlayTime DESC 
+        LIMIT :limit
+    """)
+    fun getSongsFromGenres(genres: List<String>, excludeIds: List<String>, limit: Int = 30): Flow<List<Song>>
+
+    @Transaction
+    @Query("""
+        SELECT DISTINCT song.* FROM song 
+        WHERE song.genre IN (:genres)
+        AND song.id NOT IN (SELECT DISTINCT songId FROM event)
+        AND song.genre IS NOT NULL AND song.genre != ''
+        ORDER BY song.totalPlayTime DESC 
+        LIMIT :limit
+    """)
+    fun getUnplayedSongsFromGenres(genres: List<String>, limit: Int = 15): Flow<List<Song>>
 
     @Query("UPDATE artist SET songCount = :count WHERE id = :artistId")
     suspend fun setArtistSongCount(artistId: String, count: Int)

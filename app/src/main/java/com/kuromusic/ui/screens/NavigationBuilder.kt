@@ -41,6 +41,7 @@ import com.kuromusic.ui.screens.settings.PlayerSettings
 import com.kuromusic.ui.screens.settings.PrivacySettings
 import com.kuromusic.ui.screens.settings.SettingsScreen
 import com.kuromusic.ui.screens.settings.StorageSettings
+import com.kuromusic.ui.screens.WelcomeScreen
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SuppressLint("UnrememberedMutableState")
@@ -50,6 +51,9 @@ fun NavGraphBuilder.navigationBuilder(
     scrollBehavior: TopAppBarScrollBehavior,
     latestVersionName: String,
 ) {
+    composable("welcome") {
+        WelcomeScreen(navController)
+    }
     composable(Screens.Home.route) {
         HomeScreen(navController)
     }

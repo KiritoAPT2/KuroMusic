@@ -28,8 +28,8 @@ android {
         applicationId = "com.kuromusic"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0.5"
+        versionCode = 6
+        versionName = "1.0.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "KuroMusic-Master")
 
@@ -154,7 +154,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.blurry)
     implementation(libs.material.ripple)
-    implementation(libs.room.runtime.android)
     implementation(libs.material.icons.extended)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
@@ -167,7 +166,7 @@ dependencies {
     implementation(libs.apache.lang3)
 
     implementation(libs.hilt)
-    implementation("org.jsoup:jsoup:1.22.2")
+    implementation(libs.jsoup)
     ksp(libs.hilt.compiler)
 
     implementation(projects.innertube)

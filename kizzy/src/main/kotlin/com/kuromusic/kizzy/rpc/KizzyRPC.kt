@@ -31,6 +31,15 @@ import org.json.JSONObject
 open class KizzyRPC(token: String) {
     private val kizzyRepository = KizzyRepository()
     private val discordWebSocket = DiscordWebSocket(token)
+    private var lastActivityTime = 0L
+    private val minActivityInterval = 5000L
+
+    private fun canSendActivity(): Boolean {
+        val now = System.currentTimeMillis()
+        if (now - lastActivityTime < minActivityInterval) return false
+        lastActivityTime = now
+        return true
+    }
 
     fun closeRPC() {
         discordWebSocket.close()
@@ -96,11 +105,13 @@ open class KizzyRPC(token: String) {
                     url = streamUrl
                 )
             ),
-            afk = true,
+            afk = false,
             since = since,
             status = status ?: "online"
         )
-        discordWebSocket.sendActivity(presence)
+        if (canSendActivity()) {
+            discordWebSocket.sendActivity(presence)
+        }
     }
 
     enum class Type(val value: Int) {

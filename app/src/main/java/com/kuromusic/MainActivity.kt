@@ -24,7 +24,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -33,6 +32,7 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
@@ -222,6 +222,8 @@ import com.kuromusic.ui.theme.extractThemeColor
 import com.kuromusic.ui.utils.appBarScrollBehavior
 import com.kuromusic.ui.utils.backToMain
 import com.kuromusic.ui.utils.resetHeightOffset
+import com.kuromusic.ui.screens.settings.UpdateDownloadDialog
+import com.kuromusic.constants.LastSeenVersionCodeKey
 import com.kuromusic.utils.SyncUtils
 // import com.kuromusic.utils.Updater
 import com.kuromusic.utils.UpdateChecker
@@ -403,31 +405,9 @@ class MainActivity : ComponentActivity() {
 
             if (showUpdateDialog != null) {
                 val updateInfo = showUpdateDialog!!
-                AlertDialog(
-                    onDismissRequest = { showUpdateDialog = null },
-                    icon = { Icon(painterResource(R.drawable.update), null) },
-                    title = { Text("Nueva versión: ${updateInfo.version}") }, // Using hardcoded or context strings if preferred
-                    text = { Text("¿Descargar actualización ahora?") },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                showUpdateDialog = null
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(updateInfo.apkUrl))
-                                    startActivity(intent)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                        ) {
-                            Text("Sí, Descargar")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showUpdateDialog = null }) {
-                            Text(stringResource(R.string.close))
-                        }
-                    }
+                UpdateDownloadDialog(
+                    latestVersion = updateInfo.version,
+                    onDismiss = { showUpdateDialog = null }
                 )
             }
 
@@ -516,8 +496,6 @@ class MainActivity : ComponentActivity() {
 
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val (previousTab) = rememberSaveable { mutableStateOf("home") }
-
                     val navigationItems = remember { Screens.MainScreens }
                     val (slimNav) = rememberPreference(SlimNavBarKey, defaultValue = false)
                     val defaultOpenTab =
@@ -532,6 +510,17 @@ class MainActivity : ComponentActivity() {
                                 else -> null
                             }
                         }
+
+                    val (lastSeenVersionCode) = rememberPreference(LastSeenVersionCodeKey, defaultValue = 0)
+                    LaunchedEffect(Unit) {
+                        if (lastSeenVersionCode < BuildConfig.VERSION_CODE) {
+                            navController.navigate("welcome") {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
 
                     val topLevelScreens =
                         listOf(
@@ -1089,30 +1078,6 @@ class MainActivity : ComponentActivity() {
                                 .background(MaterialTheme.colorScheme.surface),
                             contentWindowInsets = WindowInsets(0, 0, 0, 0)
                         ) {
-                            var transitionDirection =
-                                AnimatedContentTransitionScope.SlideDirection.Left
-
-                            if (navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route }) {
-                                if (navigationItems.fastAny { it.route == previousTab }) {
-                                    val curIndex = navigationItems.indexOf(
-                                        navigationItems.fastFirstOrNull {
-                                            it.route == navBackStackEntry?.destination?.route
-                                        }
-                                    )
-
-                                    val prevIndex = navigationItems.indexOf(
-                                        navigationItems.fastFirstOrNull {
-                                            it.route == previousTab
-                                        }
-                                    )
-
-                                    if (prevIndex > curIndex)
-                                        AnimatedContentTransitionScope.SlideDirection.Right.also {
-                                            transitionDirection = it
-                                        }
-                                }
-                            }
-
                             NavHost(
                                 navController = navController,
                                 startDestination = when (tabOpenedFromShortcut ?: defaultOpenTab) {
@@ -1257,7 +1222,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // DARK GRADIENT PROTECTION for NavigationBar (Premium bottom scrim - Visually tied to NavBar)
+                        // DARK GRADIENT PROTECTION for NavigationBar (Tinted with dynamic color)
                         AnimatedVisibility(
                             visible = shouldShowNavigationBar,
                             modifier = Modifier
@@ -1266,25 +1231,32 @@ class MainActivity : ComponentActivity() {
                             enter = fadeIn(),
                             exit = fadeOut()
                         ) {
+                            val scrimColors = if (enableDynamicTheme) {
+                                listOf(
+                                    Color.Transparent,
+                                    animatedDynamicColor.copy(alpha = 0.06f),
+                                    animatedDynamicColor.copy(alpha = 0.1f),
+                                    Color.Black.copy(alpha = 0.5f),
+                                    Color.Black.copy(alpha = 0.75f)
+                                )
+                            } else {
+                                listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.15f),
+                                    Color.Black.copy(alpha = 0.35f),
+                                    Color.Black.copy(alpha = 0.55f),
+                                    Color.Black.copy(alpha = 0.75f)
+                                )
+                            }
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(140.dp)
-                                    .background(
-                                        Brush.verticalGradient(
-                                            colors = listOf(
-                                                Color.Transparent,
-                                                Color.Black.copy(alpha = 0.2f),
-                                                Color.Black.copy(alpha = 0.5f),
-                                                Color.Black.copy(alpha = 0.8f),
-                                                Color.Black.copy(alpha = 0.95f) // Slightly reduced from solid
-                                            )
-                                        )
-                                    )
+                                    .background(Brush.verticalGradient(colors = scrimColors))
                             )
                         }
 
-                        // NAVBAR - Transparent with white icons
+                        // NAVBAR - Slim mode support, animated underline, dynamic color tint
                         AnimatedVisibility(
                             visible = shouldShowNavigationBar,
                             modifier = Modifier
@@ -1293,48 +1265,94 @@ class MainActivity : ComponentActivity() {
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
                         ) {
-                            // NavigationBar transparent - icons always white for visibility
-                            // NavigationBar transparent container
+                            val navHeight = if (slimNav) 48.dp else 64.dp
+                            val navHPad = if (slimNav) 12.dp else 24.dp
+                            val navBPad = if (slimNav) 8.dp else 12.dp
+
                             NavigationBar(
                                 modifier = Modifier
-                                    .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
-                                    .height(64.dp)
+                                    .padding(start = navHPad, end = navHPad, bottom = navBPad + bottomInsetDp)
+                                    .height(navHeight)
                                     .clip(RoundedCornerShape(50.dp)),
-                                    containerColor = Color.Transparent,
-                                    tonalElevation = 0.dp,
-                                    windowInsets = WindowInsets(0, 0, 0, 0)
-                                ) {
-                                    navigationItems.fastForEach { screen ->
-                                        val selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
-                                        NavigationBarItem(
-                                            selected = selected,
-                                            onClick = { navigateToScreen(navController, screen) },
-                                            icon = {
+                                containerColor = Color.Transparent,
+                                tonalElevation = 0.dp,
+                                windowInsets = WindowInsets(0, 0, 0, 0)
+                            ) {
+                                navigationItems.fastForEach { screen ->
+                                    val selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
+
+                                    val iconScale by animateFloatAsState(
+                                        targetValue = if (selected) 1f else 0.85f,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessMedium
+                                        ),
+                                        label = "navIconScale"
+                                    )
+
+                                    val underlineWidth by animateDpAsState(
+                                        targetValue = if (selected) 20.dp else 0.dp,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessMedium
+                                        ),
+                                        label = "navUnderline"
+                                    )
+
+                                    val iconColor = if (enableDynamicTheme) animatedDynamicColor else Color.White
+                                    val iconAlpha = if (selected) 1f else 0.6f
+
+                                    NavigationBarItem(
+                                        selected = selected,
+                                        onClick = { navigateToScreen(navController, screen) },
+                                        icon = {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
                                                 Icon(
                                                     painter = painterResource(
                                                         if (selected) screen.iconIdActive else screen.iconIdInactive
                                                     ),
-                                                    contentDescription = null
+                                                    contentDescription = stringResource(screen.titleId),
+                                                    tint = iconColor.copy(alpha = iconAlpha),
+                                                    modifier = Modifier
+                                                        .size(if (slimNav) 20.dp else 24.dp)
+                                                        .scale(iconScale)
                                                 )
-                                            },
-                                            label = {
+                                                Spacer(modifier = Modifier.height(if (slimNav) 2.dp else 4.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .width(underlineWidth)
+                                                        .height(2.dp)
+                                                        .clip(RoundedCornerShape(1.dp))
+                                                        .background(iconColor.copy(alpha = if (selected) 1f else 0f))
+                                                )
+                                            }
+                                        },
+                                        label = if (!slimNav) {
+                                            {
                                                 Text(
                                                     text = stringResource(screen.titleId),
                                                     style = MaterialTheme.typography.labelSmall,
-                                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                                    color = iconColor.copy(alpha = iconAlpha)
                                                 )
-                                            },
-                                            alwaysShowLabel = false,
-                                            colors = NavigationBarItemDefaults.colors(
-                                                selectedIconColor = if (enableDynamicTheme) animatedDynamicColor else Color.White,
-                                                selectedTextColor = if (enableDynamicTheme) animatedDynamicColor else Color.White,
-                                                unselectedIconColor = Color.White.copy(alpha = 0.6f),
-                                                unselectedTextColor = Color.White.copy(alpha = 0.6f),
-                                                indicatorColor = if (enableDynamicTheme) animatedDynamicColor.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.2f)
-                                            )
+                                            }
+                                        } else {
+                                            null
+                                        },
+                                        alwaysShowLabel = !slimNav,
+                                        colors = NavigationBarItemDefaults.colors(
+                                            selectedIconColor = Color.Transparent,
+                                            selectedTextColor = Color.Transparent,
+                                            unselectedIconColor = Color.Transparent,
+                                            unselectedTextColor = Color.Transparent,
+                                            indicatorColor = Color.Transparent
                                         )
-                                    }
+                                    )
                                 }
+                            }
                         }
                     }
                 }
@@ -1519,7 +1537,7 @@ private fun openNotificationSettings(context: Context) {
 
 suspend fun checkForUpdates(): String? = withContext(Dispatchers.IO) {
     try {
-        val url = URL("https://api.github.com/repos/KuroMusic/KuroMusic/releases/latest")
+        val url = URL("https://api.github.com/repos/KiritoAPT2/KuroMusic/releases/latest")
         val connection = url.openConnection()
         connection.connect()
         val json = connection.getInputStream().bufferedReader().use { it.readText() }

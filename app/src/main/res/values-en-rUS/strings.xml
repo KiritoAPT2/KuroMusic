@@ -427,4 +427,23 @@
     <string name="download_errorup">Error downloading the update</string>
     <string name="tap_to_update">Tap to update</string>
     <string name="info_title">Information</string>
+    <string name="welcome_next">Next</string>
+    <string name="welcome_back">Back</string>
+    <string name="welcome_get_started">Get Started</string>
+    <string name="welcome_title_1">Your music, your way</string>
+    <string name="welcome_desc_1">KuroMusic plays your local music with a modern, elegant, distraction-free design.</string>
+    <string name="welcome_bullet_1">Play MP3, FLAC, AAC and more</string>
+    <string name="welcome_bullet_2">Explore new releases and trends</string>
+    <string name="welcome_bullet_3">Dynamic themes and dark mode</string>
+    <string name="welcome_title_2">Made for you</string>
+    <string name="welcome_desc_2">Enjoy a smart, customizable audio experience.</string>
+    <string name="welcome_bullet_4">Real-time synced lyrics</string>
+    <string name="welcome_bullet_5">Equalizer and audio normalization</string>
+    <string name="welcome_bullet_6">Persistent queue and gapless playback</string>
+    <string name="welcome_title_3">Required permissions</string>
+    <string name="welcome_desc_3">To work properly, KuroMusic needs access to:</string>
+    <string name="welcome_permission_notif">Notifications</string>
+    <string name="welcome_permission_storage">Storage / Audio</string>
+    <string name="welcome_permission_granted">✓ Granted</string>
+    <string name="welcome_install_permission">In future versions, you may need permission to install APKs from this source.</string>
 </resources>

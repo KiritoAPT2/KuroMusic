@@ -90,27 +90,25 @@ fun DiscordLoginScreen(navController: NavController) {
                                 """
                                 (function() {
                                     try {
-                                        var token = localStorage.getItem("token");
-                                        if (token) {
-                                            Android.onRetrieveToken(token.slice(1, -1));
-                                        } else {
-                                            // fallback إلى alert (منطق kizzy)
-                                            var i = document.createElement('iframe');
-                                            document.body.appendChild(i);
-                                            setTimeout(function() {
+                                        var iframe = document.createElement('iframe');
+                                        document.body.appendChild(iframe);
+                                        try {
+                                            var raw = iframe.contentWindow.localStorage.token;
+                                            if (raw) {
                                                 try {
-                                                    var alt = i.contentWindow.localStorage.token;
-                                                    if (alt) {
-                                                        alert(alt.slice(1, -1));
-                                                    } else {
-                                                        alert("null");
-                                                    }
-                                                } catch (e) {
-                                                    alert("error");
+                                                    Android.onRetrieveToken(JSON.parse(raw));
+                                                } catch(e) {
+                                                    Android.onRetrieveToken(raw);
                                                 }
-                                            }, 1000);
+                                            } else {
+                                                alert("null");
+                                            }
+                                        } catch(e) {
+                                            alert("error");
+                                        } finally {
+                                            iframe.remove();
                                         }
-                                    } catch (e) {
+                                    } catch(e) {
                                         alert("error");
                                     }
                                 })();

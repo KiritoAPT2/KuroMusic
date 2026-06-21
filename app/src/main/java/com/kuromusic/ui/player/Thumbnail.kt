@@ -348,7 +348,7 @@ private fun AlbumArtItem(
     onColorExtracted: (Color) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    
+
     Box(
         modifier = Modifier
             .width(horizontalLazyGridItemWidth)
@@ -399,10 +399,10 @@ private fun AlbumArtItem(
                     if (isCurrentItem) {
                         coroutineScope.launch(Dispatchers.Default) {
                             val bitmap = state.result.drawable.toBitmapOrNull()
-                            if (bitmap != null) {
-                                val color = bitmap.extractThemeColor()
-                                onColorExtracted(color)
-                            }
+                                    if (bitmap != null) {
+                                        val color = bitmap.extractThemeColor()
+                                        onColorExtracted(color)
+                                    }
                         }
                     }
                 },

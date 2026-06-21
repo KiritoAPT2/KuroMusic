@@ -33,6 +33,13 @@ sealed class Screens(
         route = "library"
     )
 
+    data object Welcome : Screens(
+        titleId = R.string.app_name,
+        iconIdInactive = R.drawable.home_outlined,
+        iconIdActive = R.drawable.home_filled,
+        route = "welcome"
+    )
+
     companion object {
         val MainScreens = listOf(Home, Explore, Library)
     }

@@ -221,7 +221,7 @@ fun AboutScreen(
         )
 
         Text(
-            text = "v1.0.5-stable \uD83D\uDC8E",
+            text = "v${BuildConfig.VERSION_NAME}-stable \uD83D\uDC8E",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.tertiary
         )
@@ -308,7 +308,7 @@ fun AboutScreen(
 
         // Footer
         Text(
-            text = "KuroMusic v1.0.5-stable | Team Animax \u2764\ufe0f",
+            text = "KuroMusic v${BuildConfig.VERSION_NAME}-stable | Team Animax \u2764\ufe0f",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -356,10 +356,10 @@ fun UserCards(uriHandler: UriHandler) {
         )
 
         UserCard(
-            imageUrl = "https://raw.githubusercontent.com/KuroMusic/KuroMusic/main/assets/banner_kuro.png",
+            imageUrl = "https://raw.githubusercontent.com/KiritoAPT2/KuroMusic/main/assets/banner_kuro.png",
             name = "TeamAnimax",
             role = "Agradecimiento de apoyo 🙌",
-            onClick = { uriHandler.openUri("https://github.com/KuroMusic") }
+            onClick = { uriHandler.openUri("https://github.com/KiritoAPT2") }
         )
     }
 }

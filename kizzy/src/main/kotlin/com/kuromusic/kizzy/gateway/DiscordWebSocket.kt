@@ -16,9 +16,11 @@ import com.kuromusic.kizzy.gateway.entities.op.OpCode.RECONNECT
 import com.kuromusic.kizzy.gateway.entities.op.OpCode.RESUME
 import com.kuromusic.kizzy.gateway.entities.presence.Presence
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.header
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
@@ -42,6 +44,7 @@ import java.util.logging.Level
 import java.util.logging.Level.INFO
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -50,7 +53,7 @@ import kotlin.time.Duration.Companion.milliseconds
 open class DiscordWebSocket(
     private val token: String,
 ) : CoroutineScope {
-    private val gatewayUrl = "wss://gateway.discord.gg/?v=10&encoding=json"
+    private val gatewayUrl = "wss://gateway.discord.gg/?v=10&encoding=json&compress=zlib-stream"
     private var websocket: DefaultClientWebSocketSession? = null
     private var sequence = 0
     private var sessionId: String? = null
@@ -58,8 +61,13 @@ open class DiscordWebSocket(
     private var resumeGatewayUrl: String? = null
     private var heartbeatJob: Job? = null
     private var connected = false
+    private var reconnectAttempts = 0
     private var client: HttpClient = HttpClient {
         install(WebSockets)
+        defaultRequest {
+            header("User-Agent", "Discord-Android/289120")
+            header("Origin", "https://discord.com")
+        }
     }
     private val json = Json {
         ignoreUnknownKeys = true
@@ -72,7 +80,9 @@ open class DiscordWebSocket(
     fun connect() {
         launch {
             try {
-                Logger.getLogger("Kizzy").log(INFO, "Gateway: Connect called")
+                val jitter = Random.nextLong(100, 1000)
+                delay(jitter)
+                Logger.getLogger("Kizzy").log(INFO, "Gateway: Connect called (jitter=$jitter ms)")
                 val url = resumeGatewayUrl ?: gatewayUrl
                 websocket = client.webSocketSession(url)
 
@@ -100,12 +110,16 @@ open class DiscordWebSocket(
         heartbeatJob?.cancel()
         connected = false
         val close = websocket?.closeReason?.await()
-        Logger.getLogger("Kizzy").log(INFO, "Gateway: Closed with code: ${close?.code}, reason: ${close?.message},  can_reconnect: ${close?.code?.toInt() == 4000}")
         if (close?.code?.toInt() == 4000) {
-            delay(200.milliseconds)
+            reconnectAttempts++
+            val backoff = (200L * (1 shl minOf(reconnectAttempts, 5))) + Random.nextLong(0, 500)
+            Logger.getLogger("Kizzy").log(INFO, "Gateway: Closed with code: ${close?.code}, reason: ${close?.message}, attempt=$reconnectAttempts, backoff=${backoff}ms")
+            delay(backoff.milliseconds)
             connect()
-        } else
+        } else {
+            Logger.getLogger("Kizzy").log(INFO, "Gateway: Closed with code: ${close?.code}, reason: ${close?.message}")
             close()
+        }
     }
 
     private suspend fun onMessage(payload: Payload) {
@@ -129,7 +143,8 @@ open class DiscordWebSocket(
             "READY" -> {
                 val ready = json.decodeFromJsonElement<Ready>(this.d!!)
                 sessionId = ready.sessionId
-                resumeGatewayUrl = ready.resumeGatewayUrl + "/?v=10&encoding=json"
+                resumeGatewayUrl = ready.resumeGatewayUrl + "/?v=10&encoding=json&compress=zlib-stream"
+                reconnectAttempts = 0
                 Logger.getLogger("Kizzy").log(INFO, "Gateway: resume_gateway_url updated to $resumeGatewayUrl")
                 Logger.getLogger("Kizzy").log(INFO, "Gateway: session_id updated to $sessionId")
                 connected = true
@@ -204,7 +219,8 @@ open class DiscordWebSocket(
         heartbeatJob = launch {
             while (isActive) {
                 sendHeartBeat()
-                delay(interval)
+                val jitter = Random.nextLong(-1000, 1000)
+                delay(interval + jitter)
             }
         }
     }

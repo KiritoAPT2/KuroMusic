@@ -362,7 +362,7 @@ suspend fun downloadApk(
 ): Uri? = withContext(Dispatchers.IO) {
     try {
         val apkUrl =
-            "https://github.com/KuroMusic/KuroMusic/releases/download/$version/app-release.apk"
+            "https://github.com/KiritoAPT2/KuroMusic/releases/download/$version/app-release.apk"
 
         val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
         val apkFile = File(downloadDir, "app-release-$version.apk")
@@ -455,7 +455,7 @@ fun installApk(context: Context, apkUri: Uri) {
 
 suspend fun checkForUpdates(): String? = withContext(Dispatchers.IO) {
     try {
-        val url = URL("https://api.github.com/repos/KuroMusic/KuroMusic/releases/latest")
+        val url = URL("https://api.github.com/repos/KiritoAPT2/KuroMusic/releases/latest")
         val connection = url.openConnection()
         connection.connect()
         val json = connection.getInputStream().bufferedReader().use { it.readText() }
@@ -649,16 +649,8 @@ fun SettingsScreen(
             title = stringResource(R.string.community),
             items = listOf(
                 SettingsCategoryItem(
-                    icon = painterResource(R.drawable.paypal),
-                    title = { Text("Donar ❤️") },
-                    iconTint = pinkColor,
-                    iconContainerColor = pinkColor.copy(alpha = 0.1f),
-                    borderStroke = BorderStroke(1.5.dp, pinkColor.copy(alpha = 0.3f)),
-                    onClick = { uriHandler.openUri("https://paypal.me/KiritoAPT2") }
-                ),
-                SettingsCategoryItem(
                     icon = painterResource(R.drawable.telegram),
-                    title = { Text(stringResource(R.string.Telegramchanel)) },
+                    title = { Text("KiritoDev - Donaciones ❤️") },
                     iconTint = blueColor,
                     iconContainerColor = blueColor.copy(alpha = 0.1f),
                     borderStroke = BorderStroke(1.5.dp, blueColor.copy(alpha = 0.3f)),
@@ -679,7 +671,7 @@ fun SettingsScreen(
 
         // Footer
         Text(
-            text = "KuroMusic v1.0.5-stable | Team Animax ❤️",
+            text = "KuroMusic v${BuildConfig.VERSION_NAME}-stable | Team Animax ❤️",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,

@@ -475,7 +475,7 @@ enum class ReleaseNoteType(
 suspend fun fetchReleaseNotes(): List<ReleaseNoteItem> {
     return withContext(Dispatchers.IO) {
         try {
-            val document = Jsoup.connect("https://github.com/KuroMusic/KuroMusic/releases/latest").get()
+            val document = Jsoup.connect("https://github.com/KiritoAPT2/KuroMusic/releases/latest").get()
             val changelogElement = document.selectFirst(".markdown-body")
             val htmlContent = changelogElement?.html() ?: "No release notes found"
 

@@ -74,5 +74,6 @@ Thumbs.db
 
 .idea/
 app/schemas/
-*.txt
 *.log
+.kotlin/
+!app/src/main/baseline-prof.txt

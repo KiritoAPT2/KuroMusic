@@ -9,6 +9,7 @@ material3 = "1.5.0-alpha12"
 media3 = "1.8.0"
 room = "2.6.1"
 hilt = "2.55"
+jsoup = "1.22.2"
 ktor = "3.0.3"
 ksp = "2.1.0-1.0.29"
 kotlinxSerializationJson = "1.8.0"
@@ -16,11 +17,10 @@ okhttp = "5.3.2"
 loggingInterceptor = "5.3.2"
 blurry = "4.0.1"
 materialRipple = "1.10.0"
-roomRuntimeAndroid = "2.7.2"
 extractor = "master-SNAPSHOT"
 composeReorderable = "3.0.0"
-uiAndroid = "1.9.2"
 materialIconsExtended = "1.7.6"
+
 glanceAppwidget = "1.1.1"
 glanceMaterial3 = "1.1.1"
 graphicsShapes = "1.1.0"
@@ -73,7 +73,7 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 apache-lang3 = { group = "org.apache.commons", name = "commons-lang3", version = "3.17.0" }
 
-hilt = { group = "com.google.dagger", name = "hilt-android", version = "2.53.1" }
+hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -99,8 +99,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
 blurry = { group = "jp.wasabeef", name = "blurry", version.ref = "blurry" }
 material-ripple = { group = "androidx.compose.material", name = "material-ripple", version.ref = "materialRipple" }
-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glanceAppwidget" }
 glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glanceMaterial3" }

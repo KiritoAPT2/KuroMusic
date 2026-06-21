@@ -24,6 +24,8 @@ import com.kuromusic.constants.AudioQuality
 import com.kuromusic.constants.AudioQualityKey
 import com.kuromusic.constants.AutoLoadMoreKey
 import com.kuromusic.constants.AutoSkipNextOnErrorKey
+import com.kuromusic.constants.BeatBuddyType
+import com.kuromusic.constants.BeatBuddyTypeKey
 import com.kuromusic.constants.PersistentQueueKey
 import com.kuromusic.constants.SimilarContent
 import com.kuromusic.constants.SkipSilenceKey
@@ -76,6 +78,10 @@ fun PlayerSettings(
         StopMusicOnTaskClearKey,
         defaultValue = false
     )
+    val (beatBuddyType, onBeatBuddyTypeChange) = rememberEnumPreference(
+        BeatBuddyTypeKey,
+        defaultValue = BeatBuddyType.NONE
+    )
 
     SettingsPage(
         title = stringResource(R.string.player_and_audio),
@@ -111,6 +117,20 @@ fun PlayerSettings(
                     icon = { Icon(painterResource(R.drawable.volume_up), null) },
                     checked = audioNormalization,
                     onCheckedChange = onAudioNormalizationChange
+                )},
+
+                {EnumListPreference(
+                    title = { Text(stringResource(R.string.beat_buddy)) },
+                    icon = { Icon(painterResource(R.drawable.mood), null) },
+                    selectedValue = beatBuddyType,
+                    onValueSelected = onBeatBuddyTypeChange,
+                    valueText = {
+                        when (it) {
+                            BeatBuddyType.NONE -> stringResource(R.string.beat_buddy_none)
+                            BeatBuddyType.CAT -> stringResource(R.string.beat_buddy_cat)
+                            BeatBuddyType.BEAR -> stringResource(R.string.beat_buddy_bear)
+                        }
+                    }
                 )},
             )
         )

@@ -27,6 +27,7 @@ val ContentLanguageKey = stringPreferencesKey("contentLanguage")
 val ContentCountryKey = stringPreferencesKey("contentCountry")
 val EnableKugouKey = booleanPreferencesKey("enableKugou")
 val EnableLrcLibKey = booleanPreferencesKey("enableLrclib")
+val ShowAnimaxSectionKey = booleanPreferencesKey("showAnimaxSection")
 val HideExplicitKey = booleanPreferencesKey("hideExplicit")
 val LastNewReleaseCheckKey = longPreferencesKey("last_new_release_check")
 val minPlaybackDurKey = intPreferencesKey("minPlaybackDur")
@@ -300,6 +301,16 @@ val TranslateLyricsKey = booleanPreferencesKey("translateLyrics")
 val PlayerVolumeKey = floatPreferencesKey("playerVolume")
 val RepeatModeKey = intPreferencesKey("repeatMode")
 val PlayerButtonsStyleKey = stringPreferencesKey("player_buttons_style")
+
+val BeatBuddyTypeKey = stringPreferencesKey("beatBuddyType")
+
+val LastSeenVersionCodeKey = intPreferencesKey("lastSeenVersionCode")
+
+val LanguageSelectorDismissedKey = booleanPreferencesKey("languageSelectorDismissed")
+
+enum class BeatBuddyType {
+    NONE, CAT, BEAR
+}
 
 val SearchSourceKey = stringPreferencesKey("searchSource")
 val SwipeThumbnailKey = booleanPreferencesKey("swipeThumbnail")

@@ -225,7 +225,7 @@ fun MiniPlayer(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.96f)) // Dynamic surface container for legibility
+                    .background(            MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.75f)) // Dynamic surface container for legibility
             )
             
             // Contenido con zIndex elevado para evitar blur

@@ -372,6 +372,7 @@
     <string name="disable_screenshot_desc">When this option is on, screenshots and the app\'s view in Recents are disabled.</string>
 
     <string name="hide_explicit">Hide explicit content</string>
+    <string name="show_animax_section_desc">Replaces Animax L Music with algorithmic recommendations</string>
 
     <string name="backup_restore">Backup and restore</string>
     <string name="backup">Backup</string>
@@ -410,7 +411,7 @@
     <string name="history_duration">History duration</string>
     <string name="contributors">contributors</string>
     <string name="about_description">KuroMusic: YT Music Premium GRATIS \n✅ Streaming ilimitado sin API\n✅ Descargas offline Room DB\n✅ MaterialYou morado custom\n✅ Animax L Music recomendaciones \n\nCreado con 🔥 por Team Animax para gamers/crypto devs.\nKiritoAPT2 - Lead Developer &amp; Visionary</string>
-    <string name="about_footer">KuroMusic v1.0.5-stable | Team Animax ❤️</string>
+    <string name="about_footer">KuroMusic v1.0.6-stable | Team Animax ❤️</string>
     <string name="Donate">Donar</string>
     <string name="Telegramchanel">Telegram Chanel</string>
     <string name="contribution">Contribution</string>
@@ -661,7 +662,30 @@
     <string name="previous_action">Previous</string>
     <string name="loading_lyrics">Loading lyrics</string>
     <string name="apple_music">Apple music</string>
+    <string name="beat_buddy">Beat Buddy</string>
+    <string name="beat_buddy_none">None</string>
+    <string name="beat_buddy_cat">Cat</string>
+    <string name="beat_buddy_bear">Bear</string>
     <string name="update_available_title">Update available</string>
     <string name="update_available_message">New version %s is available</string>
     <string name="view_on_github">View on GitHub</string>
+    <string name="welcome_next">Siguiente</string>
+    <string name="welcome_back">Atrás</string>
+    <string name="welcome_get_started">Comenzar</string>
+    <string name="welcome_title_1">Tu música, tu estilo</string>
+    <string name="welcome_desc_1">KuroMusic reproduce tu música local con un diseño moderno, elegante y sin distracciones.</string>
+    <string name="welcome_bullet_1">🎵 Reproduce archivos MP3, FLAC, AAC y más</string>
+    <string name="welcome_bullet_2">🌐 Explora nuevos lanzamientos y tendencias</string>
+    <string name="welcome_bullet_3">🎨 Temas dinámicos y modo oscuro</string>
+    <string name="welcome_title_2">Hecho para ti</string>
+    <string name="welcome_desc_2">Disfruta de una experiencia de audio inteligente y personalizable.</string>
+    <string name="welcome_bullet_4">📜 Letras sincronizadas en tiempo real</string>
+    <string name="welcome_bullet_5">⚡ Ecualizador y normalización de audio</string>
+    <string name="welcome_bullet_6">📥 Cola persistente y reproducción sin pausas</string>
+    <string name="welcome_title_3">Permisos necesarios</string>
+    <string name="welcome_desc_3">Para funcionar correctamente, KuroMusic necesita acceder a:</string>
+    <string name="welcome_permission_notif">Notificaciones</string>
+    <string name="welcome_permission_storage">Almacenamiento / Audio</string>
+    <string name="welcome_permission_granted">✓ Concedido</string>
+    <string name="welcome_install_permission">En versiones futuras, podrías necesitar permiso para instalar APKs desde esta fuente.</string>
 </resources>

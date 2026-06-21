@@ -129,6 +129,7 @@ class LocaleManager private constructor(private val context: Context) {
         private const val PREF_NAME = "locale_preferences"
         private const val PREF_LANGUAGE_KEY = "selected_language"
         private const val SYSTEM_DEFAULT = "system_default"
+    private const val DEFAULT_LANGUAGE = "es"
         private const val RESTART_DELAY = 800L
         private const val ANIMATION_DELAY = 200L
 
@@ -184,7 +185,7 @@ class LocaleManager private constructor(private val context: Context) {
     private var _cachedSystemLanguage: String? = null
 
     fun getSelectedLanguageCode(): String {
-        return sharedPreferences.getString(PREF_LANGUAGE_KEY, SYSTEM_DEFAULT) ?: SYSTEM_DEFAULT
+        return sharedPreferences.getString(PREF_LANGUAGE_KEY, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
     }
 
     fun getEffectiveLanguageCode(): String {

@@ -188,8 +188,16 @@ class MusicService :
     
     private val binder = MusicBinder()
 
-    // Cache to prevent blocking ExoPlayer loader
-    private val playbackCache = java.util.concurrent.ConcurrentHashMap<String, YTPlayerUtils.PlaybackData>()
+    // Cache to prevent blocking ExoPlayer loader. Max 500 entries, LRU-like eviction on insert.
+    private val playbackCache = object : java.util.concurrent.ConcurrentHashMap<String, YTPlayerUtils.PlaybackData>() {
+        override fun put(key: String, value: YTPlayerUtils.PlaybackData): YTPlayerUtils.PlaybackData? {
+            if (size >= 500) {
+                val oldest = entries.minByOrNull { it.value.streamExpiresInSeconds }?.key
+                oldest?.let { remove(it) }
+            }
+            return super.put(key, value)
+        }
+    }
     private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 
@@ -421,10 +429,13 @@ class MusicService :
                     // Launch in IO scope with SupervisorJob
                     scope.launch(Dispatchers.IO) {
                         try {
-                            val queueSize = player.mediaItemCount
-                            val nextSongs = (1..3).mapNotNull { offset -> 
-                                val index = (currentIndex + offset) % queueSize
-                                if (index != currentIndex) player.getMediaItemAt(index) else null
+                            val queueSize = withContext(Dispatchers.Main) { player.mediaItemCount }
+                            if (queueSize <= 0) return@launch
+                            val nextSongs = withContext(Dispatchers.Main) {
+                                (1..3).mapNotNull { offset ->
+                                    val index = (currentIndex + offset) % queueSize
+                                    if (index != currentIndex) player.getMediaItemAt(index) else null
+                                }
                             }
                             
                             nextSongs.forEach { item ->
@@ -1572,7 +1583,7 @@ class MusicService :
                 enableAudioTrackPlaybackParams: Boolean,
             ) = DefaultAudioSink
                 .Builder(this@MusicService)
-                .setEnableFloatOutput(enableFloatOutput)
+                .setEnableFloatOutput(true)
                 .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
                 .setAudioProcessorChain(
                     DefaultAudioSink.DefaultAudioProcessorChain(

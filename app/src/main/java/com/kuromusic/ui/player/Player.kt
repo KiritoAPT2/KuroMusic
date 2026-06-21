@@ -26,7 +26,6 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -93,6 +92,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -151,6 +151,8 @@ import com.kuromusic.constants.ShowLyricsKey
 import com.kuromusic.constants.SliderStyle
 import com.kuromusic.constants.SliderStyleKey
 import com.kuromusic.constants.SmallButtonsShapeKey
+import com.kuromusic.constants.BeatBuddyType
+import com.kuromusic.constants.BeatBuddyTypeKey
 import me.saket.squiggles.SquigglySlider
 import com.kuromusic.extensions.togglePlayPause
 import com.kuromusic.extensions.toggleRepeatMode
@@ -236,7 +238,8 @@ fun BottomSheetPlayer(
     val canSkipNext by playerConnection.canSkipNext.collectAsState()
 
     val showLyrics by rememberPreference(ShowLyricsKey, defaultValue = false)
-    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SQUIGGLY)
+    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+    val beatBuddyType by rememberEnumPreference(BeatBuddyTypeKey, BeatBuddyType.CAT)
 
     // State Hoisting: Use '=' to keep the State object, do NOT read .longValue here!
     val positionState = rememberSaveable(playbackState) {
@@ -530,6 +533,11 @@ fun BottomSheetPlayer(
             .size(42.dp)
             .clip(smallButtonShape.toShape())
             .background(textButtonColor)
+    }
+
+    LaunchedEffect(mediaMetadata) {
+        positionState.longValue = playerConnection.player.currentPosition
+        durationState.longValue = playerConnection.player.duration
     }
 
     LaunchedEffect(playbackState) {
@@ -941,6 +949,7 @@ fun BottomSheetPlayer(
                                 canSkipNext = canSkipNext,
                                 playbackState = playbackState,
                                 currentSongLiked = currentSong?.song?.liked == true,
+                                beatBuddyType = beatBuddyType,
                                 onTitleClick = onTitleClickRemembered,
                                 onTitleLongClick = onTitleLongClickRemembered,
                                 onArtistClick = { id -> onArtistClickRemembered(id) },
@@ -1004,6 +1013,7 @@ fun BottomSheetPlayer(
                             canSkipNext = canSkipNext,
                             playbackState = playbackState,
                             currentSongLiked = currentSong?.song?.liked == true,
+                            beatBuddyType = beatBuddyType,
                             onTitleClick = onTitleClickRemembered,
                             onTitleLongClick = onTitleLongClickRemembered,
                             onArtistClick = { id -> onArtistClickRemembered(id) },
@@ -1223,7 +1233,7 @@ fun PlayerSlider(
         derivedStateOf { makeTimeString(sliderPosition ?: positionState.longValue) }
     }
     val totalDurationText by remember {
-        derivedStateOf { if (durationState.longValue != C.TIME_UNSET) makeTimeString(durationState.longValue) else "" }
+        derivedStateOf { makeTimeString(durationState.longValue) }
     }
 
     val progress by remember {
@@ -1383,6 +1393,7 @@ fun PlayerControls(
     canSkipNext: Boolean,
     playbackState: Int,
     currentSongLiked: Boolean,
+    beatBuddyType: BeatBuddyType,
     onTitleClick: () -> Unit,
     onTitleLongClick: () -> Unit,
     onArtistClick: (String?) -> Unit,
@@ -1396,7 +1407,7 @@ fun PlayerControls(
     // --- Título y Artistas (Debajo de la carátula) ---
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = PlayerHorizontalPadding),
@@ -1414,6 +1425,7 @@ fun PlayerControls(
                         text = title,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 0.5.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = resolvedOnBackgroundColor,
@@ -1440,8 +1452,10 @@ fun PlayerControls(
                     DisableSelection {
                         mediaMetadata.artists.forEachIndexed { index, artist ->
                             Text(
-                                text = artist.name,
-                                style = MaterialTheme.typography.titleMedium,
+                                text = artist.name.uppercase(),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    letterSpacing = 1.sp
+                                ),
                                 color = resolvedOnBackgroundColor.copy(alpha = 0.7f),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -1452,8 +1466,11 @@ fun PlayerControls(
                             )
                             if (index != mediaMetadata.artists.lastIndex) {
                                 Text(
-                                    text = ", ",
-                                    style = MaterialTheme.typography.titleMedium.copy(color = resolvedOnBackgroundColor.copy(alpha = 0.7f))
+                                    text = " / ",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        letterSpacing = 1.sp,
+                                        color = resolvedOnBackgroundColor.copy(alpha = 0.4f)
+                                    )
                                 )
                             }
                         }
@@ -1462,9 +1479,9 @@ fun PlayerControls(
             }
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
-        // BOTONES DE ACCIÓN (Like y Download al lado del título)
+        // BOTONES DE ACCIÓN (Like, Download, More — horizontal)
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -1511,10 +1528,20 @@ fun PlayerControls(
         }
     }
 
-    Spacer(Modifier.height(24.dp))
+    Spacer(Modifier.height(16.dp))
+
+    // Separador de diseño
+    Box(
+        modifier = Modifier
+            .padding(horizontal = PlayerHorizontalPadding + 8.dp)
+            .fillMaxWidth()
+            .height(0.5.dp)
+            .background(resolvedOnBackgroundColor.copy(alpha = 0.08f))
+    )
+
+    Spacer(Modifier.height(16.dp))
 
     // Slider Estilizado
-    Spacer(Modifier.height(24.dp))
 
     // PlayerSlider extracted (Using State objects)
     PlayerSlider(
@@ -1526,7 +1553,23 @@ fun PlayerControls(
         modifier = Modifier.padding(horizontal = PlayerHorizontalPadding)
     )
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(8.dp))
+
+    // Beat Buddy
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = PlayerHorizontalPadding + 4.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        BeatBuddy(
+            type = beatBuddyType,
+            isPlaying = isPlaying,
+            color = resolvedOnBackgroundColor,
+        )
+    }
+
+    Spacer(Modifier.height(4.dp))
 
     // CONTROLES DE REPRODUCCIÓN CON ANIMACIONES AL PRESIONAR
     Row(
@@ -1593,10 +1636,29 @@ fun PlayerControls(
 
         Spacer(modifier = Modifier.width(32.dp))
 
+        // Play button pulse when playing
+        val playButtonScale by animateFloatAsState(
+            targetValue = if (isPlayPausePressed) 0.95f else 1f,
+            animationSpec = spring(dampingRatio = 0.5f, stiffness = 600f),
+            label = "playButtonScale"
+        )
+
+        val pulseAnim by rememberInfiniteTransition(label = "pulse").animateFloat(
+            initialValue = 1f,
+            targetValue = 1.08f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "pulse"
+        )
+
         // Botón Play/Pause (Círculo grande, limpio y sin texto)
         Box(
             modifier = Modifier
                 .size(80.dp)
+                .scale(if (isPlaying && !isPlayPausePressed) pulseAnim else playButtonScale)
+                .shadow(8.dp, CircleShape, spotColor = resolvedOnBackgroundColor.copy(alpha = 0.3f))
                 .clip(CircleShape)
                 .background(resolvedOnBackgroundColor)
                 .clickable(

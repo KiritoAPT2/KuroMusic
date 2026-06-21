@@ -17,6 +17,7 @@ import com.kuromusic.constants.CountryCodeToName
 import com.kuromusic.constants.EnableKugouKey
 import com.kuromusic.constants.EnableLrcLibKey
 import com.kuromusic.constants.HideExplicitKey
+import com.kuromusic.constants.ShowAnimaxSectionKey
 import com.kuromusic.constants.HistoryDuration
 import com.kuromusic.constants.LanguageCodeToName
 import com.kuromusic.constants.PreferredLyricsProvider
@@ -56,6 +57,10 @@ fun ContentSettings(
     val (hideExplicit, onHideExplicitChange) = rememberPreference(
         key = HideExplicitKey,
         defaultValue = false
+    )
+    val (showAnimaxSection, onShowAnimaxSectionChange) = rememberPreference(
+        key = ShowAnimaxSectionKey,
+        defaultValue = true
     )
     val (proxyEnabled, onProxyEnabledChange) = rememberPreference(
         key = ProxyEnabledKey,
@@ -131,6 +136,15 @@ fun ContentSettings(
                     icon = { Icon(painterResource(R.drawable.explicit), null) },
                     checked = hideExplicit,
                     onCheckedChange = onHideExplicitChange,
+                )},
+
+                // Animax section toggle
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.animax_l_music_recommendations)) },
+                    icon = { Icon(painterResource(R.drawable.music_note), null) },
+                    description = stringResource(R.string.show_animax_section_desc),
+                    checked = showAnimaxSection,
+                    onCheckedChange = onShowAnimaxSectionChange,
                 )},
 
                 {NotificationPermissionPreference()},

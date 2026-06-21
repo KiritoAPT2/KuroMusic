@@ -39,9 +39,9 @@ object YTPlayerUtils {
     private const val logTag = "YTPlayerUtils"
 
     private val MUSIC_CLIENT_HEADERS = mapOf(
-        "User-Agent" to "com.google.android.apps.youtube.music/5.39.51 (Linux; U; Android 14)",
-        "X-YouTube-Client-Name" to "67",
-        "X-YouTube-Client-Version" to "18.25.34",
+        "User-Agent" to "com.google.android.apps.youtube.music/7.01.52 (Linux; U; Android 15; Pixel 9 Pro)",
+        "X-YouTube-Client-Name" to "21",
+        "X-YouTube-Client-Version" to "7.01.52",
         "X-YouTube-API-Key" to BuildConfig.INNER_TUBE_API_KEY,
         "Accept-Language" to "es-419,es;q=0.9,en;q=0.8"
     )
@@ -123,6 +123,25 @@ object YTPlayerUtils {
     // Cache to prevent re-fetching PlayerResponse (Speed up by ~1s)
     private val playerCache = mutableMapOf<String, Result<PlayerResponse>>()
     private val cacheTime = mutableMapOf<String, Long>()
+    private const val MAX_CACHE_ENTRIES = 200
+    private const val CACHE_TTL_MS = 60 * 60 * 1000L
+
+    fun trimCache() {
+        val now = System.currentTimeMillis()
+        val staleKeys = cacheTime.filter { (_, time) -> now - time > CACHE_TTL_MS }.keys
+        staleKeys.forEach { key ->
+            playerCache.remove(key)
+            cacheTime.remove(key)
+        }
+        if (playerCache.size > MAX_CACHE_ENTRIES) {
+            val extra = playerCache.size - MAX_CACHE_ENTRIES
+            val toRemove = cacheTime.entries.sortedBy { it.value }.take(extra).map { it.key }
+            toRemove.forEach { key ->
+                playerCache.remove(key)
+                cacheTime.remove(key)
+            }
+        }
+    }
 
     private suspend fun getCachedPlayerResponse(
         videoId: String, 
@@ -370,20 +389,23 @@ object YTPlayerUtils {
     ): PlayerResponse.StreamingData.Format? {
         Timber.tag(logTag).d("Finding format with audioQuality: $audioQuality, network metered: ${connectivityManager.isActiveNetworkMetered}")
 
-        // PRIORIDAD NUCLEAR: itag 140 (m4a) es el más estable y seguro.
         val adaptiveFormats = playerResponse.streamingData?.adaptiveFormats
             ?.filter { it.isAudio } ?: emptyList()
-            
-        val safeFormat = adaptiveFormats.find { it.itag == 140 }
-            ?: adaptiveFormats.find { it.itag == 251 }
-            ?: adaptiveFormats.maxByOrNull {
-                it.bitrate * when (audioQuality) {
-                    AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
-                    AudioQuality.HIGH -> 1
-                    AudioQuality.LOW -> -1
-                } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
-            }
-            
+
+        val safeFormat = when (audioQuality) {
+            AudioQuality.HIGH -> adaptiveFormats.find { it.itag == 141 }
+                ?: adaptiveFormats.find { it.itag == 251 }
+                ?: adaptiveFormats.find { it.itag == 140 }
+            else -> adaptiveFormats.find { it.itag == 251 }
+                ?: adaptiveFormats.find { it.itag == 140 }
+        } ?: adaptiveFormats.maxByOrNull {
+            it.bitrate * when (audioQuality) {
+                AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
+                AudioQuality.HIGH -> 1
+                AudioQuality.LOW -> -1
+            } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
+        }
+
         if (safeFormat != null) {
             Timber.tag(logTag).d("Selected format: ${safeFormat.mimeType}, bitrate: ${safeFormat.bitrate}, itag: ${safeFormat.itag}")
         } else {
@@ -420,7 +442,10 @@ object YTPlayerUtils {
         videoId: String
     ): Int? {
         Timber.tag(logTag).d("Signature timestamp bypass for videoId: $videoId")
-        return null
+        return NewPipeUtils.getSignatureTimestamp(videoId)
+            .onSuccess { Timber.tag(logTag).d("Signature timestamp obtained: $it") }
+            .onFailure { Timber.tag(logTag).w(it, "Failed to get signature timestamp") }
+            .getOrNull()
     }
     /**
      * Wrapper around the [NewPipeUtils.getStreamUrl] function which reports exceptions

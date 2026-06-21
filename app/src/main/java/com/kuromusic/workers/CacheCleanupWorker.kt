@@ -4,29 +4,31 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import coil.annotation.ExperimentalCoilApi
+import coil.imageLoader
+import com.kuromusic.db.InternalDatabase
+import com.kuromusic.utils.YTPlayerUtils
 import java.io.File
 
 class CacheCleanupWorker(
-    appContext: Context, 
+    appContext: Context,
     params: WorkerParameters
 ) : CoroutineWorker(appContext, params) {
 
+    @OptIn(ExperimentalCoilApi::class)
     override suspend fun doWork(): Result {
         return try {
             val cacheDir = applicationContext.cacheDir
-            val cutoff = System.currentTimeMillis() - (2L * 24 * 60 * 60 * 1000) // 2 days
-            
+            val cutoff = System.currentTimeMillis() - (2L * 24 * 60 * 60 * 1000)
+
             Log.i("CacheCleanup", "Starting cache cleanup. Cutoff: $cutoff")
 
             var deletedCount = 0
             var reclaimedBytes = 0L
 
             cacheDir.walkTopDown().forEach { file ->
-                // Avoid deleting files inside ExoPlayer or Media cache to prevent corrupting ExoPlayer's SimpleCache
-                if (file.absolutePath.contains("/media/") || file.absolutePath.contains("\\media\\") ||
-                    file.absolutePath.contains("/exoplayer/") || file.absolutePath.contains("\\exoplayer\\")) {
-                    return@forEach
-                }
+                val parentName = file.parentFile?.name
+                if (parentName == "media" || parentName == "exoplayer") return@forEach
                 if (file.isFile && file.lastModified() < cutoff) {
                     val size = file.length()
                     if (file.delete()) {
@@ -35,18 +37,30 @@ class CacheCleanupWorker(
                     }
                 }
             }
-            
-            // Try to clear Glide cache (must be on main thread usually, but clearDiskCache is background thread safe)
-            // Since we don't have Glide dependency injected here cleanly and user snippet suggested:
-            // Glide.get(context).clearDiskCache()
-            // But we need to check if Glide is used. `libs.versions.toml` uses Coil?
-            // "coil = { group = "io.coil-kt", name = "coil-compose", version = "2.7.0" }"
-            // The user mentioned Glide, but the project uses Coil. 
-            // I will implement Coil cache clearing instead if possible, or just ignore "Glide" if not present.
-            // Coil's disk cache is usually in cacheDir/image_cache. The walkTopDown above SHOULD cover it 
-            // if it respects lastModified.
-            
-            Log.i("CacheCleanup", "✅ Cleanup complete. Deleted $deletedCount files, reclaimed ${reclaimedBytes / 1024} KB")
+
+            // Clear Coil disk cache via API
+            try {
+                val coilCache = applicationContext.imageLoader.diskCache
+                coilCache?.clear()
+                Log.i("CacheCleanup", "Coil disk cache cleared via API")
+            } catch (e: Exception) {
+                Log.w("CacheCleanup", "Could not clear Coil cache via API", e)
+            }
+
+            // Prune old song history from Room DB (keep last 30 days)
+            try {
+                val db = InternalDatabase.newInstance(applicationContext)
+                val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
+                db.deleteSongHistoryOlderThan(thirtyDaysAgo)
+                Log.i("CacheCleanup", "Pruned song history older than 30 days")
+            } catch (e: Exception) {
+                Log.w("CacheCleanup", "Could not prune song history", e)
+            }
+
+            // Trim stale entries from YTPlayerUtils in-memory cache
+            YTPlayerUtils.trimCache()
+
+            Log.i("CacheCleanup", "Cleanup complete. Deleted $deletedCount files, reclaimed ${reclaimedBytes / 1024} KB")
             Result.success()
         } catch (e: Exception) {
             Log.e("CacheCleanup", "Error during cache cleanup", e)

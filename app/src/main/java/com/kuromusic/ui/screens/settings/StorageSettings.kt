@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import android.util.Log
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -135,6 +136,21 @@ fun StorageSettings(
         while (isActive) {
             delay(500)
             downloadCacheSize = tryOrNull { downloadCache.cacheSpace } ?: 0
+        }
+    }
+
+    // Invalidate Coil disk cache when max size changes
+    LaunchedEffect(maxImageCacheSize) {
+        if (maxImageCacheSize != -1) {
+            delay(100)
+            coroutineScope.launch(Dispatchers.IO) {
+                try {
+                    imageDiskCache.clear()
+                    Log.i("StorageSettings", "Coil cache cleared due to size change to ${maxImageCacheSize}MB")
+                } catch (e: Exception) {
+                    Log.w("StorageSettings", "Failed to clear Coil cache on size change", e)
+                }
+            }
         }
     }
 
