@@ -13,7 +13,7 @@ data class UpdateInfo(val version: String, val apkUrl: String)
 
 class UpdateChecker(private val context: Context) {
     companion object {
-        private const val GITHUB_OWNER = "KuroMusic"
+        private const val GITHUB_OWNER = "KiritoAPT2"
         private const val GITHUB_REPO = "KuroMusic"
     }
     
@@ -30,7 +30,7 @@ class UpdateChecker(private val context: Context) {
                 val jsonString = response.body?.string() ?: return@withContext null
                 val json = JSONObject(jsonString)
                 val tagName = json.optString("tag_name", "")
-                val latest = tagName.removePrefix("v")
+                val latest = tagName.removePrefix("v.").removePrefix("v")
                 
                 Log.i("UpdateChecker", "Current: ${BuildConfig.VERSION_NAME} | Latest: $latest")
                 
