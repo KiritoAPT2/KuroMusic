@@ -112,6 +112,9 @@ android {
 
     baselineProfile {
         mergeIntoMain = true
+        filter {
+            include("com.kuromusic.**")
+        }
     }
 
     lint {
@@ -166,6 +169,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.blurry)
     implementation(libs.material.ripple)
+    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation(libs.material.icons.extended)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)

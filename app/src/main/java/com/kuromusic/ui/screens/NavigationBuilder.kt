@@ -65,10 +65,22 @@ fun NavGraphBuilder.navigationBuilder(
     composable(Screens.Explore.route) {
         ExploreScreen(navController,scrollBehavior)
     }
-    composable("history") {
+    composable(
+        route = "history",
+        enterTransition = { fadeIn(tween(250)) },
+        exitTransition = { fadeOut(tween(200)) },
+        popEnterTransition = { fadeIn(tween(250)) },
+        popExitTransition = { fadeOut(tween(200)) },
+    ) {
         HistoryScreen(navController)
     }
-    composable("stats") {
+    composable(
+        route = "stats",
+        enterTransition = { fadeIn(tween(250)) },
+        exitTransition = { fadeOut(tween(200)) },
+        popEnterTransition = { fadeIn(tween(250)) },
+        popExitTransition = { fadeOut(tween(200)) },
+    ) {
         StatsScreen(navController)
     }
     composable("account") {

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.kuromusic.constants.NavigationBarAnimationSpec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 /**
@@ -155,15 +156,15 @@ class BottomSheetState(
     val value by animatable.asState()
 
     val isDismissed by derivedStateOf {
-        value == animatable.lowerBound!!
+        (value.value - animatable.lowerBound!!.value).absoluteValue < 0.5f
     }
 
     val isCollapsed by derivedStateOf {
-        value == collapsedBound
+        (value.value - collapsedBound.value).absoluteValue < 0.5f
     }
 
     val isExpanded by derivedStateOf {
-        value == animatable.upperBound
+        (value.value - animatable.upperBound!!.value).absoluteValue < 0.5f
     }
 
     val progress by derivedStateOf {
