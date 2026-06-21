@@ -51,8 +51,8 @@ class UpdateChecker(private val context: Context) {
                         }
                     }
 
-                    Log.i("UpdateChecker", "✅ UPDATE AVAILABLE! URL: $downloadUrl")
-                    return@withContext UpdateInfo(latest, downloadUrl)
+                    Log.i("UpdateChecker", "✅ UPDATE AVAILABLE! tag=$tagName url=$downloadUrl")
+                    return@withContext UpdateInfo(tagName, downloadUrl)
                 }
             }
         } catch (e: Exception) {

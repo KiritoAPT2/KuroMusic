@@ -424,7 +424,7 @@ suspend fun downloadApk(
 
         return@withContext FileProvider.getUriForFile(
             context,
-            "${context.packageName}.fileprovider",
+            "${context.packageName}.provider",
             apkFile
         )
     } catch (e: Exception) {
