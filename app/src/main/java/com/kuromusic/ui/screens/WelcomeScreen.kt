@@ -68,7 +68,7 @@ import com.kuromusic.utils.rememberPreference
 fun WelcomeScreen(navController: NavController) {
     val context = LocalContext.current
     var currentPage by rememberSaveable { mutableIntStateOf(0) }
-    val pagerState = rememberPagerState(pageCount = { 3 }, initialPage = 0)
+    val pagerState = rememberPagerState(pageCount = { 4 }, initialPage = 0)
     val (langDismissed, onLangDismissedChange) = rememberPreference(LanguageSelectorDismissedKey, defaultValue = false)
     val (lastSeenVersionCode, onLastSeenVersionChange) = rememberPreference(LastSeenVersionCodeKey, defaultValue = 0)
 
@@ -105,7 +105,8 @@ fun WelcomeScreen(navController: NavController) {
                     when (page) {
                         0 -> WelcomeStep1()
                         1 -> WelcomeStep2()
-                        2 -> WelcomePermissions()
+                        2 -> WelcomeStepAudio()
+                        3 -> WelcomePermissions()
                     }
                 }
             }
@@ -360,6 +361,72 @@ private fun WelcomeStep2() {
             title = "Sonido a tu gusto",
             subtitle = "Ecualizador y normalización incluidos"
         )
+    }
+}
+
+@Composable
+private fun WelcomeStepAudio() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 28.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Sonido profesional",
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "Cada perfil transforma tu audio con EQ diseñado para cada estilo",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(32.dp))
+
+        WelcomeBullet(
+            icon = R.drawable.tune,
+            title = "WARM — Cálido",
+            subtitle = "Voces suaves y tonos acogedores, ideal para baladas y podcasts"
+        )
+        Spacer(Modifier.height(8.dp))
+        WelcomeBullet(
+            icon = R.drawable.tune,
+            title = "BASS — Graves",
+            subtitle = "Potencia y profundidad para reggaetón, electrónica y hip-hop"
+        )
+        Spacer(Modifier.height(8.dp))
+        WelcomeBullet(
+            icon = R.drawable.tune,
+            title = "LOFI — Vintage",
+            subtitle = "Estética relajada con filtro nostálgico para lo-fi y chill"
+        )
+        Spacer(Modifier.height(8.dp))
+        WelcomeBullet(
+            icon = R.drawable.tune,
+            title = "STUDIO — Precisión",
+            subtitle = "Análisis limpio con presencia en medios para rock y clásica"
+        )
+        Spacer(Modifier.height(24.dp))
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Cambia de perfil desde el menú de reproducción.\nModo automático en Ajustes > Perfil de sonido.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 }
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.kuromusic.LocalPlayerAwareWindowInsets
 import com.kuromusic.R
@@ -27,9 +29,13 @@ import com.kuromusic.constants.AutoSkipNextOnErrorKey
 import com.kuromusic.constants.BeatBuddyType
 import com.kuromusic.constants.BeatBuddyTypeKey
 import com.kuromusic.constants.PersistentQueueKey
+import com.kuromusic.constants.ProfileModeKey
 import com.kuromusic.constants.SimilarContent
 import com.kuromusic.constants.SkipSilenceKey
+import com.kuromusic.constants.SoundProfileKey
 import com.kuromusic.constants.StopMusicOnTaskClearKey
+import com.kuromusic.playback.ProfileMode
+import com.kuromusic.playback.SoundProfile
 import com.kuromusic.ui.component.EnumListPreference
 import com.kuromusic.ui.component.IconButton
 import com.kuromusic.ui.component.PreferenceGroupTitle
@@ -82,6 +88,14 @@ fun PlayerSettings(
         BeatBuddyTypeKey,
         defaultValue = BeatBuddyType.NONE
     )
+    val (soundProfile, onSoundProfileChange) = rememberEnumPreference(
+        SoundProfileKey,
+        defaultValue = SoundProfile.CLEAN
+    )
+    val (profileMode, onProfileModeChange) = rememberEnumPreference(
+        ProfileModeKey,
+        defaultValue = ProfileMode.MANUAL
+    )
 
     SettingsPage(
         title = stringResource(R.string.player_and_audio),
@@ -118,6 +132,44 @@ fun PlayerSettings(
                     checked = audioNormalization,
                     onCheckedChange = onAudioNormalizationChange
                 )},
+
+                {EnumListPreference(
+                    title = { Text(stringResource(R.string.profile_mode)) },
+                    icon = { Icon(painterResource(R.drawable.tune), null) },
+                    selectedValue = profileMode,
+                    onValueSelected = onProfileModeChange,
+                    valueText = {
+                        when (it) {
+                            ProfileMode.AUTO -> stringResource(R.string.profile_mode_auto)
+                            ProfileMode.MANUAL -> stringResource(R.string.profile_mode_manual)
+                        }
+                    }
+                )},
+
+                {EnumListPreference(
+                    title = { Text(stringResource(R.string.sound_profile)) },
+                    icon = { Icon(painterResource(R.drawable.tune), null) },
+                    selectedValue = soundProfile,
+                    onValueSelected = onSoundProfileChange,
+                    valueText = {
+                        when (it) {
+                            SoundProfile.CLEAN -> stringResource(R.string.sound_profile_clean)
+                            SoundProfile.WARM -> stringResource(R.string.sound_profile_warm)
+                            SoundProfile.BASS -> stringResource(R.string.sound_profile_bass)
+                            SoundProfile.LOFI -> stringResource(R.string.sound_profile_lofi)
+                            SoundProfile.STUDIO -> stringResource(R.string.sound_profile_studio)
+                        }
+                    }
+                )},
+
+                {
+                    Text(
+                        text = stringResource(R.string.sound_profile_note),
+                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                },
 
                 {EnumListPreference(
                     title = { Text(stringResource(R.string.beat_buddy)) },

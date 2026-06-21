@@ -10,7 +10,6 @@ import android.database.SQLException
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
-import android.media.audiofx.LoudnessEnhancer
 import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Build
@@ -73,7 +72,6 @@ import com.kuromusic.innertube.models.WatchEndpoint
 import com.kuromusic.jossredconnect.JossRedClient
 import com.kuromusic.MainActivity
 import com.kuromusic.R
-import com.kuromusic.constants.AudioNormalizationKey
 import com.kuromusic.constants.AudioQualityKey
 import com.kuromusic.constants.AutoLoadMoreKey
 import com.kuromusic.constants.AutoSkipNextOnErrorKey
@@ -93,6 +91,8 @@ import com.kuromusic.constants.RepeatModeKey
 import com.kuromusic.constants.ShowLyricsKey
 import com.kuromusic.constants.SimilarContent
 import com.kuromusic.constants.SkipSilenceKey
+import com.kuromusic.constants.ProfileModeKey
+import com.kuromusic.constants.SoundProfileKey
 import com.kuromusic.db.MusicDatabase
 import com.kuromusic.db.entities.Event
 import com.kuromusic.db.entities.FormatEntity
@@ -114,6 +114,20 @@ import com.kuromusic.models.PersistPlayerState
 import com.kuromusic.models.PersistQueue
 import com.kuromusic.models.toMediaMetadata
 import com.kuromusic.playback.queues.EmptyQueue
+import com.kuromusic.playback.AudioState
+import com.kuromusic.playback.AudioStateHolder
+import com.kuromusic.playback.GainAudioProcessor
+import com.kuromusic.playback.SoundProfile
+import com.kuromusic.playback.AutoSoundProfileEngine
+import com.kuromusic.playback.DeviceAudioStateHolder
+import com.kuromusic.playback.DeviceCompensationAudioProcessor
+import com.kuromusic.playback.GenreDetector
+import com.kuromusic.playback.LoudnessAnalyzer
+import com.kuromusic.playback.LoudnessTap
+import com.kuromusic.playback.ProfileCalibrationSystem
+import com.kuromusic.playback.ProfileMode
+import com.kuromusic.playback.SoundProfileAudioProcessor
+import com.kuromusic.playback.SoundProfileStateHolder
 import com.kuromusic.playback.queues.Queue
 import com.kuromusic.playback.queues.YouTubeQueue
 import com.kuromusic.playback.queues.filterExplicit
@@ -253,8 +267,14 @@ class MusicService :
     lateinit var player: ExoPlayer
     private lateinit var mediaSession: MediaLibrarySession
 
-    private var isAudioEffectSessionOpened = false
-    private var loudnessEnhancer: LoudnessEnhancer? = null
+    private val stateHolder = AudioStateHolder()
+    private val gainProcessor = GainAudioProcessor(stateHolder)
+    private val soundProfileHolder = SoundProfileStateHolder()
+    private val deviceStateHolder = DeviceAudioStateHolder(this)
+    private val soundProfileProcessor = SoundProfileAudioProcessor(soundProfileHolder, deviceStateHolder)
+    private val deviceProcessor = DeviceCompensationAudioProcessor(deviceStateHolder)
+    private val loudnessAnalyzer = LoudnessAnalyzer()
+    private val calibrationSystem = ProfileCalibrationSystem(loudnessAnalyzer, soundProfileHolder)
 
     private var discordRpc: DiscordRPC? = null
     private var lastPlaybackSpeed = 1.0f
@@ -376,6 +396,41 @@ class MusicService :
         connectivityManager = getSystemService()!!
         connectivityObserver = NetworkConnectivityObserver(this)
 
+        deviceStateHolder.detect()
+
+        LoudnessTap.attach(loudnessAnalyzer)
+
+        soundProfileHolder.applyAutoGain(SoundProfile.WARM, 0.2f)
+        soundProfileHolder.applyAutoGain(SoundProfile.BASS, 0.3f)
+        soundProfileHolder.applyAutoGain(SoundProfile.LOFI, 0.5f)
+        soundProfileHolder.applyAutoGain(SoundProfile.STUDIO, 0.2f)
+
+        scope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(30_000L)
+                calibrationSystem.calibrate()
+            }
+        }
+
+        val audioManager = getSystemService(AudioManager::class.java)
+        audioManager?.registerAudioDeviceCallback(object : android.media.AudioDeviceCallback() {
+            override fun onAudioDevicesAdded(addedDevices: Array<android.media.AudioDeviceInfo>) {
+                deviceStateHolder.refresh()
+                deviceProcessor.updateProfile()
+                if (soundProfileHolder.state.mode == ProfileMode.AUTO) {
+                    resolveAutoProfile()
+                }
+            }
+
+            override fun onAudioDevicesRemoved(removedDevices: Array<android.media.AudioDeviceInfo>) {
+                deviceStateHolder.refresh()
+                deviceProcessor.updateProfile()
+                if (soundProfileHolder.state.mode == ProfileMode.AUTO) {
+                    resolveAutoProfile()
+                }
+            }
+        }, android.os.Handler(android.os.Looper.getMainLooper()))
+
         // Observar conectividad de red
         scope.launch {
             connectivityObserver.networkStatus.collect { isConnected ->
@@ -494,15 +549,38 @@ class MusicService :
                 }
             }
 
-        combine(
-            currentFormat,
-            dataStore.data
-                .map { it[AudioNormalizationKey] ?: true }
-                .distinctUntilChanged(),
-        ) { format, normalizeAudio ->
-            format to normalizeAudio
-        }.collectLatest(scope) { (format, normalizeAudio) ->
-            setupLoudnessEnhancer()
+        dataStore.data
+            .map { it[ProfileModeKey]?.let(ProfileMode::valueOf) ?: ProfileMode.MANUAL }
+            .distinctUntilChanged()
+            .collectLatest(scope) { mode ->
+                if (mode == ProfileMode.MANUAL) {
+                    val savedProfile = dataStore.data.first()[SoundProfileKey]
+                        ?.let(SoundProfile::valueOf) ?: SoundProfile.CLEAN
+                    soundProfileHolder.setManual(savedProfile)
+                } else {
+                    soundProfileHolder.setAuto()
+                    resolveAutoProfile()
+                }
+            }
+
+        dataStore.data
+            .map { it[SoundProfileKey]?.let(SoundProfile::valueOf) ?: SoundProfile.CLEAN }
+            .distinctUntilChanged()
+            .collectLatest(scope) { profile ->
+                if (soundProfileHolder.state.mode == ProfileMode.MANUAL) {
+                    soundProfileHolder.setManual(profile)
+                }
+            }
+
+        currentFormat.collectLatest(scope) { format ->
+            val loudnessDb = format?.loudnessDb?.toFloat()
+            stateHolder.update(
+                AudioState(
+                    loudnessDb = loudnessDb,
+                    gainDb = 0f,
+                    targetLufs = -14f
+                )
+            )
         }
 
         dataStore.data
@@ -632,6 +710,14 @@ class MusicService :
 
     private fun stopOnError() {
         player.pause()
+    }
+
+    private fun resolveAutoProfile() {
+        val title = player.currentMediaItem?.metadata?.title?.toString() ?: ""
+        val genre = GenreDetector.detect(title)
+        val device = deviceStateHolder.device
+        val resolved = AutoSoundProfileEngine.resolve(device, genre)
+        soundProfileHolder.update(resolved)
     }
 
     private fun updateNotification() {
@@ -993,108 +1079,11 @@ class MusicService :
         }
     }
 
-    private fun setupLoudnessEnhancer() {
-        scope.launch(Dispatchers.Main) {
-            try {
-                val audioSessionId = player.audioSessionId
-
-                if (audioSessionId == C.AUDIO_SESSION_ID_UNSET || audioSessionId <= 0) {
-                    Log.w(TAG, "setupLoudnessEnhancer: invalid audioSessionId ($audioSessionId), cannot create effect yet")
-                    return@launch
-                }
-                
-                // Guard: Only setup enhancer if player is ready
-                if (player.playbackState != Player.STATE_READY) {
-                    return@launch
-                }
-
-                // Defer creation if this is the first time (avoid blocking app startup)
-                if (loudnessEnhancer == null) {
-                    delay(500)  // Let UI draw first
-                }
-
-                // Create or recreate enhancer if necessary
-                if (loudnessEnhancer == null) {
-                    try {
-                        loudnessEnhancer = LoudnessEnhancer(audioSessionId)
-                        Log.d(TAG, "LoudnessEnhancer created (lazy) for sessionId=$audioSessionId")
-                    } catch (e: RuntimeException) {
-                        // Some devices (Tecno/Infinix with custom ROMs) may fail here
-                        Log.e(TAG, "Failed to create LoudnessEnhancer, but app continues", e)
-                        reportException(e)
-                        return@launch
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to create LoudnessEnhancer", e)
-                        reportException(e)
-                        return@launch
-                    }
-                }
-
-                // Configure the enhancer
-                val currentMediaId = player.currentMediaItem?.mediaId
-
-                val normalizeAudio = withContext(Dispatchers.IO) {
-                    dataStore.data.map { it[AudioNormalizationKey] ?: true }.first()
-                }
-
-                if (normalizeAudio && currentMediaId != null) {
-                    val format = withContext(Dispatchers.IO) {
-                        database.format(currentMediaId).first()
-                    }
-
-                    val loudnessDb = format?.loudnessDb
-
-                    if (loudnessDb != null) {
-                        // Fix: Disable LoudnessEnhancer for Opus to prevent "MediaCodec mime type not supported" error
-                        if (format.mimeType.contains("opus", ignoreCase = true)) {
-                            Log.d(TAG, "setupLoudnessEnhancer: Skipping Opus format due to codec compatibility")
-                            loudnessEnhancer?.enabled = false
-                            return@launch
-                        }
-
-                        val targetGain = (-loudnessDb * 100).toInt()
-                        val clampedGain = targetGain.coerceIn(MIN_GAIN_MB, MAX_GAIN_MB)
-                        try {
-                            loudnessEnhancer?.setTargetGain(clampedGain)
-                            loudnessEnhancer?.enabled = true
-                            Log.d(TAG, "LoudnessEnhancer gain applied: $clampedGain mB")
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Error applying LoudnessEnhancer gain", e)
-                            reportException(e)
-                            releaseLoudnessEnhancer()
-                        }
-                    } else {
-                        loudnessEnhancer?.enabled = false
-                        Log.w(TAG, "setupLoudnessEnhancer: loudnessDb is null, enhancer disabled")
-                    }
-                } else {
-                    loudnessEnhancer?.enabled = false
-                    Log.d(TAG, "setupLoudnessEnhancer: normalization disabled or mediaId unavailable")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in setupLoudnessEnhancer", e)
-                reportException(e)
-                releaseLoudnessEnhancer()
-            }
-        }
-    }
-
-    private fun releaseLoudnessEnhancer() {
-        try {
-            loudnessEnhancer?.release()
-            Log.d(TAG, "LoudnessEnhancer released")
-        } catch (e: Exception) {
-            reportException(e)
-            Log.e(TAG, "Error releasing LoudnessEnhancer: ${e.message}")
-        } finally {
-            loudnessEnhancer = null
-        }
-    }
+    private var isAudioEffectSessionOpened = false
 
     private fun openAudioEffectSession() {
         if (isAudioEffectSessionOpened) return
         isAudioEffectSessionOpened = true
-        setupLoudnessEnhancer()
         sendBroadcast(
             Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
                 putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.audioSessionId)
@@ -1107,7 +1096,6 @@ class MusicService :
     private fun closeAudioEffectSession() {
         if (!isAudioEffectSessionOpened) return
         isAudioEffectSessionOpened = false
-        releaseLoudnessEnhancer()
         sendBroadcast(
             Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION).apply {
                 putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.audioSessionId)
@@ -1160,9 +1148,13 @@ class MusicService :
                 }
             }
         }
-        lastPlaybackSpeed = -1.0f // forzar actualización de canción
+        if (soundProfileHolder.state.mode == ProfileMode.AUTO) {
+            resolveAutoProfile()
+        }
 
-        setupLoudnessEnhancer()
+        calibrationSystem.onTrackPlayed()
+
+        lastPlaybackSpeed = -1.0f // forzar actualización de canción
 
         discordUpdateJob?.cancel()
 
@@ -1245,10 +1237,6 @@ class MusicService :
     }
 
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-        if (playWhenReady) {
-            setupLoudnessEnhancer()
-        }
-
         // Actualizar notificación cuando cambia el estado de reproducción
         scope.launch {
             delay(300)
@@ -1401,7 +1389,7 @@ class MusicService :
                     connectivityManager = connectivityManager
                 ).getOrThrow()
 
-                val streamUrl = YTPlayerUtils.getValidStreamUrl(playback.format)
+                val streamUrl = playback.streamUrl
                 
                 if (streamUrl.startsWith("https://")) {
                     try {
@@ -1587,7 +1575,7 @@ class MusicService :
                 .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
                 .setAudioProcessorChain(
                     DefaultAudioSink.DefaultAudioProcessorChain(
-                        emptyArray(),
+                        arrayOf(gainProcessor, deviceProcessor, soundProfileProcessor),
                         SilenceSkippingAudioProcessor(2_000_000, 20_000, 256),
                         SonicAudioProcessor(),
                     ),
@@ -1724,7 +1712,6 @@ class MusicService :
             discordRpc?.closeRPC()
         }
         discordRpc = null
-        releaseLoudnessEnhancer()
         mediaSession.release()
         if (::player.isInitialized) {
             player.removeListener(this)
@@ -1767,10 +1754,6 @@ class MusicService :
         const val CHUNK_LENGTH = 512 * 1024L
         const val PERSISTENT_QUEUE_FILE = "persistent_queue.data"
         const val PERSISTENT_AUTOMIX_FILE = "persistent_automix.data"
-
-        // Constants for audio normalization
-        private const val MAX_GAIN_MB = 800 // Maximum gain in millibels (8 dB)
-        private const val MIN_GAIN_MB = -800 // Minimum gain in millibels (-8 dB)
 
         private const val TAG = "MusicService"
     }

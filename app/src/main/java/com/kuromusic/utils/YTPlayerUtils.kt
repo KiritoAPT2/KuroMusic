@@ -459,27 +459,9 @@ object YTPlayerUtils {
         format: PlayerResponse.StreamingData.Format,
         videoId: String
     ): String? {
-        // 1️⃣ DIRECT URL
-        val url = format.url
-        if (!url.isNullOrEmpty()) {
-            Timber.tag(logTag).i("✅ DIRECT URL found for itag ${format.itag}")
-            return url
-        }
-
-        // 2️⃣ SignatureCipher fallback (Naive parse)
-        val sigCipher = format.signatureCipher
-        if (!sigCipher.isNullOrEmpty()) {
-            Timber.tag(logTag).d("Attempting manual signature parsing for itag ${format.itag}")
-            return parseSignatureCipher(sigCipher)
-        }
-
-        // 3️⃣ NewPipe Fallback (Last resort for extraction if above fails, though usually Format has one of the above)
-        Timber.tag(logTag).d("No direct URL/Cipher, trying NewPipeUtils extraction...")
         return NewPipeUtils.getStreamUrl(format, videoId)
-            .onSuccess { Timber.tag(logTag).d("Stream URL obtained via NewPipe") }
-            .onFailure {
-                Timber.tag(logTag).e(it, "NewPipe failed to get stream URL")
-            }
+            .onSuccess { Timber.tag(logTag).d("Stream URL obtained via NewPipe for itag ${format.itag}") }
+            .onFailure { Timber.tag(logTag).e(it, "Failed to get stream URL for itag ${format.itag}") }
             .getOrNull()
     }
 
