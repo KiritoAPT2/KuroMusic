@@ -2,58 +2,58 @@
 # Compila AOT los paths críticos de startup y navegación
 
 # ───── Application & DI ─────
-HSPLcom/kuromusic/App
-HSPLcom/kuromusic/di/AppModule
-HSPLcom/kuromusic/di/LyricsHelperEntryPoint
+com/kuromusic/App
+com/kuromusic/di/AppModule
+com/kuromusic/di/LyricsHelperEntryPoint
 
 # ───── Main Activity & Core UI ─────
-HSPLcom/kuromusic/MainActivity
-HSPLcom/kuromusic/MainActivity$
-HSPLcom/kuromusic/ui/theme/ThemeKt
-SPLandroidx/compose/material3/MaterialTheme
-SPLandroidx/compose/material3/Surface
+com/kuromusic/MainActivity
+com/kuromusic/MainActivity$
+com/kuromusic/ui/theme/ThemeKt
+androidx/compose/material3/MaterialTheme
+androidx/compose/material3/Surface
 
 # ───── Navigation ─────
-HSPLcom/kuromusic/ui/screens/NavigationBuilderKt
-SPLcom/kuromusic/ui/screens/Screens
-SPLcom/kuromusic/ui/screens/Screens$MainScreens
+com/kuromusic/ui/screens/NavigationBuilderKt
+com/kuromusic/ui/screens/Screens
+com/kuromusic/ui/screens/Screens$MainScreens
 
 # ───── Home Screen ─────
-HSPLcom/kuromusic/ui/screens/HomeScreen
-HSPLcom/kuromusic/ui/screens/HomeScreen$
-HSPLcom/kuromusic/viewmodels/HomeViewModel
+com/kuromusic/ui/screens/HomeScreen
+com/kuromusic/ui/screens/HomeScreen$
+com/kuromusic/viewmodels/HomeViewModel
 
 # ───── Player ─────
-HSPLcom/kuromusic/playback/MusicService
-HSPLcom/kuromusic/playback/PlayerConnection
-HSPLcom/kuromusic/playback/MusicService$MusicBinder
+com/kuromusic/playback/MusicService
+com/kuromusic/playback/PlayerConnection
+com/kuromusic/playback/MusicService$MusicBinder
 
 # ───── Database ─────
-SPLcom/kuromusic/db/MusicDatabase
-SPLcom/kuromusic/db/InternalDatabase
-SPLcom/kuromusic/db/dao/SongDao
-SPLcom/kuromusic/db/dao/PlaylistDao
-SPLcom/kuromusic/db/dao/ArtistDao
-SPLcom/kuromusic/db/dao/AlbumDao
+com/kuromusic/db/MusicDatabase
+com/kuromusic/db/InternalDatabase
+com/kuromusic/db/dao/SongDao
+com/kuromusic/db/dao/PlaylistDao
+com/kuromusic/db/dao/ArtistDao
+com/kuromusic/db/dao/AlbumDao
 
 # ───── Explore & Library ─────
-SPLcom/kuromusic/ui/screens/ExploreScreen
-SPLcom/kuromusic/ui/screens/ExploreScreen$
-SPLcom/kuromusic/ui/screens/LibraryScreen
-SPLcom/kuromusic/ui/screens/LibraryScreen$
-SPLcom/kuromusic/viewmodels/ExploreViewModel
+com/kuromusic/ui/screens/ExploreScreen
+com/kuromusic/ui/screens/ExploreScreen$
+com/kuromusic/ui/screens/LibraryScreen
+com/kuromusic/ui/screens/LibraryScreen$
+com/kuromusic/viewmodels/ExploreViewModel
 
 # ───── Player Screen ─────
-SPLcom/kuromusic/ui/screens/PlayerScreen
-SPLcom/kuromusic/ui/screens/PlayerScreen$
+com/kuromusic/ui/screens/PlayerScreen
+com/kuromusic/ui/screens/PlayerScreen$
 
 # ───── Common UI Components ─────
-Wcom/kuromusic/ui/component/
-Wcom/kuromusic/ui/components/
+com/kuromusic/ui/component/
+com/kuromusic/ui/components/
 
 # ───── Network ─────
-Wcom/kuromusic/utils/YTPlayerUtilsKt
+com/kuromusic/utils/YTPlayerUtilsKt
 
 # ───── Search ─────
-Wcom/kuromusic/ui/screens/SearchScreen
-Wcom/kuromusic/ui/screens/SearchScreen$
+com/kuromusic/ui/screens/SearchScreen
+com/kuromusic/ui/screens/SearchScreen$

@@ -180,4 +180,17 @@ dependencies {
     coreLibraryDesugaring(libs.desugaring)
 
     implementation(libs.timber)
+
+    constraints {
+        implementation("io.netty:netty-handler:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec-http:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec-http2:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-resolver-dns:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-common:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-handler-proxy:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec-dns:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-resolver:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-buffer:4.1.120.Final") { because("CVE fixes") }
+    }
 }
