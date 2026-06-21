@@ -2,9 +2,7 @@ package com.kuromusic.baselineprofile
 
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.Direction
-import androidx.test.uiautomator.Until
+import androidx.test.uiautomator.UiDevice
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,16 +19,21 @@ class BaselineProfileGenerator {
             packageName = "com.kuromusic",
             profileBlock = {
                 startActivityAndWait()
-                device.wait(Until.hasObject(By.descContains("Home")), 10_000)
+                device.waitForIdle()
 
-                val listView = device.findObject(By.depth(10))
-                listView?.let {
-                    it.setGestureMargin(device.displayWidth / 5)
-                    it.fling(Direction.DOWN)
-                    it.fling(Direction.UP)
+                android.util.Log.d("BaselineProfile", "=== MODO MANUAL ===")
+                android.util.Log.d("BaselineProfile", "Esperando 5 minutos para interacción manual...")
+                android.util.Log.d("BaselineProfile", "Sigue las instrucciones en pantalla.")
+
+                // Wait 1 minute for manual interaction
+                val startTime = System.currentTimeMillis()
+                val timeoutMs = 60_000L // 1 minute
+                while (System.currentTimeMillis() - startTime < timeoutMs) {
+                    device.waitForIdle()
+                    Thread.sleep(5_000) // check every 5 seconds
                 }
 
-                device.waitForIdle()
+                android.util.Log.d("BaselineProfile", "=== FIN MODO MANUAL ===")
             },
         )
     }

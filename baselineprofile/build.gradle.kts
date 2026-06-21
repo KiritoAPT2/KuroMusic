@@ -1,6 +1,7 @@
 plugins {
     id("com.android.test")
     id("kotlin-android")
+    alias(libs.plugins.baseline.profile.producer)
 }
 
 android {
@@ -10,6 +11,8 @@ android {
     defaultConfig {
         minSdk = 24
         targetSdk = 35
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["androidx.benchmark.enabledRules"] = "BaselineProfile"
     }
 
     targetProjectPath = ":app"

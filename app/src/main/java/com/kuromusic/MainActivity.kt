@@ -67,6 +67,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
@@ -130,6 +131,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -151,7 +153,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.util.Consumer
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -204,6 +208,7 @@ import com.kuromusic.ui.component.LocaleManager
 import com.kuromusic.ui.component.Lyrics
 import com.kuromusic.ui.component.SwitchPreference
 import com.kuromusic.ui.component.TopSearch
+import com.kuromusic.ui.component.collapsedAnchor
 import com.kuromusic.ui.component.rememberBottomSheetState
 import com.kuromusic.ui.component.shimmer.ShimmerTheme
 import com.kuromusic.ui.menu.YouTubeSongMenu
@@ -490,9 +495,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val focusManager = LocalFocusManager.current
                     val density = LocalDensity.current
-                    val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
-                    val bottomInsetDp = remember(systemBarsPadding) { systemBarsPadding.calculateBottomPadding() }
-
+                    val view = LocalView.current
+                    val bottomInsetDp = remember(view, density) {
+                        val insets = ViewCompat.getRootWindowInsets(view)
+                        val navBarBottomPx = insets?.getInsets(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
+                        (navBarBottomPx / density.density).dp
+                    }
 
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -583,11 +591,13 @@ class MainActivity : ComponentActivity() {
                                     !active
                         }
 
+                    val collapsedBoundDp = MiniPlayerHeight + (if (isNavBarScreen) NavigationBarHeight + bottomInsetDp + 8.dp else bottomInsetDp + 4.dp)
                     val playerBottomSheetState =
                         rememberBottomSheetState(
                             dismissedBound = 0.dp,
-                            collapsedBound = MiniPlayerHeight + (if (isNavBarScreen) NavigationBarHeight else bottomInsetDp + 4.dp),
+                            collapsedBound = collapsedBoundDp,
                             expandedBound = maxHeight,
+                            initialAnchor = collapsedAnchor,
                         )
 
                     val playerProgress = playerBottomSheetState.progress
@@ -603,7 +613,7 @@ class MainActivity : ComponentActivity() {
                             playerBottomSheetState.isDismissed,
                             systemBars // Add as key since we use it
                         ) {
-                            var bottom = if (shouldShowNavigationBar) NavigationBarHeight else bottomInsetDp
+                            var bottom = if (shouldShowNavigationBar) NavigationBarHeight + bottomInsetDp else bottomInsetDp
                             if (!playerBottomSheetState.isDismissed) bottom = playerBottomSheetState.collapsedBound
                             systemBars
                                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
@@ -1078,8 +1088,13 @@ class MainActivity : ComponentActivity() {
                                 .background(MaterialTheme.colorScheme.surface),
                             contentWindowInsets = WindowInsets(0, 0, 0, 0)
                         ) {
-                            NavHost(
-                                navController = navController,
+                            Box(
+                                modifier = Modifier.padding(
+                                    bottom = if (shouldShowNavigationBar) NavigationBarHeight else 0.dp
+                                )
+                            ) {
+                                NavHost(
+                                    navController = navController,
                                 startDestination = when (tabOpenedFromShortcut ?: defaultOpenTab) {
                                     NavigationTab.HOME -> Screens.Home
                                     NavigationTab.EXPLORE -> Screens.Explore
@@ -1090,12 +1105,12 @@ class MainActivity : ComponentActivity() {
                                     if (initialState.destination.route in topLevelScreens &&
                                         targetState.destination.route in topLevelScreens
                                     ) {
-                                        fadeIn(spring(dampingRatio = Spring.DampingRatioNoBouncy))
+                                        fadeIn(tween(250))
                                     } else {
-                                        fadeIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) +
+                                        fadeIn(tween(250)) +
                                                 slideInHorizontally(
                                                     initialOffsetX = { it },
-                                                    animationSpec = spring(stiffness = Spring.StiffnessLow)
+                                                    animationSpec = tween(250)
                                                 )
                                     }
                                 },
@@ -1104,42 +1119,36 @@ class MainActivity : ComponentActivity() {
                                     if (initialState.destination.route in topLevelScreens &&
                                         targetState.destination.route in topLevelScreens
                                     ) {
-                                        fadeOut(spring(dampingRatio = Spring.DampingRatioNoBouncy))
+                                        fadeOut(tween(200))
                                     } else {
-                                        fadeOut(spring(dampingRatio = Spring.DampingRatioLowBouncy)) +
+                                        fadeOut(tween(200)) +
                                                 slideOutHorizontally(
                                                     targetOffsetX = { -it / 5 },
-                                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                                                    animationSpec = tween(200)
                                                 )
                                     }
                                 },
 
                                 popEnterTransition = {
-                                    if ((initialState.destination.route in topLevelScreens ||
-                                                initialState.destination.route?.startsWith("search/") == true) &&
-                                        targetState.destination.route in topLevelScreens
-                                    ) {
-                                        fadeIn(spring(dampingRatio = Spring.DampingRatioNoBouncy))
+                                    if (targetState.destination.route in topLevelScreens) {
+                                        fadeIn(tween(250))
                                     } else {
-                                        fadeIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) +
+                                        fadeIn(tween(250)) +
                                                 slideInHorizontally(
                                                     initialOffsetX = { -it },
-                                                    animationSpec = spring(stiffness = Spring.StiffnessLow)
+                                                    animationSpec = tween(250)
                                                 )
                                     }
                                 },
 
                                 popExitTransition = {
-                                    if ((initialState.destination.route in topLevelScreens ||
-                                                initialState.destination.route?.startsWith("search/") == true) &&
-                                        targetState.destination.route in topLevelScreens
-                                    ) {
-                                        fadeOut(spring(dampingRatio = Spring.DampingRatioNoBouncy))
+                                    if (targetState.destination.route in topLevelScreens) {
+                                        fadeOut(tween(200))
                                     } else {
-                                        fadeOut(spring(dampingRatio = Spring.DampingRatioLowBouncy)) +
+                                        fadeOut(tween(200)) +
                                                 slideOutHorizontally(
                                                     targetOffsetX = { it / 5 },
-                                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                                                    animationSpec = tween(200)
                                                 )
                                     }
                                 },
@@ -1159,6 +1168,7 @@ class MainActivity : ComponentActivity() {
                                     topAppBarScrollBehavior,
                                     latestVersionName
                                 )
+                            }
                             }
 
                         }
@@ -1271,7 +1281,8 @@ class MainActivity : ComponentActivity() {
 
                             NavigationBar(
                                 modifier = Modifier
-                                    .padding(start = navHPad, end = navHPad, bottom = navBPad + bottomInsetDp)
+                                    .navigationBarsPadding()
+                                    .padding(start = navHPad, end = navHPad, bottom = navBPad)
                                     .height(navHeight)
                                     .clip(RoundedCornerShape(50.dp)),
                                 containerColor = Color.Transparent,
