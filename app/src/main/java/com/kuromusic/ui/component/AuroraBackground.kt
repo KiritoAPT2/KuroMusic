@@ -93,15 +93,19 @@ fun AuroraBackground(
 
     val brushColors = remember(animatedDynamicColor, isDarkTheme) {
         if (isDarkTheme) {
+            val defaultColor = Color(0xFF121212)
+            val isDynamic = animatedDynamicColor != defaultColor
+            val primary = if (isDynamic) animatedDynamicColor else PurpleElectric
+            val secondary = if (isDynamic) animatedDynamicColor else defaultColor
             AuroraBrushColors(
-                topPrimary = PurpleElectric,
-                topSecondary = animatedDynamicColor,
+                topPrimary = primary,
+                topSecondary = secondary,
                 topAlpha = 0.3f,
-                leftPrimary = PurpleElectric,
-                leftSecondary = animatedDynamicColor,
+                leftPrimary = primary,
+                leftSecondary = secondary,
                 leftAlpha = 0.35f,
-                rightPrimary = animatedDynamicColor,
-                rightSecondary = PurpleElectric.copy(alpha = 0.6f).compositeOver(Color.White),
+                rightPrimary = secondary,
+                rightSecondary = primary.copy(alpha = 0.6f).compositeOver(Color.White),
                 rightAlpha = 0.3f,
                 blendMode = BlendMode.Plus
             )

@@ -270,6 +270,14 @@
     <string name="stop_music_on_task_clear">Detener la música al borrar la tarea</string>
     <string name="equalizer">Ecualizador</string>
 
+    <string name="sound_profile">Perfil de sonido</string>
+    <string name="sound_profile_clean">Limpio</string>
+    <string name="sound_profile_warm">Cálido</string>
+    <string name="sound_profile_bass">Graves</string>
+    <string name="sound_profile_lofi">Lo-Fi</string>
+    <string name="sound_profile_studio">Estudio</string>
+    <string name="sound_profile_note">Las mejoras se notan más con auriculares. La salida del altavoz también se potencia para mayor claridad y cuerpo.</string>
+
     <string name="storage">Almacenamiento</string>
     <string name="cache">Caché</string>
     <string name="image_cache">Caché de imágenes</string>
