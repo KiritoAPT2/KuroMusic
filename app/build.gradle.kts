@@ -8,6 +8,7 @@ plugins {
     kotlin("plugin.serialization") version "2.1.0"
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.baseline.profile)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -39,20 +40,6 @@ android {
         buildConfigField("String", "YOUTUBE_SESSION_COOKIES", "\"${localProperties.getProperty("YOUTUBE_SESSION_COOKIES") ?: ""}\"")
     }
 
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true  // Activa R8 para reducir el tamaño y optimizar
-            isShrinkResources = true // Elimina recursos (imágenes/layouts) que no uses
-            isCrunchPngs = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro" // Aquí es donde pusimos las reglas de Media3
-            )
-        }
-        debug {
-        }
-    }
-
     signingConfigs {
         getByName("debug") {
             if (System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD") != null) {
@@ -61,6 +48,27 @@ android {
                 keyAlias = "debug"
                 keyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD")
             }
+        }
+        create("release") {
+            storeFile = file("/home/kiritoapt2/KuroMusic")
+            storePassword = "110474"
+            keyAlias = "KuroMusic"
+            keyPassword = "110474"
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isCrunchPngs = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
         }
     }
 
@@ -100,6 +108,10 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.isReturnDefaultValues = true
+    }
+
+    baselineProfile {
+        mergeIntoMain = true
     }
 
     lint {
@@ -174,6 +186,7 @@ dependencies {
     implementation(projects.lrclib)
     implementation(projects.kizzy)
     implementation(project(":jossredconnect"))
+    baselineProfile(project(":baselineprofile"))
 
     implementation(libs.ktor.client.core)
 
@@ -182,15 +195,17 @@ dependencies {
     implementation(libs.timber)
 
     constraints {
-        implementation("io.netty:netty-handler:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-codec-http:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-codec-http2:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-resolver-dns:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-codec:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-common:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-handler-proxy:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-codec-dns:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-resolver:4.1.120.Final") { because("CVE fixes") }
-        implementation("io.netty:netty-buffer:4.1.120.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-handler:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec-http:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec-http2:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-resolver-dns:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-common:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-handler-proxy:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-codec-dns:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-resolver:4.1.135.Final") { because("CVE fixes") }
+        implementation("io.netty:netty-buffer:4.1.135.Final") { because("CVE fixes") }
+        implementation("com.fasterxml.jackson.core:jackson-core:2.18.3") { because("CVE fixes") }
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3") { because("CVE fixes") }
     }
 }
