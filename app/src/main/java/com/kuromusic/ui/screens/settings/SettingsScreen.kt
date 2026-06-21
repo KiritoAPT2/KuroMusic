@@ -472,8 +472,8 @@ suspend fun checkForUpdates(): String? = withContext(Dispatchers.IO) {
 }
 
 fun isNewerVersion(remoteVersion: String, currentVersion: String): Boolean {
-    val remote = remoteVersion.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-    val current = currentVersion.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
+    val remote = remoteVersion.removePrefix("v.").removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
+    val current = currentVersion.removePrefix("v.").removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
 
     for (i in 0 until maxOf(remote.size, current.size)) {
         val r = remote.getOrNull(i) ?: 0
@@ -661,8 +661,76 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Card de actualización disponible
-        UpdateCard()
+        // Actualizaciones
+        val updateScope = rememberCoroutineScope()
+        var updateCheckResult by remember { mutableStateOf<String?>(null) }
+        var showUpdateResultDialog by remember { mutableStateOf(false) }
+        var showDownloadDialog by remember { mutableStateOf(false) }
+
+        if (showUpdateResultDialog && updateCheckResult != null) {
+            val isNewer = updateCheckResult?.let { isNewerVersion(it, BuildConfig.VERSION_NAME) } ?: false
+            AlertDialog(
+                onDismissRequest = { showUpdateResultDialog = false },
+                title = {
+                    Text(
+                        if (isNewer) stringResource(R.string.NewVersion)
+                        else "KuroMusic"
+                    )
+                },
+                text = {
+                    Text(
+                        if (isNewer) {
+                            stringResource(R.string.update_version, updateCheckResult!!)
+                        } else {
+                            "KuroMusic v${BuildConfig.VERSION_NAME} está actualizada"
+                        }
+                    )
+                },
+                confirmButton = {
+                    if (isNewer) {
+                        TextButton(onClick = {
+                            showUpdateResultDialog = false
+                            showDownloadDialog = true
+                        }) {
+                            Text(stringResource(R.string.download))
+                        }
+                    }
+                    TextButton(onClick = { showUpdateResultDialog = false }) {
+                        Text(stringResource(R.string.close))
+                    }
+                }
+            )
+        }
+
+        SettingsCategory(
+            title = "Actualizaciones",
+            items = listOf(
+                SettingsCategoryItem(
+                    icon = painterResource(R.drawable.update),
+                    title = { Text("Buscar actualizaciones") },
+                    description = { Text("v${BuildConfig.VERSION_NAME}") },
+                    onClick = {
+                        updateScope.launch {
+                            val result = checkForUpdates()
+                            updateCheckResult = result
+                            showUpdateResultDialog = true
+                        }
+                    }
+                )
+            )
+        )
+
+        if (showDownloadDialog && updateCheckResult != null) {
+            UpdateDownloadDialog(
+                latestVersion = updateCheckResult!!,
+                onDismiss = { showDownloadDialog = false }
+            )
+        }
+
+        // Card de actualización disponible (auto)
+        if (!showUpdateResultDialog) {
+            UpdateCard()
+        }
 
         // Card de versión
 
