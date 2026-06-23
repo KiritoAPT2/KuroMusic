@@ -26,6 +26,7 @@ import com.kuromusic.constants.AudioQuality
 import com.kuromusic.constants.AudioQualityKey
 import com.kuromusic.constants.AutoLoadMoreKey
 import com.kuromusic.constants.AutoSkipNextOnErrorKey
+import com.kuromusic.constants.ForceAacFallbackKey
 import com.kuromusic.constants.BeatBuddyType
 import com.kuromusic.constants.BeatBuddyTypeKey
 import com.kuromusic.constants.PersistentQueueKey
@@ -84,6 +85,10 @@ fun PlayerSettings(
         StopMusicOnTaskClearKey,
         defaultValue = false
     )
+    val (forceAacFallback, onForceAacFallbackChange) = rememberPreference(
+        ForceAacFallbackKey,
+        defaultValue = false
+    )
     val (beatBuddyType, onBeatBuddyTypeChange) = rememberEnumPreference(
         BeatBuddyTypeKey,
         defaultValue = BeatBuddyType.NONE
@@ -117,6 +122,14 @@ fun PlayerSettings(
                             AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
                         }
                     }
+                )},
+
+                {SwitchPreference(
+                    title = { Text("Forzar AAC (solución ZTE)") },
+                    description = "Usar AAC en vez de Opus si hay problemas de codec",
+                    icon = { Icon(painterResource(R.drawable.graphic_eq), null) },
+                    checked = forceAacFallback,
+                    onCheckedChange = onForceAacFallbackChange
                 )},
 
                 {SwitchPreference(
