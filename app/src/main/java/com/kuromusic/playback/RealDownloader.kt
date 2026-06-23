@@ -1,10 +1,6 @@
 package com.kuromusic.playback
 
 import android.content.Context
-import com.kuromusic.innertube.YouTube
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -42,22 +38,7 @@ object RealDownloader {
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
             .followRedirects(true)
-            .cookieJar(object : CookieJar {
-                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) = Unit
-                override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                    // Pasar cookies de la sesión de YouTube al CDN de descargas
-                    val raw = YouTube.cookie ?: return emptyList()
-                    return raw.split("; ").mapNotNull { pair ->
-                        val parts = pair.split("=", limit = 2)
-                        if (parts.size == 2) Cookie.Builder()
-                            .name(parts[0])
-                            .value(parts[1])
-                            .domain(url.host)
-                            .build()
-                        else null
-                    }
-                }
-            })
+            .addInterceptor(YouTubeSessionInterceptor())
             .build()
     }
 
@@ -120,9 +101,6 @@ object RealDownloader {
         val request = Request.Builder()
             .url(url)
             .header("User-Agent", YT_MUSIC_USER_AGENT)
-            .header("Referer", "https://music.youtube.com/")
-            .header("Accept", "*/*")
-            .header("Accept-Encoding", "identity")
             .build()
 
         val response: Response = httpClient.newCall(request).execute()
