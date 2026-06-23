@@ -34,6 +34,7 @@ import java.net.URI
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import com.kuromusic.constants.InnerTubeCookieKey
+import com.kuromusic.constants.ForceAacFallbackKey
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.runBlocking
 import com.kuromusic.utils.dataStore
@@ -426,8 +427,19 @@ object YTPlayerUtils {
         val adaptiveFormats = playerResponse.streamingData?.adaptiveFormats
             ?.filter { it.isAudio } ?: emptyList()
 
-        val safeFormat = when (audioQuality) {
-            AudioQuality.HIGH -> adaptiveFormats.find { it.itag == 141 }
+        // Si este dispositivo no soporta Opus (detectado automáticamente
+        // en onPlayerError por ERROR_CODE_DECODER_QUERY_FAILED),
+        // priorizamos AAC para evitar silencio/error (ZTE Blade V70, etc.)
+        val forceAacFallback = appContext?.dataStore?.get(ForceAacFallbackKey, false) ?: false
+        if (forceAacFallback) {
+            Timber.tag(logTag).d("AAC fallback active — prioritizing AAC over Opus for compatibility")
+        }
+
+        val safeFormat = when {
+            forceAacFallback -> adaptiveFormats.find { it.itag == 141 }
+                ?: adaptiveFormats.find { it.itag == 140 }
+                ?: adaptiveFormats.find { it.itag == 251 }
+            audioQuality == AudioQuality.HIGH -> adaptiveFormats.find { it.itag == 141 }
                 ?: adaptiveFormats.find { it.itag == 251 }
                 ?: adaptiveFormats.find { it.itag == 140 }
             else -> adaptiveFormats.find { it.itag == 251 }

@@ -52,6 +52,7 @@ val AudioNormalizationKey = booleanPreferencesKey("audioNormalization")
 val AutoLoadMoreKey = booleanPreferencesKey("autoLoadMore")
 val SimilarContent = booleanPreferencesKey("similarContent")
 val AutoSkipNextOnErrorKey = booleanPreferencesKey("autoSkipNextOnError")
+val ForceAacFallbackKey = booleanPreferencesKey("forceAacFallback")
 val StopMusicOnTaskClearKey = booleanPreferencesKey("stopMusicOnTaskClear")
 
 val MaxImageCacheSizeKey = intPreferencesKey("maxImageCacheSize")

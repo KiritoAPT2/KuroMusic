@@ -101,6 +101,10 @@ object RealDownloader {
         val request = Request.Builder()
             .url(url)
             .header("User-Agent", YT_MUSIC_USER_AGENT)
+            // Range: bytes=0-  →  force progressive-download behavior.
+            // YouTube CDN throttles full-file GETs but serves range-based
+            // streaming (the same way ExoPlayer requests it) at full speed.
+            .header("Range", "bytes=0-")
             .build()
 
         val response: Response = httpClient.newCall(request).execute()

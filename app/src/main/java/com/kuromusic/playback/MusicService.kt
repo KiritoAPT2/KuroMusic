@@ -75,6 +75,7 @@ import com.kuromusic.R
 import com.kuromusic.constants.AudioQualityKey
 import com.kuromusic.constants.AutoLoadMoreKey
 import com.kuromusic.constants.AutoSkipNextOnErrorKey
+import com.kuromusic.constants.ForceAacFallbackKey
 import com.kuromusic.constants.DisableLoadMoreWhenRepeatAllKey
 import com.kuromusic.constants.DiscordTokenKey
 import com.kuromusic.constants.DiscordUseDetailsKey
@@ -1335,6 +1336,15 @@ class MusicService :
         super.onPlayerError(error)
 
         Log.e(TAG, "Player error: ${error.errorCodeName}, message: ${error.message}", error)
+
+        // Detectar error de codec no soportado (ZTE Blade V70, etc. sin Opus)
+        if (error.errorCode == PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED ||
+            error.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED) {
+            Timber.w(TAG, "Codec not supported on this device! Enabling AAC fallback for future plays.")
+            scope.launch {
+                dataStore.edit { it[ForceAacFallbackKey] = true }
+            }
+        }
 
         val isConnectionError = (error.cause?.cause is PlaybackException) &&
                 (error.cause?.cause as PlaybackException).errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
