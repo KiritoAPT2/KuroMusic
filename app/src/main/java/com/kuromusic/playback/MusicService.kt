@@ -1115,7 +1115,12 @@ class MusicService :
                         // Capture duration from player if metadata says <= 0
                         // Convert millis to seconds for internal MediaMetadata
                         val actualDurationSeconds = if (mediaMetadata.duration <= 0) {
-                             withContext(Dispatchers.Main) { (player.duration.coerceAtLeast(0) / 1000).toInt() }
+                            val playerDurationMs = withContext(Dispatchers.Main) { player.duration }
+                            if (playerDurationMs > 0L && playerDurationMs != C.TIME_UNSET) {
+                                (playerDurationMs / 1000).toInt()
+                            } else {
+                                mediaMetadata.duration // keep -1, don't store 0
+                            }
                         } else {
                             mediaMetadata.duration
                         }

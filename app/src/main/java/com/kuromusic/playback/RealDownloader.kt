@@ -1,7 +1,10 @@
 package com.kuromusic.playback
 
 import android.content.Context
-import android.net.ConnectivityManager
+import com.kuromusic.innertube.YouTube
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -24,16 +27,37 @@ object RealDownloader {
     private const val TAG = "RealDownloader"
     private const val CONNECT_TIMEOUT = 15L
     private const val READ_TIMEOUT = 60L
-    /** Read buffer size: 256 KB for fast downloads */
-    private const val BUFFER_SIZE = 256 * 1024L
+    /** Read buffer size: 1 MB for faster downloads */
+    private const val BUFFER_SIZE = 1024L * 1024L
     /** Log progress every ~5% */
     private const val PROGRESS_LOG_INTERVAL = 5
+    /**
+     * User-Agent que imita la app oficial de YouTube Music.
+     * YouTube CDN limita la velocidad si ve un UA desconocido.
+     */
+    private const val YT_MUSIC_USER_AGENT = "com.google.android.apps.youtube.music/7.01.52 (Linux; U; Android 15; Pixel 9 Pro)"
 
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
             .followRedirects(true)
+            .cookieJar(object : CookieJar {
+                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) = Unit
+                override fun loadForRequest(url: HttpUrl): List<Cookie> {
+                    // Pasar cookies de la sesión de YouTube al CDN de descargas
+                    val raw = YouTube.cookie ?: return emptyList()
+                    return raw.split("; ").mapNotNull { pair ->
+                        val parts = pair.split("=", limit = 2)
+                        if (parts.size == 2) Cookie.Builder()
+                            .name(parts[0])
+                            .value(parts[1])
+                            .domain(url.host)
+                            .build()
+                        else null
+                    }
+                }
+            })
             .build()
     }
 
@@ -95,7 +119,10 @@ object RealDownloader {
 
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", "Kuromusic/1.0")
+            .header("User-Agent", YT_MUSIC_USER_AGENT)
+            .header("Referer", "https://music.youtube.com/")
+            .header("Accept", "*/*")
+            .header("Accept-Encoding", "identity")
             .build()
 
         val response: Response = httpClient.newCall(request).execute()
