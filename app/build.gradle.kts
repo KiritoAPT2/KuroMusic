@@ -32,8 +32,6 @@ android {
         versionCode = 8
         versionName = "1.0.8"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        setProperty("archivesBaseName", "KuroMusic")
-
         buildConfigField("String", "GOOGLE_API_KEY", "\"${localProperties.getProperty("GOOGLE_API_KEY") ?: ""}\"")
         buildConfigField("String", "PO_TOKEN_REQUEST_KEY", "\"${localProperties.getProperty("PO_TOKEN_REQUEST_KEY") ?: ""}\"")
         buildConfigField("String", "INNER_TUBE_API_KEY", "\"${localProperties.getProperty("INNER_TUBE_API_KEY") ?: ""}\"")
@@ -72,6 +70,12 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
         debug {
+        }
+    }
+
+    applicationVariants.configureEach {
+        outputs.configureEach {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = "KuroMusic.apk"
         }
     }
 
