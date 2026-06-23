@@ -124,8 +124,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_READY
 import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
+
 import androidx.navigation.NavController
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
@@ -157,7 +156,6 @@ import me.saket.squiggles.SquigglySlider
 import com.kuromusic.extensions.togglePlayPause
 import com.kuromusic.extensions.toggleRepeatMode
 import com.kuromusic.models.MediaMetadata
-import com.kuromusic.playback.ExoDownloadService
 import com.kuromusic.ui.component.BottomSheet
 import com.kuromusic.ui.component.BottomSheetState
 import com.kuromusic.ui.component.LocalMenuState
@@ -242,11 +240,21 @@ fun BottomSheetPlayer(
     val beatBuddyType by rememberEnumPreference(BeatBuddyTypeKey, BeatBuddyType.CAT)
 
     // State Hoisting: Use '=' to keep the State object, do NOT read .longValue here!
-    val positionState = rememberSaveable(playbackState) {
-        mutableLongStateOf(playerConnection.player.currentPosition)
+    // NOTE: No key — positionState must be a single stable object so both
+    // LaunchedEffects (mediaMetadata and playbackState) always mutate the same
+    // MutableLongState. Using playbackState as key would re-create it on every
+    // state transition (3→2→3 during skip), causing stale reference bugs.
+    val positionState = rememberSaveable {
+        mutableLongStateOf(0L)
     }
-    val durationState = rememberSaveable(playbackState) {
-        mutableLongStateOf(playerConnection.player.duration)
+    val durationState = remember {
+        mutableLongStateOf(-1L)
+    }
+    // Observe _duration StateFlow from PlayerConnection (updated via onTimelineChanged)
+    LaunchedEffect(Unit) {
+        playerConnection.duration.collect { duration ->
+            durationState.longValue = duration
+        }
     }
 
     val sliderProgress by remember {
@@ -437,7 +445,8 @@ fun BottomSheetPlayer(
         )
     }
 
-    val download by LocalDownloadUtil.current.getDownload(mediaMetadata?.id ?: "")
+    val downloadUtil = LocalDownloadUtil.current
+    val download by downloadUtil.getDownload(mediaMetadata?.id ?: "")
         .collectAsState(initial = null)
 
     val sleepTimerEnabled =
@@ -536,8 +545,9 @@ fun BottomSheetPlayer(
     }
 
     LaunchedEffect(mediaMetadata) {
-        positionState.longValue = playerConnection.player.currentPosition
-        durationState.longValue = playerConnection.player.duration
+        // Reset to 0 when a new track starts — player.currentPosition during
+        // transition may still report the previous track's position.
+        positionState.longValue = 0L
     }
 
     LaunchedEffect(playbackState) {
@@ -545,7 +555,6 @@ fun BottomSheetPlayer(
             while (isActive) {
                 delay(100)
                 positionState.longValue = playerConnection.player.currentPosition
-                durationState.longValue = playerConnection.player.duration
             }
         }
     }
@@ -784,23 +793,18 @@ fun BottomSheetPlayer(
                     Unit
                 }
             }
-            val onDownloadClickRemembered = remember(download?.state, mediaMetadata, context, database) {
+            val onDownloadClickRemembered = remember(download?.state, mediaMetadata, database) {
                 {
                     mediaMetadata?.let { metadata ->
                         when (download?.state) {
-                            Download.STATE_COMPLETED -> {
-                                DownloadService.sendRemoveDownload(context, ExoDownloadService::class.java, metadata.id, false)
-                            }
-                            Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> {
-                                DownloadService.sendRemoveDownload(context, ExoDownloadService::class.java, metadata.id, false)
+                            Download.STATE_COMPLETED,
+                            Download.STATE_QUEUED,
+                            Download.STATE_DOWNLOADING -> {
+                                downloadUtil.removeDownload(metadata.id)
                             }
                             else -> {
                                 database.transaction { insert(metadata) }
-                                val downloadRequest = DownloadRequest.Builder(metadata.id, metadata.id.toUri())
-                                    .setCustomCacheKey(metadata.id)
-                                    .setData(metadata.title.toByteArray())
-                                    .build()
-                                DownloadService.sendAddDownload(context, ExoDownloadService::class.java, downloadRequest, false)
+                                downloadUtil.startDownload(metadata.id, metadata.title)
                             }
                         }
                     }

@@ -136,7 +136,7 @@ class PlayerConnection(
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition: StateFlow<Long> = _currentPosition.asStateFlow()
 
-    private val _duration = MutableStateFlow(0L)
+    private val _duration = MutableStateFlow(-1L)
     val duration: StateFlow<Long> = _duration.asStateFlow()
 
     private val _bufferedPosition = MutableStateFlow(0L)
@@ -236,7 +236,7 @@ class PlayerConnection(
                 _shuffleModeEnabled.value = playerSnapshot.shuffleModeEnabled
                 _repeatMode.value = playerSnapshot.repeatMode
                 _currentPosition.value = playerSnapshot.currentPosition
-                _duration.value = playerSnapshot.duration
+                _duration.value = if (playerSnapshot.duration > 0L) playerSnapshot.duration else -1L
                 _bufferedPosition.value = playerSnapshot.bufferedPosition
                 
                 updateCanSkipPreviousAndNext()
@@ -358,7 +358,7 @@ class PlayerConnection(
             ) {
 
                 _currentPosition.value = currentPos
-                _duration.value = totalDuration
+                if (totalDuration > 0L) _duration.value = totalDuration
                 _bufferedPosition.value = buffered
 
                 lastPosition = currentPos
@@ -593,6 +593,14 @@ class PlayerConnection(
         _currentMediaItemIndex.value = player.currentMediaItemIndex
         _currentWindowIndex.value = player.getCurrentQueueIndex()
 
+        // Seed duration from metadata immediately (before timeline resolves stream)
+        val meta = mediaItem?.metadata
+        if (meta != null && meta.duration > 0) {
+            _duration.value = meta.duration * 1000L
+        } else {
+            _duration.value = -1L
+        }
+
         // Actualizar estado de like cuando cambia la canción
         updateScope.launch {
             updateLikeStatusForCurrentSong()
@@ -638,6 +646,16 @@ class PlayerConnection(
         _queueTitle.value = service.queueTitle
         _currentMediaItemIndex.value = player.currentMediaItemIndex
         _currentWindowIndex.value = player.getCurrentQueueIndex()
+
+        // Duration: usar player.duration si es válido, sino fallback a metadata
+        val playerDuration = player.duration
+        val metaDuration = player.currentMediaItem?.metadata?.duration
+        _duration.value = when {
+            playerDuration > 0L -> playerDuration
+            metaDuration != null && metaDuration > 0 -> metaDuration * 1000L
+            else -> -1L
+        }
+
         updateCanSkipPreviousAndNext()
     }
 

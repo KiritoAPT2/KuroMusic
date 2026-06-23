@@ -29,10 +29,10 @@ android {
         applicationId = "com.kuromusic"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.0.7"
+        versionCode = 8
+        versionName = "1.0.8"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        setProperty("archivesBaseName", "KuroMusic-Master")
+        setProperty("archivesBaseName", "KuroMusic")
 
         buildConfigField("String", "GOOGLE_API_KEY", "\"${localProperties.getProperty("GOOGLE_API_KEY") ?: ""}\"")
         buildConfigField("String", "PO_TOKEN_REQUEST_KEY", "\"${localProperties.getProperty("PO_TOKEN_REQUEST_KEY") ?: ""}\"")
@@ -50,10 +50,13 @@ android {
             }
         }
         create("release") {
-            storeFile = file("")
-            storePassword = ""
-            keyAlias = "KuroMusic"
-            keyPassword = ""
+            val keystoreFile = localProperties.getProperty("RELEASE_KEYSTORE_FILE")
+            if (keystoreFile != null) {
+                storeFile = file(keystoreFile)
+                storePassword = localProperties.getProperty("RELEASE_KEYSTORE_PASSWORD") ?: ""
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS") ?: ""
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: ""
+            }
         }
     }
 

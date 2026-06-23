@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,8 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.media3.common.PlaybackParameters
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
+import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kuromusic.innertube.YouTube
@@ -75,7 +75,6 @@ import com.kuromusic.constants.ListItemHeight
 import com.kuromusic.constants.ListThumbnailSize
 import com.kuromusic.constants.ThumbnailCornerRadius
 import com.kuromusic.models.MediaMetadata
-import com.kuromusic.playback.ExoDownloadService
 import com.kuromusic.playback.queues.YouTubeQueue
 import com.kuromusic.ui.component.BottomSheetState
 import com.kuromusic.ui.component.DownloadGridMenu
@@ -115,7 +114,8 @@ fun PlayerMenu(
     val librarySong by database.song(mediaMetadata.id).collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
 
-    val download by LocalDownloadUtil.current.getDownload(mediaMetadata.id)
+    val downloadUtil = LocalDownloadUtil.current
+    val download by downloadUtil.getDownload(mediaMetadata.id)
         .collectAsState(initial = null)
 
     val artists =
@@ -440,7 +440,7 @@ fun PlayerMenu(
             MenuGroup(
                 items = listOf(
                     when (download?.state) {
-                        androidx.media3.exoplayer.offline.Download.STATE_COMPLETED -> {
+                        Download.STATE_COMPLETED -> {
                             MenuItemData(
                                 title = { Text(text = stringResource(R.string.remove_download)) },
                                 icon = {
@@ -451,33 +451,23 @@ fun PlayerMenu(
                                     )
                                 },
                                 onClick = {
-                                    DownloadService.sendRemoveDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        mediaMetadata.id,
-                                        false,
-                                    )
+                                    downloadUtil.removeDownload(mediaMetadata.id)
                                 }
                             )
                         }
 
-                        androidx.media3.exoplayer.offline.Download.STATE_QUEUED,
-                        androidx.media3.exoplayer.offline.Download.STATE_DOWNLOADING -> {
+                        Download.STATE_QUEUED,
+                        Download.STATE_DOWNLOADING -> {
                             MenuItemData(
                                 title = { Text(text = stringResource(R.string.downloading)) },
                                 icon = {
-                                    androidx.compose.material3.CircularProgressIndicator(
+                                    CircularProgressIndicator(
                                         modifier = Modifier.size(24.dp),
                                         strokeWidth = 2.dp
                                     )
                                 },
                                 onClick = {
-                                    DownloadService.sendRemoveDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        mediaMetadata.id,
-                                        false,
-                                    )
+                                    downloadUtil.removeDownload(mediaMetadata.id)
                                 }
                             )
                         }
@@ -496,18 +486,7 @@ fun PlayerMenu(
                                     database.transaction {
                                         insert(mediaMetadata)
                                     }
-                                    val downloadRequest =
-                                        DownloadRequest
-                                            .Builder(mediaMetadata.id, mediaMetadata.id.toUri())
-                                            .setCustomCacheKey(mediaMetadata.id)
-                                            .setData(mediaMetadata.title.toByteArray())
-                                            .build()
-                                    DownloadService.sendAddDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        downloadRequest,
-                                        false,
-                                    )
+                                    downloadUtil.startDownload(mediaMetadata.id, mediaMetadata.title)
                                 }
                             )
                         }

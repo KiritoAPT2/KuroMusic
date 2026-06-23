@@ -23,10 +23,6 @@ import javax.inject.Singleton
 @Retention(AnnotationRetention.BINARY)
 annotation class PlayerCache
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class DownloadCache
-
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -58,20 +54,6 @@ object AppModule {
                 },
                 databaseProvider,
             )
-        }
-        constructor().release()
-        return constructor()
-    }
-
-    @Singleton
-    @Provides
-    @DownloadCache
-    fun provideDownloadCache(
-        @ApplicationContext context: Context,
-        databaseProvider: DatabaseProvider,
-    ): SimpleCache {
-        val constructor = {
-            SimpleCache(context.filesDir.resolve("download"), NoOpCacheEvictor(), databaseProvider)
         }
         constructor().release()
         return constructor()

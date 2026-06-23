@@ -109,7 +109,7 @@ class SoundProfileAudioProcessor(
         }
 
         val finalGainDb = stateHolder.getFinalGainDb(profile)
-        val gainComp = 10f.pow(finalGainDb / 20f).coerceAtMost(4f)
+        val gainComp = (10f.pow(finalGainDb / 20f)).coerceAtMost(4f).takeIf(Float::isFinite) ?: 1f
         var i = 0
         while (i < size) {
             workBuffer[i] *= gainComp
@@ -120,7 +120,8 @@ class SoundProfileAudioProcessor(
 
         i = 0
         while (i < size) {
-            out.putFloat(workBuffer[i].coerceIn(-1f, 1f))
+            val sample = workBuffer[i]
+            out.putFloat(sample.coerceIn(-1f, 1f).takeIf(Float::isFinite) ?: 0f)
             i++
         }
     }
@@ -138,7 +139,7 @@ class SoundProfileAudioProcessor(
         }
 
         val finalGainDb = stateHolder.getFinalGainDb(profile)
-        val gainComp = 10f.pow(finalGainDb / 20f).coerceAtMost(4f)
+        val gainComp = (10f.pow(finalGainDb / 20f)).coerceAtMost(4f).takeIf(Float::isFinite) ?: 1f
         var i = 0
         while (i < size) {
             workBuffer[i] *= gainComp
@@ -149,7 +150,8 @@ class SoundProfileAudioProcessor(
 
         i = 0
         while (i < size) {
-            val denormalized = (workBuffer[i] * 32768f).toInt()
+            val sample = workBuffer[i].takeIf(Float::isFinite) ?: 0f
+            val denormalized = (sample * 32768f).toInt()
                 .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
                 .toShort()
             out.putShort(denormalized)

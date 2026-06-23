@@ -45,8 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
+
 import coil.compose.AsyncImage
 import com.kuromusic.innertube.YouTube
 import com.kuromusic.innertube.models.PlaylistItem
@@ -63,7 +62,6 @@ import com.kuromusic.db.entities.PlaylistSongMap
 import com.kuromusic.extensions.toMediaItem
 import com.kuromusic.models.MediaMetadata
 import com.kuromusic.models.toMediaMetadata
-import com.kuromusic.playback.ExoDownloadService
 import com.kuromusic.playback.queues.YouTubeQueue
 import com.kuromusic.ui.component.DefaultDialog
 import com.kuromusic.ui.component.ListDialog
@@ -238,12 +236,7 @@ fun YouTubePlaylistMenu(
                     onClick = {
                         showRemoveDownloadDialog = false
                         songs.forEach { song ->
-                            DownloadService.sendRemoveDownload(
-                                context,
-                                ExoDownloadService::class.java,
-                                song.id,
-                                false
-                            )
+                            downloadUtil.removeDownload(song.id)
                         }
                     }
                 ) {
@@ -521,16 +514,7 @@ fun YouTubePlaylistMenu(
                                     },
                                     onClick = {
                                         songs.forEach { song ->
-                                            val downloadRequest = DownloadRequest.Builder(song.id, song.id.toUri())
-                                                .setCustomCacheKey(song.id)
-                                                .setData(song.title.toByteArray())
-                                                .build()
-                                            DownloadService.sendAddDownload(
-                                                context,
-                                                ExoDownloadService::class.java,
-                                                downloadRequest,
-                                                false
-                                            )
+                                            downloadUtil.startDownload(song.id, song.title)
                                         }
                                     }
                                 )

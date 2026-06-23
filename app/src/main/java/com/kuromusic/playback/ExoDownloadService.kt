@@ -1,104 +1,29 @@
 package com.kuromusic.playback
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.content.Context
+import android.app.Service
 import android.content.Intent
-import androidx.media3.common.util.NotificationUtil
-import androidx.media3.common.util.Util
-import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadManager
-import androidx.media3.exoplayer.offline.DownloadNotificationHelper
-import androidx.media3.exoplayer.offline.DownloadService
-import androidx.media3.exoplayer.scheduler.PlatformScheduler
-import androidx.media3.exoplayer.scheduler.Scheduler
-import com.kuromusic.R
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import android.os.IBinder
+import timber.log.Timber
 
-
-@AndroidEntryPoint
-class ExoDownloadService : DownloadService(
-    NOTIFICATION_ID,
-    1000L,
-    CHANNEL_ID,
-    R.string.download,
-    0
-) {
-    @Inject
-    lateinit var downloadUtil: DownloadUtil
+/**
+ * Legacy service stub.
+ *
+ * Previously extended Media3's [DownloadService] for cache-based downloads.
+ * Now downloads are handled by [DownloadUtil] + [RealDownloader] which save
+ * real .opus/.m4a files to filesDir/songs/.
+ *
+ * This stub exists for manifest compatibility. It is no longer actively started.
+ */
+class ExoDownloadService : Service() {
+    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == REMOVE_ALL_PENDING_DOWNLOADS) {
-            downloadManager.currentDownloads.forEach { download ->
-                downloadManager.removeDownload(download.request.id)
-            }
-        }
-        return super.onStartCommand(intent, flags, startId)
-    }
-
-    override fun getDownloadManager() = downloadUtil.downloadManager
-
-    override fun getScheduler(): Scheduler = PlatformScheduler(this, JOB_ID)
-
-    override fun getForegroundNotification(
-        downloads: MutableList<Download>,
-        notMetRequirements: Int
-    ): Notification {
-        val contentText =
-            if (downloads.size == 1) Util.fromUtf8Bytes(downloads[0].request.data)
-            else resources.getQuantityString(R.plurals.n_song, downloads.size, downloads.size)
-
-        val cancelIntent = PendingIntent.getService(
-            this,
-            0,
-            Intent(this, ExoDownloadService::class.java).setAction(REMOVE_ALL_PENDING_DOWNLOADS),
-            PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Build using the helper, which already sets the proper notification channel,
-        // progress bar, and ongoing state required by FGS on Android 12+.
-        return downloadUtil.downloadNotificationHelper.buildProgressNotification(
-            this,
-            R.drawable.download,
-            cancelIntent,   // pass cancel intent directly as the notification action
-            contentText,
-            downloads,
-            notMetRequirements
-        )
-    }
-
-
-    /**
-     * This helper will outlive the lifespan of a single instance of
-     * [ExoDownloadService]
-     */
-    class TerminalStateNotificationHelper(
-        private val context: Context,
-        private val notificationHelper: DownloadNotificationHelper,
-        private var nextNotificationId: Int,
-    ) : DownloadManager.Listener {
-        override fun onDownloadChanged(
-            downloadManager: DownloadManager,
-            download: Download,
-            finalException: Exception?,
-        ) {
-            if (download.state == Download.STATE_FAILED) {
-                val notification = notificationHelper.buildDownloadFailedNotification(
-                    context,
-                    R.drawable.error,
-                    null,
-                    Util.fromUtf8Bytes(download.request.data)
-                )
-                NotificationUtil.setNotification(context, nextNotificationId++, notification)
-            }
-        }
+        Timber.w("ExoDownloadService: received stale intent (new download system is active)")
+        return START_NOT_STICKY
     }
 
     companion object {
         const val CHANNEL_ID = "download"
         const val NOTIFICATION_ID = 1
-        const val JOB_ID = 1
-        const val REMOVE_ALL_PENDING_DOWNLOADS = "REMOVE_ALL_PENDING_DOWNLOADS"
     }
 }

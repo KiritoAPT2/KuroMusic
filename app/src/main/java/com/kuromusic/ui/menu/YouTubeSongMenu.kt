@@ -42,8 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
+import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kuromusic.innertube.YouTube
@@ -59,7 +58,6 @@ import com.kuromusic.db.entities.SongEntity
 import com.kuromusic.extensions.toMediaItem
 import com.kuromusic.models.MediaMetadata
 import com.kuromusic.models.toMediaMetadata
-import com.kuromusic.playback.ExoDownloadService
 import com.kuromusic.playback.queues.YouTubeQueue
 import com.kuromusic.ui.component.ListDialog
 import com.kuromusic.ui.component.ListItem
@@ -84,7 +82,8 @@ fun YouTubeSongMenu(
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
     val librarySong by database.song(song.id).collectAsState(initial = null)
-    val download by LocalDownloadUtil.current.getDownload(song.id).collectAsState(initial = null)
+    val downloadUtil = LocalDownloadUtil.current
+    val download by downloadUtil.getDownload(song.id).collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
     val artists =
         remember {
@@ -395,18 +394,13 @@ fun YouTubeSongMenu(
                                     )
                                 },
                                 onClick = {
-                                    DownloadService.sendRemoveDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        song.id,
-                                        false,
-                                    )
+                                    downloadUtil.removeDownload(song.id)
                                 }
                             )
                         }
 
-                        androidx.media3.exoplayer.offline.Download.STATE_QUEUED,
-                        androidx.media3.exoplayer.offline.Download.STATE_DOWNLOADING -> {
+                        Download.STATE_QUEUED,
+                        Download.STATE_DOWNLOADING -> {
                             MenuItemData(
                                 title = { Text(text = stringResource(R.string.downloading)) },
                                 icon = {
@@ -416,12 +410,7 @@ fun YouTubeSongMenu(
                                     )
                                 },
                                 onClick = {
-                                    DownloadService.sendRemoveDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        song.id,
-                                        false,
-                                    )
+                                    downloadUtil.removeDownload(song.id)
                                 }
                             )
                         }
@@ -440,18 +429,7 @@ fun YouTubeSongMenu(
                                     database.transaction {
                                         insert(song.toMediaMetadata())
                                     }
-                                    val downloadRequest =
-                                        DownloadRequest
-                                            .Builder(song.id, song.id.toUri())
-                                            .setCustomCacheKey(song.id)
-                                            .setData(song.title.toByteArray())
-                                            .build()
-                                    DownloadService.sendAddDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        downloadRequest,
-                                        false,
-                                    )
+                                    downloadUtil.startDownload(song.id, song.title)
                                 }
                             )
                         }

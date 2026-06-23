@@ -98,7 +98,6 @@ import com.kuromusic.db.entities.Event
 import com.kuromusic.db.entities.FormatEntity
 import com.kuromusic.db.entities.LyricsEntity
 import com.kuromusic.db.entities.RelatedSongMap
-import com.kuromusic.di.DownloadCache
 import com.kuromusic.di.PlayerCache
 import com.kuromusic.extensions.SilentHandler
 import com.kuromusic.extensions.collect
@@ -255,10 +254,6 @@ class MusicService :
     @Inject
     @PlayerCache
     lateinit var playerCache: SimpleCache
-
-    @Inject
-    @DownloadCache
-    lateinit var downloadCache: SimpleCache
 
     private lateinit var simpleCache: SimpleCache
     private lateinit var cacheEvictor: LeastRecentlyUsedCacheEvictor
@@ -1500,55 +1495,52 @@ class MusicService :
             .setUpstreamDataSourceFactory(resolvingFactory)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
 
-        // Cache for downloaded songs (persistent cache, read-only during playback)
-        val downloadCacheFactory = CacheDataSource.Factory()
-            .setCache(downloadCache)
-            .setUpstreamDataSourceFactory(resolvingFactory) // Use resolvingFactory as upstream directly!
-            .setCacheWriteDataSinkFactory(null) // Prevent writing streaming audio to downloads
-            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        // Local file data source for downloaded songs
+        val localFileFactory = DefaultDataSource.Factory(this)
 
-        // Composite / Hybrid Factory to prevent nested CacheDataSource issues
+        // Composite Factory: checks local files first, falls back to streaming cache
         return DataSource.Factory {
-            val downloadDataSource = downloadCacheFactory.createDataSource()
             val playerDataSource = playerCacheFactory.createDataSource()
-            
+
             object : DataSource {
                 private var activeDataSource: DataSource? = null
-                
+
                 override fun addTransferListener(transferListener: androidx.media3.datasource.TransferListener) {
-                    downloadDataSource.addTransferListener(transferListener)
                     playerDataSource.addTransferListener(transferListener)
                 }
-                
+
                 override fun open(dataSpec: androidx.media3.datasource.DataSpec): Long {
                     val mediaId = dataSpec.key
-                    val isDownloaded = if (mediaId != null) {
-                        downloadCache.keys.contains(mediaId)
-                    } else {
-                        false
+
+                    // Try to serve from a local downloaded file
+                    if (mediaId != null) {
+                        val localFile = RealDownloader.getSongFile(this@MusicService, mediaId)
+                        if (localFile != null) {
+                            val fileUri = android.net.Uri.fromFile(localFile)
+                            val fileSpec = dataSpec.buildUpon().setUri(fileUri).build()
+                            val fileSource = localFileFactory.createDataSource()
+                            activeDataSource = fileSource
+                            return fileSource.open(fileSpec)
+                        }
                     }
-                    
-                    val dataSource = if (isDownloaded) {
-                        downloadDataSource
-                    } else {
-                        playerDataSource
-                    }
-                    activeDataSource = dataSource
-                    return dataSource.open(dataSpec)
+
+                    // Fall back to streaming (with player cache)
+                    activeDataSource = playerDataSource
+                    return playerDataSource.open(dataSpec)
                 }
-                
+
                 override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
                     return activeDataSource!!.read(buffer, offset, length)
                 }
-                
+
                 override fun getUri(): android.net.Uri? {
                     return activeDataSource?.getUri()
                 }
-                
+
                 override fun getResponseHeaders(): Map<String, List<String>> {
                     return activeDataSource?.getResponseHeaders() ?: emptyMap()
                 }
-                
+
                 override fun close() {
                     activeDataSource?.close()
                     activeDataSource = null

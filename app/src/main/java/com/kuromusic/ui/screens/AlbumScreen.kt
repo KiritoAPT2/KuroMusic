@@ -91,8 +91,6 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import com.kuromusic.LocalDatabase
 import com.kuromusic.LocalDownloadUtil
@@ -101,7 +99,6 @@ import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.R
 import com.kuromusic.db.entities.Album
 import com.kuromusic.extensions.togglePlayPause
-import com.kuromusic.playback.ExoDownloadService
 import com.kuromusic.playback.queues.LocalAlbumRadio
 import com.kuromusic.ui.component.IconButton
 import com.kuromusic.ui.component.LocalMenuState
@@ -542,28 +539,12 @@ fun AlbumScreen(
                                     when (downloadState) {
                                         Download.STATE_COMPLETED, Download.STATE_DOWNLOADING -> {
                                             albumWithSongs.songs.forEach { song ->
-                                                DownloadService.sendRemoveDownload(
-                                                    context,
-                                                    ExoDownloadService::class.java,
-                                                    song.id,
-                                                    false,
-                                                )
+                                                downloadUtil.removeDownload(song.id)
                                             }
                                         }
                                         else -> {
                                             albumWithSongs.songs.forEach { song ->
-                                                val downloadRequest =
-                                                    DownloadRequest
-                                                        .Builder(song.id, song.id.toUri())
-                                                        .setCustomCacheKey(song.id)
-                                                        .setData(song.song.title.toByteArray())
-                                                        .build()
-                                                DownloadService.sendAddDownload(
-                                                    context,
-                                                    ExoDownloadService::class.java,
-                                                    downloadRequest,
-                                                    false,
-                                                )
+                                                downloadUtil.startDownload(song.id, song.song.title)
                                             }
                                         }
                                     }

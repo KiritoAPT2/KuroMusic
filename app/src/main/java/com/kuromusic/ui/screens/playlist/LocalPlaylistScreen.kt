@@ -99,12 +99,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastSumBy
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kuromusic.innertube.YouTube
@@ -126,7 +123,6 @@ import com.kuromusic.extensions.move
 import com.kuromusic.extensions.toMediaItem
 import com.kuromusic.extensions.togglePlayPause
 import com.kuromusic.models.toMediaMetadata
-import com.kuromusic.playback.ExoDownloadService
 import com.kuromusic.playback.queues.ListQueue
 import com.kuromusic.ui.component.DefaultDialog
 import com.kuromusic.ui.component.DraggableScrollbar
@@ -333,12 +329,7 @@ fun LocalPlaylistScreen(
                             }
                         }
                         songs.forEach { song ->
-                            DownloadService.sendRemoveDownload(
-                                context,
-                                ExoDownloadService::class.java,
-                                song.song.id,
-                                false
-                            )
+                            downloadUtil.removeDownload(song.song.id)
                         }
                     }
                 ) {
@@ -1424,17 +1415,7 @@ fun LocalPlaylistHeader(
                             }
                             else -> {
                                 songs.forEach { song ->
-                                    val downloadRequest = DownloadRequest
-                                        .Builder(song.song.id, song.song.id.toUri())
-                                        .setCustomCacheKey(song.song.id)
-                                        .setData(song.song.song.title.toByteArray())
-                                        .build()
-                                    DownloadService.sendAddDownload(
-                                        context,
-                                        ExoDownloadService::class.java,
-                                        downloadRequest,
-                                        false,
-                                    )
+                                    downloadUtil.startDownload(song.song.id, song.song.song.title)
                                 }
                             }
                         }

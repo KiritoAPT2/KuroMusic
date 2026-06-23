@@ -64,6 +64,7 @@ import com.kuromusic.constants.MaxSongCacheSizeKey
 import com.kuromusic.constants.ThumbnailCornerRadius
 import com.kuromusic.db.entities.Song
 import com.kuromusic.extensions.tryOrNull
+import com.kuromusic.playback.RealDownloader
 import com.kuromusic.ui.component.IconButton
 import com.kuromusic.ui.component.ListPreference
 import com.kuromusic.ui.utils.backToMain
@@ -86,7 +87,6 @@ fun StorageSettings(
     val context = LocalContext.current
     val imageDiskCache = context.imageLoader.diskCache ?: return
     val playerCache = LocalPlayerConnection.current?.service?.playerCache ?: return
-    val downloadCache = LocalPlayerConnection.current?.service?.downloadCache ?: return
 
     val coroutineScope = rememberCoroutineScope()
     val (maxImageCacheSize, onMaxImageCacheSizeChange) = rememberPreference(
@@ -100,7 +100,7 @@ fun StorageSettings(
 
     var imageCacheSize by remember { mutableLongStateOf(imageDiskCache.size) }
     var playerCacheSize by remember { mutableLongStateOf(tryOrNull { playerCache.cacheSpace } ?: 0) }
-    var downloadCacheSize by remember { mutableLongStateOf(tryOrNull { downloadCache.cacheSpace } ?: 0) }
+    var downloadCacheSize by remember { mutableLongStateOf(RealDownloader.getTotalDownloadSize(context)) }
 
     val animatedImageCacheSize by animateFloatAsState(
         targetValue = if (maxImageCacheSize == -1) 0f
@@ -132,10 +132,11 @@ fun StorageSettings(
             playerCacheSize = tryOrNull { playerCache.cacheSpace } ?: 0
         }
     }
-    LaunchedEffect(downloadCache) {
+    // Poll download size from filesystem
+    LaunchedEffect(Unit) {
         while (isActive) {
-            delay(500)
-            downloadCacheSize = tryOrNull { downloadCache.cacheSpace } ?: 0
+            delay(2000)
+            downloadCacheSize = RealDownloader.getTotalDownloadSize(context)
         }
     }
 
@@ -172,9 +173,13 @@ fun StorageSettings(
                 onClearClick = {
                     coroutineScope.launch(Dispatchers.IO) {
                         try {
-                            downloadCache.keys.toList().forEach { key ->
-                                tryOrNull { downloadCache.removeResource(key) }
+                            val songsDir = RealDownloader.getSongDir(context)
+                            songsDir.listFiles()?.forEach { file ->
+                                if (file.isFile && (file.extension == "opus" || file.extension == "m4a")) {
+                                    file.delete()
+                                }
                             }
+                            downloadCacheSize = 0L
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }

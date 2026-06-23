@@ -5,7 +5,6 @@ import java.security.MessageDigest
 
 fun makeTimeString(duration: Long?): String {
     if (duration == null || duration < 0) return ""
-    if (duration == 0L) return "LIVE"  // Live streams
     
     var sec = duration / 1000
     val day = sec / 86400

@@ -416,6 +416,7 @@ constructor(
                 .build(),
         ).build()
 
+    @Suppress("DEPRECATION")
     private fun Song.toMediaItem(path: String) =
         MediaItem
             .Builder()

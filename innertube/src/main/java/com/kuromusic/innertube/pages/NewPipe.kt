@@ -18,6 +18,9 @@ object NewPipeUtils {
     @Volatile
     private var cachedPlayer: Pair<String, Int>? = null
 
+    private var playerCacheTime: Long = 0L
+    private const val PLAYER_CACHE_TTL_MS = 30 * 60 * 1000L // 30 minutos
+
     private val playerLock = Any()
 
     private fun log(message: String) {
@@ -26,22 +29,28 @@ object NewPipeUtils {
 
     /**
      * Gets the current YouTube player information (player ID and signature timestamp).
-     * Results are cached to avoid unnecessary API calls.
+     * Results are cached for [PLAYER_CACHE_TTL_MS] to avoid unnecessary API calls.
      * Thread-safe.
      *
      * @return Pair of (player ID, signature timestamp) or null if unavailable
      */
     private fun getPlayer(): Pair<String, Int>? {
-        cachedPlayer?.let { return it }
+        val now = System.currentTimeMillis()
+        if (cachedPlayer != null && now - playerCacheTime < PLAYER_CACHE_TTL_MS) {
+            return cachedPlayer
+        }
 
         return synchronized(playerLock) {
             // Double-check after acquiring lock
-            cachedPlayer?.let { return it }
+            if (cachedPlayer != null && now - playerCacheTime < PLAYER_CACHE_TTL_MS) {
+                return@synchronized cachedPlayer
+            }
 
             log("Fetching latest player from API...")
             val player = YouTubeDecryptionHelper.getLatestPlayer()
             log("Got player: ${player?.first}, sts: ${player?.second}")
             cachedPlayer = player
+            playerCacheTime = now
             player
         }
     }

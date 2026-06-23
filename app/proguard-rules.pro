@@ -46,7 +46,8 @@
 }
 
 # @Serializable and @Polymorphic are used at runtime for polymorphic serialization.
--keepattributes RuntimeVisibleAnnotations,AnnotationDefault
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault,InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
 
 -dontwarn javax.servlet.ServletContainerInitializer
 -dontwarn org.bouncycastle.jsse.BCSSLParameters

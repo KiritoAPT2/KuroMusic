@@ -41,8 +41,11 @@ class YouTubeSessionInterceptor : Interceptor {
 
         // Si falla con sesión (403), intentamos fallback como invitado
         if (response.code == 403) {
-            Timber.tag("YouTubeSession").w("Session request failed (403). Retrying as guest fallback...")
+            Timber.tag("YouTubeSession").w("Session request failed (403). Clearing expired session and retrying as guest...")
             response.close() // Importante cerrar la respuesta fallida
+            
+            // Limpiar cookie expirada para no reusarla
+            YouTube.cookie = null
             
             val guestRequest = originalRequest.newBuilder()
                 .removeHeader("Cookie")

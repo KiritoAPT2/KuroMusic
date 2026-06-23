@@ -33,6 +33,10 @@ import java.io.File
 import java.net.URI
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
+import com.kuromusic.constants.InnerTubeCookieKey
+import androidx.datastore.preferences.core.edit
+import kotlinx.coroutines.runBlocking
+import com.kuromusic.utils.dataStore
 
 
 object YTPlayerUtils {
@@ -48,9 +52,11 @@ object YTPlayerUtils {
 
     private var cacheDir: File? = null
     private var httpClient: OkHttpClient? = null
+    private var appContext: Context? = null
 
     fun initialize(context: Context) {
         if (httpClient != null) return
+        appContext = context
         cacheDir = context.cacheDir
         httpClient = createMusicClient()
     }
@@ -67,7 +73,33 @@ object YTPlayerUtils {
 
         return builder
             .cookieJar(object : CookieJar {
-                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {}
+                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
+                    if (cookies.isEmpty()) return
+                    val host = url.host
+                    // Solo guardar cookies de YouTube
+                    if (!host.contains("youtube.com") && !host.contains("googlevideo.com") && !host.contains("ytimg.com")) return
+                    
+                    val existing = YouTube.cookie ?: BuildConfig.YOUTUBE_SESSION_COOKIES
+                    val cookieMap = mutableMapOf<String, String>()
+                    if (existing.isNotBlank()) {
+                        existing.split("; ").forEach {
+                            val parts = it.split("=", limit = 2)
+                            if (parts.size == 2) cookieMap[parts[0]] = parts[1]
+                        }
+                    }
+                    cookies.forEach { cookie ->
+                        cookieMap[cookie.name] = cookie.value
+                    }
+                    val merged = cookieMap.entries.joinToString("; ") { "${it.key}=${it.value}" }
+                    YouTube.cookie = merged
+                    
+                    // Persistir a DataStore
+                    appContext?.let { ctx ->
+                        runBlocking {
+                            ctx.dataStore.edit { it[InnerTubeCookieKey] = merged }
+                        }
+                    }
+                }
                 override fun loadForRequest(url: HttpUrl): List<Cookie> {
                     val cookiesStr = YouTube.cookie ?: BuildConfig.YOUTUBE_SESSION_COOKIES
                     return if (cookiesStr.isNotBlank()) {
@@ -154,9 +186,11 @@ object YTPlayerUtils {
         
         if (playerCache.containsKey(key)) {
             val timestamp = cacheTime[key] ?: 0L
-            if (now - timestamp < 60 * 60 * 1000) { // 1 hour cache
+            val cached = playerCache[key]!!
+            val ttl = if (cached.isSuccess) CACHE_TTL_MS else 30_000L
+            if (now - timestamp < ttl) {
                 Timber.tag(logTag).d("⚡ Using cached response for $key")
-                return playerCache[key]!!
+                return cached
             }
         }
         

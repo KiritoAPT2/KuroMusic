@@ -1,0 +1,152 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": [
+      ".opencode/skills/unified-security/unified-security",
+      ".opencode/skills/youtube-skills/skills",
+      ".opencode/skills/youtube-skills/clawhub",
+      ".opencode/skills/youtube-transcript-mcp/.opencode/skills",
+      ".opencode/skills/android-reverse-engineering/plugins/android-reverse-engineering/skills",
+      ".opencode/skills/android-reverse-engineering-incogbyte/plugins/android-reverse-engineering/skills",
+      ".opencode/skills/apk-to-openapi/plugins/apk-to-openapi/skills",
+      ".opencode/skills/osmontero-skills/skills",
+      ".opencode/skills/skills-for-open-code/.opencode/skills",
+      ".opencode/plugins/brightdata/skills",
+      ".opencode/plugins/security-agent/skills"
+    ]
+  },
+  "plugin": [
+    ".opencode/plugins/brightdata/index.ts",
+    ".opencode/plugins/security-agent/plugins/security-agent.ts",
+    ".opencode/skills/skills-for-open-code/.opencode/index.ts",
+    ".opencode/skills/skills-for-open-code/.opencode/plugins"
+  ],
+  "references": {
+    "youtubei-js": {
+      "repository": "LuanRT/YouTube.js",
+      "branch": "main",
+      "description": "JavaScript client for YouTube's InnerTube API. Used for YouTube Music API interactions."
+    },
+    "innertube-python": {
+      "repository": "tombulled/innertube",
+      "branch": "main",
+      "description": "Python client for Google's InnerTube API (YouTube, YouTube Music, YouTube Kids)."
+    },
+    "kuro-audit": {
+      "path": ".",
+      "description": "KuroMusic Android project — InnerTube-based YouTube Music client. Contains Kotlin modules: innertube, lrclib, kizzy, kugou, jossredconnect."
+    },
+    "youtube-transcript-mcp": {
+      "repository": "theCat69/youtube-transcript-mcp",
+      "description": "YouTube Transcript MCP server with InnerTube ANDROID API + HTML scrape fallback."
+    }
+  },
+  "agent": {
+    "security-auditor": {
+      "description": "Audits codebases for high-impact security issues using OWASP Top 10 and ASVS 5.0. Activates unified-security skill.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "edit": "deny"
+      }
+    },
+    "youtube-researcher": {
+      "description": "YouTube data extraction specialist. Gets transcripts, searches videos, browses channels, extracts playlists.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "edit": "deny"
+      }
+    },
+    "android-reverser": {
+      "description": "Android reverse engineering specialist. Decompiles APKs, extracts HTTP endpoints (Retrofit, OkHttp, Ktor, GraphQL), headers, auth patterns.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "edit": "deny"
+      }
+    },
+    "api-extractor": {
+      "description": "Extracts REST API specifications from Android APKs. Decompiles apps and generates OpenAPI 3.1.0 specs.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "edit": "allow"
+      }
+    },
+    "web-scraper": {
+      "description": "Web scraping specialist using Bright Data. Scrapes any webpage, searches Google/Bing/Yandex, extracts structured data from 40+ platforms.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "edit": "deny"
+      }
+    },
+    "kotlin-reviewer": {
+      "description": "Kotlin and Android code reviewer. Reviews for idiomatic patterns, coroutine safety, Jetpack Compose best practices.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "edit": "deny"
+      }
+    },
+    "kotlin-build-resolver": {
+      "description": "Kotlin/Gradle build error resolution specialist. Fixes compilation, dependency, and build configuration errors.",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "bash": "allow"
+      }
+    }
+  },
+  "command": {
+    "security-audit": {
+      "description": "Run comprehensive security audit on the codebase",
+      "template": "Run a full security audit on this project. Use the unified-security skill and security-agent plugin. Focus on OWASP Top 10, authentication, secrets management, and Android-specific vulnerabilities.\n\n$ARGUMENTS",
+      "agent": "security-auditor",
+      "subtask": true
+    },
+    "extract-apis": {
+      "description": "Extract HTTP APIs from an Android APK",
+      "template": "Extract all HTTP API endpoints from this Android application. Decompile the APK, find Retrofit/OkHttp/Ktor/GraphQL endpoints, auth headers, and base URLs. Generate an OpenAPI spec.\n\n$ARGUMENTS",
+      "agent": "android-reverser",
+      "subtask": true
+    },
+    "youtube-transcript": {
+      "description": "Get transcript of a YouTube video",
+      "template": "Get the transcript of the requested YouTube video with timestamps.\n\n$ARGUMENTS",
+      "agent": "youtube-researcher",
+      "subtask": true
+    },
+    "scrape": {
+      "description": "Scrape a webpage for data",
+      "template": "Scrape the requested URL and extract structured data. Use the Bright Data scraping tools.\n\n$ARGUMENTS",
+      "agent": "web-scraper",
+      "subtask": true
+    },
+    "fix-build": {
+      "description": "Fix Kotlin/Gradle build errors",
+      "template": "Fix the build errors in this Kotlin/Gradle project with minimal changes.\n\n$ARGUMENTS",
+      "agent": "kotlin-build-resolver",
+      "subtask": true
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "git *": "allow",
+      "npm *": "allow",
+      "*": "ask"
+    },
+    "external_directory": {
+      "*": "allow"
+    }
+  }
+}

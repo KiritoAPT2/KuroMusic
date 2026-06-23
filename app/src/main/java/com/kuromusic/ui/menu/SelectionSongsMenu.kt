@@ -26,8 +26,7 @@ import androidx.core.net.toUri
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
+
 import com.kuromusic.innertube.YouTube
 import com.kuromusic.LocalDatabase
 import com.kuromusic.LocalDownloadUtil
@@ -38,7 +37,7 @@ import com.kuromusic.db.entities.Song
 import com.kuromusic.extensions.toMediaItem
 import com.kuromusic.models.MediaMetadata
 import com.kuromusic.models.toMediaMetadata
-import com.kuromusic.playback.ExoDownloadService
+
 import com.kuromusic.playback.queues.ListQueue
 import com.kuromusic.ui.component.DefaultDialog
 import com.kuromusic.ui.component.DownloadGridMenu
@@ -153,12 +152,7 @@ fun SelectionSongMenu(
                     onClick = {
                         showRemoveDownloadDialog = false
                         songSelection.forEach { song ->
-                            DownloadService.sendRemoveDownload(
-                                context,
-                                ExoDownloadService::class.java,
-                                song.song.id,
-                                false,
-                            )
+                            downloadUtil.removeDownload(song.song.id)
                         }
                     },
                 ) {
@@ -250,18 +244,7 @@ fun SelectionSongMenu(
             state = downloadState,
             onDownload = {
                 songSelection.forEach { song ->
-                    val downloadRequest =
-                        DownloadRequest
-                            .Builder(song.id, song.id.toUri())
-                            .setCustomCacheKey(song.id)
-                            .setData(song.song.title.toByteArray())
-                            .build()
-                    DownloadService.sendAddDownload(
-                        context,
-                        ExoDownloadService::class.java,
-                        downloadRequest,
-                        false,
-                    )
+                    downloadUtil.startDownload(song.id, song.song.title)
                 }
             },
             onRemoveDownload = {
@@ -400,12 +383,7 @@ fun SelectionMediaMetadataMenu(
                     onClick = {
                         showRemoveDownloadDialog = false
                         songSelection.forEach { song ->
-                            DownloadService.sendRemoveDownload(
-                                context,
-                                ExoDownloadService::class.java,
-                                song.id,
-                                false,
-                            )
+                            downloadUtil.removeDownload(song.id)
                         }
                     },
                 ) {
@@ -505,18 +483,7 @@ fun SelectionMediaMetadataMenu(
             state = downloadState,
             onDownload = {
                 songSelection.forEach { song ->
-                    val downloadRequest =
-                        DownloadRequest
-                            .Builder(song.id, song.id.toUri())
-                            .setCustomCacheKey(song.id)
-                            .setData(song.title.toByteArray())
-                            .build()
-                    DownloadService.sendAddDownload(
-                        context,
-                        ExoDownloadService::class.java,
-                        downloadRequest,
-                        false,
-                    )
+                    downloadUtil.startDownload(song.id, song.title)
                 }
             },
             onRemoveDownload = {
