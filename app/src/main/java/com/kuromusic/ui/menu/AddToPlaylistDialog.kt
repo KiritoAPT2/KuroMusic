@@ -72,7 +72,7 @@ fun AddToPlaylistDialog(
     }
 
     LaunchedEffect(Unit) {
-        database.editablePlaylistsByCreateDateAsc().collect {
+        database.playlistDao.editablePlaylistsByCreateDateAsc().collect {
             playlists = it.asReversed()
         }
     }
@@ -107,7 +107,7 @@ fun AddToPlaylistDialog(
                             if (songIds == null) {
                                 songIds = onGetSong(playlist)
                             }
-                            duplicates = database.playlistDuplicates(playlist.id, songIds!!)
+                            duplicates = database.playlistDao.playlistDuplicates(playlist.id, songIds!!)
                             if (duplicates.isNotEmpty()) {
                                 showDuplicateDialog = true
                             } else {

@@ -94,7 +94,7 @@ class PlayerConnection(
         service.currentMediaMetadata.asStateFlow()
 
     val currentSong = mediaMetadata.flatMapLatest { metadata ->
-        database.song(metadata?.id)
+        database.songDao.song(metadata?.id)
     }
 
     val currentLyrics = mediaMetadata.flatMapLatest { mediaMetadata ->
@@ -619,7 +619,7 @@ class PlayerConnection(
             if (currentSongId != null) {
                 // DB access ONLY in IO thread
                 val songWithInfo = withContext(Dispatchers.IO) {
-                    database.song(currentSongId).first()
+                    database.songDao.song(currentSongId).first()
                 }
                 
                 // Update UI state in Main thread

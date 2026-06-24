@@ -51,10 +51,10 @@ class HomeViewModel @Inject constructor(
     val accountName = MutableStateFlow("Guest")
     val accountImageUrl = MutableStateFlow<String?>(null)
 
-    val recentlyPlayed = database.getRecentHistory(10)
-    val essentialSongs = database.essentialSongs()
-    val topArtist = database.topRecentArtist()
-    val topGenre = database.topRecentGenre()
+    val recentlyPlayed = database.historyDao.getRecentHistory(10)
+    val essentialSongs = database.songDao.essentialSongs()
+    val topArtist = database.songDao.topRecentArtist()
+    val topGenre = database.songDao.topRecentGenre()
     val animaxVideos = MutableStateFlow<List<YTItem>?>(null)
     val globalRecommendations = MutableStateFlow<List<YTItem>>(emptyList())
     
@@ -101,7 +101,7 @@ class HomeViewModel @Inject constructor(
         }
         
         val globalRecsDeferred = async {
-            val historyCount = database.eventCount().first()
+            val historyCount = database.statsDao.eventCount().first()
             if (historyCount < 5) {
                 YouTube.browse("FEmusic_charts", null).onSuccess { result ->
                     globalRecommendations.value = result.items.flatMap { it.items }.take(15)
@@ -125,26 +125,26 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun computeLocalRecommendations() {
-        val excludeIds = database.getRecentPlayedIds(50).first()
-        val genres = database.getTopGenres(3).first()
+        val excludeIds = database.statsDao.getRecentPlayedIds(50).first()
+        val genres = database.statsDao.getTopGenres(3).first()
 
         if (genres.isNotEmpty()) {
-            val genreRecs = database.getSongsFromGenres(genres, excludeIds, 20).first()
+            val genreRecs = database.statsDao.getSongsFromGenres(genres, excludeIds, 20).first()
             var combined = genreRecs
 
             if (genreRecs.size < 10) {
-                val exploration = database.getUnplayedSongsFromGenres(genres, 15).first()
+                val exploration = database.statsDao.getUnplayedSongsFromGenres(genres, 15).first()
                 combined = (genreRecs + exploration).distinctBy { it.id }.take(20)
             }
 
             if (combined.size < 5) {
-                val essentials = database.essentialSongs(15).first()
+                val essentials = database.songDao.essentialSongs(15).first()
                 combined = (combined + essentials).distinctBy { it.id }.take(20)
             }
 
             localRecommendations.value = combined
         } else {
-            val essentials = database.essentialSongs(20).first()
+            val essentials = database.songDao.essentialSongs(20).first()
             localRecommendations.value = essentials
         }
     }

@@ -154,11 +154,11 @@ constructor(
                             ),
                         )
 
-                    MusicService.SONG -> database.songsByCreateDateAsc().first()
+                    MusicService.SONG -> database.songDao.songsByCreateDateAsc().first()
                         .map { it.toMediaItem(parentId) }
 
                     MusicService.ARTIST ->
-                        database.artistsInAA().first().map { artist ->
+                        database.artistDao.artistsInAA().first().map { artist ->
                             browsableMediaItem(
                                 "${MusicService.ARTIST}/${artist.id}",
                                 artist.artist.name,
@@ -173,7 +173,7 @@ constructor(
                         }
 
                     MusicService.ALBUM ->
-                        database.albumsInAA().first().map { album ->
+                        database.albumDao.albumsInAA().first().map { album ->
                             browsableMediaItem(
                                 "${MusicService.ALBUM}/${album.id}",
                                 album.album.title,
@@ -186,7 +186,7 @@ constructor(
                         }
 
                     MusicService.PLAYLIST -> {
-                        val likedSongCount = database.likedSongsCount().first()
+                        val likedSongCount = database.songDao.likedSongsCount().first()
                         val downloadedSongCount = downloadUtil.downloads.value.size
                         listOf(
                             browsableMediaItem(
@@ -212,7 +212,7 @@ constructor(
                                 MediaMetadata.MEDIA_TYPE_PLAYLIST,
                             ),
                         ) +
-                                database.playlistsByCreateDateAsc().first().map { playlist ->
+                                database.playlistDao.playlistsByCreateDateAsc().first().map { playlist ->
                                     browsableMediaItem(
                                         "${MusicService.PLAYLIST}/${playlist.id}",
                                         playlist.playlist.name,
@@ -230,13 +230,13 @@ constructor(
                     else ->
                         when {
                             parentId.startsWith("${MusicService.ARTIST}/") ->
-                                database.artistSongsInAA(parentId.removePrefix("${MusicService.ARTIST}/"))
+                                database.songDao.artistSongsInAA(parentId.removePrefix("${MusicService.ARTIST}/"))
                                     .first().map {
                                         it.toMediaItem(parentId)
                                     }
 
                             parentId.startsWith("${MusicService.ALBUM}/") ->
-                                database.albumSongs(parentId.removePrefix("${MusicService.ALBUM}/"))
+                                database.songDao.albumSongs(parentId.removePrefix("${MusicService.ALBUM}/"))
                                     .first().map {
                                         it.toMediaItem(parentId)
                                     }
@@ -251,7 +251,7 @@ constructor(
 
                                     PlaylistEntity.DOWNLOADED_PLAYLIST_ID -> {
                                         val downloads = downloadUtil.downloads.value
-                                        database
+                                        database.songDao
                                             .allSongs()
                                             .flowOn(Dispatchers.IO)
                                             .map { songs ->
@@ -267,7 +267,7 @@ constructor(
                                     }
 
                                     else ->
-                                        database.playlistSongs(playlistId).map { list ->
+                                        database.songDao.playlistSongs(playlistId).map { list ->
                                             list.map { it.song }
                                         }
                                 }.first().map {
@@ -287,7 +287,7 @@ constructor(
         mediaId: String,
     ): ListenableFuture<LibraryResult<MediaItem>> =
         scope.future(Dispatchers.IO) {
-            database.song(mediaId).first()?.toMediaItem()?.let {
+            database.songDao.song(mediaId).first()?.toMediaItem()?.let {
                 LibraryResult.ofItem(it, null)
             } ?: LibraryResult.ofError(SessionError.ERROR_UNKNOWN)
         }
@@ -309,7 +309,7 @@ constructor(
             when (path.firstOrNull()) {
                 MusicService.SONG -> {
                     val songId = path.getOrNull(1) ?: return@future defaultResult
-                    val allSongs = database.songsByCreateDateAsc().first()
+                    val allSongs = database.songDao.songsByCreateDateAsc().first()
                     MediaSession.MediaItemsWithStartPosition(
                         allSongs.map { it.toMediaItem() },
                         allSongs.indexOfFirst { it.id == songId }.takeIf { it != -1 } ?: 0,
@@ -320,7 +320,7 @@ constructor(
                 MusicService.ARTIST -> {
                     val songId = path.getOrNull(2) ?: return@future defaultResult
                     val artistId = path.getOrNull(1) ?: return@future defaultResult
-                    val songs = database.artistSongsByCreateDateAsc(artistId).first()
+                    val songs = database.songDao.artistSongsByCreateDateAsc(artistId).first()
                     MediaSession.MediaItemsWithStartPosition(
                         songs.map { it.toMediaItem() },
                         songs.indexOfFirst { it.id == songId }.takeIf { it != -1 } ?: 0,
@@ -332,7 +332,7 @@ constructor(
                     val songId = path.getOrNull(2) ?: return@future defaultResult
                     val albumId = path.getOrNull(1) ?: return@future defaultResult
                     val albumWithSongs =
-                        database.albumWithSongs(albumId).first() ?: return@future defaultResult
+                        database.albumDao.albumWithSongs(albumId).first() ?: return@future defaultResult
                     MediaSession.MediaItemsWithStartPosition(
                         albumWithSongs.songs.map { it.toMediaItem() },
                         albumWithSongs.songs.indexOfFirst { it.id == songId }.takeIf { it != -1 }
@@ -353,7 +353,7 @@ constructor(
 
                             PlaylistEntity.DOWNLOADED_PLAYLIST_ID -> {
                                 val downloads = downloadUtil.downloads.value
-                                database
+                                database.songDao
                                     .allSongs()
                                     .flowOn(Dispatchers.IO)
                                     .map { songs ->
@@ -369,7 +369,7 @@ constructor(
                             }
 
                             else ->
-                                database.playlistSongs(playlistId).map { list ->
+                                database.songDao.playlistSongs(playlistId).map { list ->
                                     list.map { it.song }
                                 }
                         }.first()

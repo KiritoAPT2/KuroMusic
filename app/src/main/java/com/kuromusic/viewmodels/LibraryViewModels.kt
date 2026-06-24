@@ -78,11 +78,11 @@ constructor(
             }.distinctUntilChanged()
             .flatMapLatest { (filter, sortType, descending) ->
                 when (filter) {
-                    SongFilter.LIBRARY -> database.songs(sortType, descending)
-                    SongFilter.LIKED -> database.likedSongs(sortType, descending)
+                    SongFilter.LIBRARY -> database.songDao.songs(sortType, descending)
+                    SongFilter.LIKED -> database.songDao.likedSongs(sortType, descending)
                     SongFilter.DOWNLOADED ->
                         downloadUtil.downloads.flatMapLatest { downloads ->
-                            database
+                            database.songDao
                                 .allSongs()
                                 .flowOn(Dispatchers.IO)
                                 .map { songs ->
@@ -276,7 +276,7 @@ constructor(
 ) : ViewModel() {
     private val artistId = savedStateHandle.get<String>("artistId")!!
     val artist =
-        database
+        database.artistDao
             .artist(artistId)
             .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
@@ -300,7 +300,7 @@ constructor(
     val downloadUtil: DownloadUtil,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
-    val likedSongsCount = database.likedSongsCount()
+    val likedSongsCount = database.songDao.likedSongsCount()
     
     val downloadedSongsCount = downloadUtil.downloads.flatMapLatest { downloads ->
         database.allSongs().map { songs ->
@@ -355,11 +355,11 @@ constructor(
 
     private fun enrichArtistThumbnails() {
         viewModelScope.launch(Dispatchers.IO) {
-            val artistsMissingPhotos = database.getArtistsWithoutThumbnails()
+            val artistsMissingPhotos = database.artistDao.getArtistsWithoutThumbnails()
             artistsMissingPhotos.forEach { artist ->
                 YouTube.artist(artist.id).onSuccess { artistPage ->
                     artistPage.artist.thumbnail.resize(544, 544)?.let { officialThumbnail ->
-                        database.updateArtistThumbnail(artist.id, officialThumbnail)
+                        database.artistDao.updateArtistThumbnail(artist.id, officialThumbnail)
                     }
                 }
             }

@@ -45,7 +45,7 @@ fun YouTubeArtistMenu(
     val context = LocalContext.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
-    val libraryArtist by database.artist(artist.id).collectAsState(initial = null)
+    val libraryArtist by database.artistDao.artist(artist.id).collectAsState(initial = null)
 
     YouTubeListItem(
         item = artist,

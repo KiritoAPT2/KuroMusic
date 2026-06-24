@@ -89,7 +89,7 @@ fun AlbumMenu(
     val downloadUtil = LocalDownloadUtil.current
     val playerConnection = LocalPlayerConnection.current ?: return
     val scope = rememberCoroutineScope()
-    val libraryAlbum by database.album(originalAlbum.id).collectAsState(initial = originalAlbum)
+    val libraryAlbum by database.albumDao.album(originalAlbum.id).collectAsState(initial = originalAlbum)
     val album = libraryAlbum ?: originalAlbum
     var songs by remember {
         mutableStateOf(emptyList<Song>())
@@ -98,7 +98,7 @@ fun AlbumMenu(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        database.albumSongs(album.id).collect {
+        database.songDao.albumSongs(album.id).collect {
             songs = it
         }
     }

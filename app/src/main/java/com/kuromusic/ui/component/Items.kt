@@ -929,7 +929,7 @@ fun AlbumListItem(
         }
 
         LaunchedEffect(Unit) {
-            database.albumSongs(album.id).collect {
+            database.songDao.albumSongs(album.id).collect {
                 songs = it
             }
         }
@@ -1070,7 +1070,7 @@ fun AlbumGridItem(
         }
 
         LaunchedEffect(Unit) {
-            database.albumSongs(album.id).collect {
+            database.songDao.albumSongs(album.id).collect {
                 songs = it
             }
         }
@@ -1204,7 +1204,7 @@ fun AlbumGridItem(
                             .background(Color.Black.copy(alpha = 0.4f))
                             .clickable {
                                 coroutineScope.launch {
-                                    database.albumWithSongs(album.id).first()?.let { albumWithSongs ->
+                                    database.albumDao.albumWithSongs(album.id).first()?.let { albumWithSongs ->
                                         playerConnection.playQueue(
                                             LocalAlbumRadio(albumWithSongs)
                                         )
@@ -1571,8 +1571,8 @@ fun YouTubeListItem(
     isSelected: Boolean = false,
     badges: @Composable RowScope.() -> Unit = {
         val database = LocalDatabase.current
-        val song by database.song(item.id).collectAsState(initial = null)
-        val album by database.album(item.id).collectAsState(initial = null)
+        val song by database.songDao.song(item.id).collectAsState(initial = null)
+        val album by database.albumDao.album(item.id).collectAsState(initial = null)
 
         if (item is SongItem &&
             song?.song?.liked == true ||
@@ -1745,8 +1745,8 @@ fun YouTubeGridItem(
     coroutineScope: CoroutineScope? = null,
     badges: @Composable RowScope.() -> Unit = {
         val database = LocalDatabase.current
-        val song by database.song(item.id).collectAsState(initial = null)
-        val album by database.album(item.id).collectAsState(initial = null)
+        val song by database.songDao.song(item.id).collectAsState(initial = null)
+        val album by database.albumDao.album(item.id).collectAsState(initial = null)
 
         if (item is SongItem &&
             song?.song?.liked == true ||
@@ -1875,7 +1875,7 @@ fun YouTubeGridItem(
                             .clickable {
                                 var playlistId = ""
                                 coroutineScope?.launch(Dispatchers.IO) {
-                                    var albumWithSongs = database.albumWithSongs(item.id).first()
+                                    var albumWithSongs = database.albumDao.albumWithSongs(item.id).first()
                                     if (albumWithSongs?.songs.isNullOrEmpty()) {
                                         YouTube
                                             .album(item.id)
@@ -1885,7 +1885,7 @@ fun YouTubeGridItem(
                                                     insert(albumPage)
                                                 }
                                                 albumWithSongs =
-                                                    database.albumWithSongs(item.id).first()
+                                                    database.albumDao.albumWithSongs(item.id).first()
                                             }.onFailure {
                                                 reportException(it)
                                             }

@@ -86,7 +86,7 @@ fun OnlinePlaylistAdder(
 
 
     LaunchedEffect(Unit) {
-        database.editablePlaylistsByCreateDateAsc().collect {
+        database.playlistDao.editablePlaylistsByCreateDateAsc().collect {
             playlists = it.asReversed()
         }
     }

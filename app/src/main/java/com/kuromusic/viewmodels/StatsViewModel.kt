@@ -108,7 +108,7 @@ constructor(
             indexChips,
         ) { first, second -> Pair(first, second) }
             .flatMapLatest { (selection, t) ->
-                database.mostPlayedAlbums(
+                database.statsDao.mostPlayedAlbums(
                     statToPeriod(selection, t),
                     limit = -1,
                     toTimeStamp =

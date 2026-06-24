@@ -83,11 +83,11 @@ fun YouTubeAlbumMenu(
     val database = LocalDatabase.current
     val downloadUtil = LocalDownloadUtil.current
     val playerConnection = LocalPlayerConnection.current ?: return
-    val album by database.albumWithSongs(albumItem.id).collectAsState(initial = null)
+    val album by database.albumDao.albumWithSongs(albumItem.id).collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        database.album(albumItem.id).collect { album ->
+        database.albumDao.album(albumItem.id).collect { album ->
             if (album == null) {
                 YouTube
                     .album(albumItem.id)

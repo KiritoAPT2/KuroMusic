@@ -76,14 +76,14 @@ fun PlaylistMenu(
     val database = LocalDatabase.current
     val downloadUtil = LocalDownloadUtil.current
     val playerConnection = LocalPlayerConnection.current ?: return
-    val dbPlaylist by database.playlist(playlist.id).collectAsState(initial = playlist)
+    val dbPlaylist by database.playlistDao.playlist(playlist.id).collectAsState(initial = playlist)
     var songs by remember {
         mutableStateOf(emptyList<Song>())
     }
 
     LaunchedEffect(Unit) {
         if (autoPlaylist == false) {
-            database.playlistSongs(playlist.id).collect {
+            database.songDao.playlistSongs(playlist.id).collect {
                 songs = it.map(PlaylistSong::song)
             }
         } else {

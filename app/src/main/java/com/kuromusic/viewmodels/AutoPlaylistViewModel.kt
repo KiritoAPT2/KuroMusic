@@ -53,7 +53,7 @@ constructor(
                 when (playlist) {
                     "liked" -> database.likedSongs(sortType, descending)
                     "downloaded" -> downloadUtil.downloads.flatMapLatest { downloads ->
-                        database.allSongs()
+                        database.songDao.allSongs()
                             .flowOn(Dispatchers.IO)
                             .map { songs ->
                                 songs.filter {

@@ -410,7 +410,7 @@ fun LocalPlaylistScreen(
 
                 if (viewModel.playlist.value?.playlist?.browseId != null) {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
-                        val playlistSongMap = database.playlistSongMapsFrom(viewModel.playlistId, 0)
+                        val playlistSongMap = database.playlistDao.playlistSongMapsFrom(viewModel.playlistId, 0)
                         val successorIndex = if (from > to) to else to + 1
                         val successorSetVideoId = playlistSongMap.getOrNull(successorIndex)?.setVideoId
 

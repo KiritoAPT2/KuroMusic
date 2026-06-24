@@ -31,6 +31,6 @@ constructor(
     val topSongs =
         topPeriod
             .flatMapLatest { period ->
-                database.mostPlayedSongs(period.toTimeMillis(), top.toInt())
+                database.statsDao.mostPlayedSongs(period.toTimeMillis(), top.toInt())
             }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 }

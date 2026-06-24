@@ -32,7 +32,7 @@ constructor(
 
     init {
         viewModelScope.launch {
-            val album = database.album(albumId).first()
+            val album = database.albumDao.album(albumId).first()
             YouTube
                 .album(albumId)
                 .onSuccess {

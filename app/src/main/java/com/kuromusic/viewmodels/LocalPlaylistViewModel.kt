@@ -37,11 +37,11 @@ constructor(
     val playlistId = savedStateHandle.get<String>("playlistId")!!
     val playlist =
         database
-            .playlist(playlistId)
+            .playlistDao.playlist(playlistId)
             .stateIn(viewModelScope, SharingStarted.Lazily, null)
     val playlistSongs: StateFlow<List<PlaylistSong>> =
         combine(
-            database.playlistSongs(playlistId),
+            database.songDao.playlistSongs(playlistId),
             context.dataStore.data
                 .map {
                     it[PlaylistSongSortTypeKey].toEnum(PlaylistSongSortType.CUSTOM) to (it[PlaylistSongSortDescendingKey]

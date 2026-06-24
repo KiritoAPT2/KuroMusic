@@ -135,24 +135,24 @@ class LocalSearchViewModel @Inject constructor(
                 when (filter) {
                     LocalFilter.ALL ->
                         combine(
-                            database.searchSongs(query, PREVIEW_SIZE),
+                            database.songDao.searchSongs(query, PREVIEW_SIZE),
                             searchLocalAudio(query),
-                            database.searchAlbums(query, PREVIEW_SIZE),
-                            database.searchArtists(query, PREVIEW_SIZE),
-                            database.searchPlaylists(query, PREVIEW_SIZE),
+                            database.albumDao.searchAlbums(query, PREVIEW_SIZE),
+                            database.artistDao.searchArtists(query, PREVIEW_SIZE),
+                            database.playlistDao.searchPlaylists(query, PREVIEW_SIZE),
                         ) { dbSongs, localSongs, albums, artists, playlists ->
                             (dbSongs + localSongs).distinctBy { it.id } + albums + artists + playlists
                         }
 
                     LocalFilter.SONG -> combine(
-                        database.searchSongs(query),
+                        database.songDao.searchSongs(query),
                         searchLocalAudio(query)
                     ) { dbSongs, localSongs ->
                         (dbSongs + localSongs).distinctBy { it.id }
                     }
-                    LocalFilter.ALBUM -> database.searchAlbums(query)
-                    LocalFilter.ARTIST -> database.searchArtists(query)
-                    LocalFilter.PLAYLIST -> database.searchPlaylists(query)
+                    LocalFilter.ALBUM -> database.albumDao.searchAlbums(query)
+                    LocalFilter.ARTIST -> database.artistDao.searchArtists(query)
+                    LocalFilter.PLAYLIST -> database.playlistDao.searchPlaylists(query)
                 }.map { list ->
                     LocalSearchResult(
                         query = query,

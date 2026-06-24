@@ -28,12 +28,12 @@ class SyncUtils @Inject constructor(
         YouTube.playlist("LM").completed().onSuccess { page ->
             val songs = page.songs.reversed()
 
-            database.likedSongsByNameAsc().first()
+            database.songDao.likedSongsByNameAsc().first()
                 .filterNot { it.id in songs.map(SongItem::id) }
                 .forEach { database.update(it.song.localToggleLike()) }
 
             songs.forEach { song ->
-                val dbSong = database.song(song.id).firstOrNull()
+                val dbSong = database.songDao.song(song.id).firstOrNull()
                 database.transaction {
                     when (dbSong) {
                         null -> insert(song.toMediaMetadata(), SongEntity::localToggleLike)
@@ -48,12 +48,12 @@ class SyncUtils @Inject constructor(
         YouTube.library("FEmusic_liked_videos").completedLibraryPage().onSuccess { page ->
             val songs = page.items.filterIsInstance<SongItem>().reversed()
 
-            database.songsByNameAsc().first()
+            database.songDao.songsByNameAsc().first()
                 .filterNot { it.id in songs.map(SongItem::id) }
                 .forEach { database.update(it.song.toggleLibrary()) }
 
             songs.forEach { song ->
-                val dbSong = database.song(song.id).firstOrNull()
+                val dbSong = database.songDao.song(song.id).firstOrNull()
                 database.transaction {
                     when (dbSong) {
                         null -> insert(song.toMediaMetadata(), SongEntity::toggleLibrary)
@@ -68,17 +68,17 @@ class SyncUtils @Inject constructor(
         YouTube.library("FEmusic_liked_albums").completedLibraryPage().onSuccess { page ->
             val albums = page.items.filterIsInstance<AlbumItem>().reversed()
 
-            database.albumsLikedByNameAsc().first()
+            database.albumDao.albumsLikedByNameAsc().first()
                 .filterNot { it.id in albums.map(AlbumItem::id) }
                 .forEach { database.update(it.album.localToggleLike()) }
 
             albums.forEach { album ->
-                val dbAlbum = database.album(album.id).firstOrNull()
+                val dbAlbum = database.albumDao.album(album.id).firstOrNull()
                 YouTube.album(album.browseId).onSuccess { albumPage ->
                     when (dbAlbum) {
                         null -> {
                             database.insert(albumPage)
-                            database.album(album.id).firstOrNull()?.let {
+                            database.albumDao.album(album.id).firstOrNull()?.let {
                                 database.update(it.album.localToggleLike())
                             }
                         }
@@ -94,12 +94,12 @@ class SyncUtils @Inject constructor(
         YouTube.library("FEmusic_library_corpus_artists").completedLibraryPage().onSuccess { page ->
             val artists = page.items.filterIsInstance<ArtistItem>()
 
-            database.artistsBookmarkedByNameAsc().first()
+            database.artistDao.artistsBookmarkedByNameAsc().first()
                 .filterNot { it.id in artists.map(ArtistItem::id) }
                 .forEach { database.update(it.artist.localToggleLike()) }
 
             artists.forEach { artist ->
-                val dbArtist = database.artist(artist.id).firstOrNull()
+                val dbArtist = database.artistDao.artist(artist.id).firstOrNull()
                 database.transaction {
                     when (dbArtist) {
                         null -> {
@@ -126,7 +126,7 @@ class SyncUtils @Inject constructor(
             val playlistList = page.items.filterIsInstance<PlaylistItem>()
                 .filterNot { it.id == "LM" ||  it.id == "SE" }
                 .reversed()
-            val dbPlaylists = database.playlistsByNameAsc().first()
+            val dbPlaylists = database.playlistDao.playlistsByNameAsc().first()
 
             dbPlaylists.filterNot { it.playlist.browseId in playlistList.map(PlaylistItem::id) }
                 .filterNot { it.playlist.browseId == null }
@@ -172,10 +172,10 @@ class SyncUtils @Inject constructor(
     }
 
     suspend fun syncArtistsFromSongs() {
-        val songs = database.allSongs().first()
+        val songs = database.songDao.allSongs().first()
         songs.forEach { song ->
             song.artists.forEach { artist ->
-                val dbArtist = database.artist(artist.id).firstOrNull()
+                val dbArtist = database.artistDao.artist(artist.id).firstOrNull()
                 if (dbArtist == null) {
                     database.insert(artist)
                 }

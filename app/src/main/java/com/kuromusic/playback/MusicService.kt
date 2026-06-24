@@ -233,7 +233,7 @@ class MusicService :
     private val currentSong =
         currentMediaMetadata
             .flatMapLatest { mediaMetadata ->
-                database.song(mediaMetadata?.id)
+                database.songDao.song(mediaMetadata?.id)
             }.stateIn(scope, SharingStarted.Lazily, null)
 
     // Cached preference to avoid blocking reads
@@ -771,7 +771,7 @@ class MusicService :
         playbackData: YTPlayerUtils.PlaybackData? = null
     ) {
         if (mediaId.startsWith("content://") || mediaId.startsWith("file://")) return
-        val song = database.song(mediaId).first()
+                                val song = database.songDao.song(mediaId).first()
         val mediaMetadata = withContext(Dispatchers.Main.immediate) {
             player.findNextMediaItemById(mediaId)?.metadata
         } ?: return
@@ -784,7 +784,7 @@ class MusicService :
             if (song == null) insert(mediaMetadata.copy(duration = duration))
             else if (song.song.duration == -1) update(song.song.copy(duration = duration))
         }
-        if (!database.hasRelatedSongs(mediaId)) {
+        if (!database.songDao.hasRelatedSongs(mediaId)) {
             val relatedEndpoint =
                 YouTube.next(WatchEndpoint(videoId = mediaId)).getOrNull()?.relatedEndpoint
                     ?: return
@@ -1133,10 +1133,10 @@ class MusicService :
                     }
 
                     // Delete existing history for this song to prevent duplicates (Recently Played = Unique Songs)
-                    database.deleteSongHistory(mediaItem.mediaId)
+                    database.historyDao.deleteSongHistory(mediaItem.mediaId)
 
                     // Insert into history (no FK constraint, so it won't crash even if song insertion above failed)
-                    database.insert(
+                    database.historyDao.insert(
                         com.kuromusic.db.entities.SongHistory(
                             songId = mediaItem.mediaId,
                             timestamp = System.currentTimeMillis()
@@ -1431,7 +1431,7 @@ class MusicService :
                                 recoverSong(mediaId, validatedPlayback)
                                 
                                  // Fetch genre if not present
-                                val song = database.song(mediaId).first()
+        val song = database.songDao.song(mediaId).first()
                                 if (song?.song?.genre == null) {
                                     YouTube.next(WatchEndpoint(videoId = mediaId)).onSuccess { _ ->
                                              database.query {

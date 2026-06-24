@@ -48,7 +48,7 @@ fun ImportPlaylistDialog(
                 database.query { insert(newPlaylist) }
 
                 coroutineScope.launch(Dispatchers.IO) {
-                    val playlist = database.playlist(newPlaylist.id).firstOrNull()
+                    val playlist = database.playlistDao.playlist(newPlaylist.id).firstOrNull()
 
                     if (playlist != null) {
                         songIds = onGetSong()
