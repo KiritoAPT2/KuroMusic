@@ -7,6 +7,7 @@ import com.kuromusic.constants.SongSortType
 import com.kuromusic.db.entities.Artist
 import com.kuromusic.db.entities.PlaylistSong
 import com.kuromusic.db.entities.Song
+import com.kuromusic.db.entities.SongArtistMap
 import com.kuromusic.extensions.reversed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -180,4 +181,128 @@ interface SongDao {
 
     @Query("SELECT genre FROM song JOIN event ON song.id = event.songId WHERE event.timestamp > :since AND genre IS NOT NULL GROUP BY genre ORDER BY COUNT(*) DESC LIMIT 1")
     fun topRecentGenre(since: Long = System.currentTimeMillis() - 604800000): Flow<String?>
+
+    @Transaction
+    @Query("SELECT * FROM song WHERE id = :songId")
+    fun song(songId: String?): Flow<Song?>
+
+    @Transaction
+    @Query("SELECT * FROM Song WHERE id = :songId LIMIT 1")
+    fun getSongById(songId: String): Song?
+
+    @Transaction
+    @Query("SELECT * FROM song_artist_map WHERE songId = :songId")
+    fun songArtistMap(songId: String): List<SongArtistMap>
+
+    @Transaction
+    @Query("SELECT * FROM song")
+    fun allSongs(): Flow<List<Song>>
+
+    @Transaction
+    @Query("SELECT * FROM song WHERE title LIKE '%' || :query || '%' AND inLibrary IS NOT NULL LIMIT :previewSize")
+    fun searchSongs(query: String, previewSize: Int = Int.MAX_VALUE): Flow<List<Song>>
+
+    @Transaction
+    @Query("SELECT COUNT(1) FROM related_song_map WHERE songId = :songId LIMIT 1")
+    fun hasRelatedSongs(songId: String): Boolean
+
+    @Transaction
+    @Query(
+        "SELECT song.* FROM (SELECT * from related_song_map GROUP BY relatedSongId) map JOIN song ON song.id = map.relatedSongId where songId = :songId",
+    )
+    fun getRelatedSongs(songId: String): Flow<List<Song>>
+
+    @Transaction
+    @Query(
+        """
+        SELECT song.*
+        FROM (SELECT *
+              FROM related_song_map
+              GROUP BY relatedSongId) map
+                 JOIN
+             song
+             ON song.id = map.relatedSongId
+        WHERE songId = :songId
+        """
+    )
+    fun relatedSongs(songId: String): List<Song>
+
+    @Transaction
+    @Query(
+        """
+        SELECT song.*
+        FROM (SELECT n.songId      AS eid,
+                     SUM(playTime) AS oldPlayTime,
+                     newPlayTime
+              FROM event
+                       JOIN
+                   (SELECT songId, SUM(playTime) AS newPlayTime
+                    FROM event
+                    WHERE timestamp > (:now - 86400000 * 30 * 1)
+                    GROUP BY songId
+                    ORDER BY newPlayTime) as n
+                   ON event.songId = n.songId
+              WHERE timestamp < (:now - 86400000 * 30 * 1)
+              GROUP BY n.songId
+              ORDER BY oldPlayTime) AS t
+                 JOIN song on song.id = t.eid
+        WHERE 0.2 * t.oldPlayTime > t.newPlayTime
+        LIMIT 100
+    """
+    )
+    fun forgottenFavorites(now: Long = System.currentTimeMillis()): Flow<List<Song>>
+
+    @Transaction
+    @Query(
+        """
+        SELECT song.*
+        FROM event
+                 JOIN
+             song ON event.songId = song.id
+        WHERE event.timestamp > (:now - 86400000 * 7 * 2)
+        GROUP BY song.albumId
+        HAVING song.albumId IS NOT NULL
+        ORDER BY sum(event.playTime) DESC
+        LIMIT :limit
+        OFFSET :offset
+        """,
+    )
+    fun recommendedAlbum(
+        now: Long = System.currentTimeMillis(),
+        limit: Int = 5,
+        offset: Int = 0,
+    ): Flow<List<Song>>
+
+    @Transaction
+    @Query(
+        """
+        SELECT song.*
+        FROM (SELECT *, COUNT(1) AS referredCount
+              FROM related_song_map
+              GROUP BY relatedSongId) map
+                 JOIN song ON song.id = map.relatedSongId
+        WHERE songId IN (SELECT songId
+                         FROM (SELECT songId
+                               FROM event
+                               ORDER BY ROWID DESC
+                               LIMIT 5)
+                         UNION
+                         SELECT songId
+                         FROM (SELECT songId
+                               FROM event
+                               WHERE timestamp > :now - 86400000 * 7
+                               GROUP BY songId
+                               ORDER BY SUM(playTime) DESC
+                               LIMIT 5)
+                         UNION
+                         SELECT id
+                         FROM (SELECT id
+                               FROM song
+                               ORDER BY totalPlayTime DESC
+                               LIMIT 10))
+        ORDER BY referredCount DESC
+        LIMIT 100
+    """,
+    )
+    fun quickPicks(now: Long = System.currentTimeMillis()): Flow<List<Song>>
 }

@@ -44,8 +44,12 @@ import java.util.Date
 class MusicDatabase(
     private val delegate: InternalDatabase,
 ) : DatabaseDao by delegate.dao {
-    val songDao: SongDao
-        get() = delegate.songDao
+    val songDao: SongDao by delegate::songDao
+    val artistDao: ArtistDao by delegate::artistDao
+    val albumDao: AlbumDao by delegate::albumDao
+    val playlistDao: PlaylistDao by delegate::playlistDao
+    val historyDao: HistoryDao by delegate::historyDao
+    val statsDao: StatsDao by delegate::statsDao
     val openHelper: SupportSQLiteOpenHelper
         get() = delegate.openHelper
 
@@ -124,6 +128,11 @@ class MusicDatabase(
 abstract class InternalDatabase : RoomDatabase() {
     abstract val dao: DatabaseDao
     abstract val songDao: SongDao
+    abstract val artistDao: ArtistDao
+    abstract val albumDao: AlbumDao
+    abstract val playlistDao: PlaylistDao
+    abstract val historyDao: HistoryDao
+    abstract val statsDao: StatsDao
 
     companion object {
         const val DB_NAME = "song.db"
