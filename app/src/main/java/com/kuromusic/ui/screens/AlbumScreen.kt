@@ -114,7 +114,7 @@ import com.kuromusic.ui.menu.SongMenu
 import com.kuromusic.ui.menu.YouTubeAlbumMenu
 import com.kuromusic.ui.utils.ItemWrapper
 import com.kuromusic.viewmodels.AlbumViewModel
-import kotlinx.coroutines.CoroutineScope
+import com.kuromusic.sync.YouTubeActionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -231,7 +231,7 @@ fun AlbumScreen(
                             androidx.compose.material3.IconButton(
                                 onClick = {
                                     // Lanza una coroutine para guardar la imagen
-                                    CoroutineScope(Dispatchers.IO).launch {
+                                    YouTubeActionHandler.scope.launch(Dispatchers.IO) {
                                         albumWithSongs.album.thumbnailUrl?.let {
                                             saveAlbumImageToGallery(
                                                 context,

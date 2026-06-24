@@ -3,11 +3,7 @@ package com.kuromusic.db.entities
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.kuromusic.innertube.YouTube
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import com.kuromusic.sync.YouTubeActionHandler
 import java.time.LocalDateTime
 
 @Immutable
@@ -38,9 +34,7 @@ data class AlbumEntity(
     )
 
     fun toggleLike() = localToggleLike().also {
-        CoroutineScope(Dispatchers.IO).launch {
-            if (playlistId != null)
-                YouTube.likePlaylist(playlistId, it.bookmarkedAt != null)
-        }
+        if (playlistId != null)
+            YouTubeActionHandler.likePlaylist(playlistId, it.bookmarkedAt != null)
     }
 }

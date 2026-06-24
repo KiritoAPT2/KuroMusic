@@ -1617,7 +1617,7 @@ class MusicService :
             }
             val PauseRemoteListenHistoryKey = booleanPreferencesKey("pauseRemoteListenHistory")
             if (!dataStore.get(PauseRemoteListenHistoryKey, false)) {
-                CoroutineScope(Dispatchers.IO).launch {
+                ioScope.launch {
                     val playbackUrl = database.format(mediaItem.mediaId).first()?.playbackUrl
                         ?: YTPlayerUtils.playerResponseForMetadata(mediaItem.mediaId, null)
                             .getOrNull()?.playbackTracking?.videostatsPlaybackUrl?.baseUrl

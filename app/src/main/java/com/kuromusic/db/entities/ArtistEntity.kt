@@ -4,11 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.kuromusic.innertube.YouTube
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import com.kuromusic.sync.YouTubeActionHandler
 import org.apache.commons.lang3.RandomStringUtils
 import java.time.LocalDateTime
 
@@ -46,12 +42,7 @@ data class ArtistEntity(
     )
 
     fun toggleLike() = localToggleLike().also {
-        CoroutineScope(Dispatchers.IO).launch {
-            if (channelId == null)
-                YouTube.subscribeChannel(YouTube.getChannelId(id), it.bookmarkedAt != null)
-            else
-                YouTube.subscribeChannel(channelId, it.bookmarkedAt != null)
-        }
+        YouTubeActionHandler.subscribeArtist(id, channelId, it.bookmarkedAt != null)
     }
 
     companion object {

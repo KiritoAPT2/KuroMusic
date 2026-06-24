@@ -16,7 +16,7 @@ import androidx.media3.common.Player
 import coil.ImageLoader
 import coil.request.ImageRequest
 import com.kuromusic.playback.PlayerConnection
-import kotlinx.coroutines.CoroutineScope
+import com.kuromusic.sync.YouTubeActionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -225,7 +225,7 @@ class MusicWidget : AppWidgetProvider() {
                 val thumbnailUrl = player.mediaMetadata.artworkUri?.toString()
                 if (!thumbnailUrl.isNullOrEmpty()) {
                     // Verificar si ya tenemos una imagen cargada para evitar recargas frecuentes
-                    CoroutineScope(Dispatchers.IO).launch {
+                    YouTubeActionHandler.scope.launch(Dispatchers.IO) {
                         try {
                             val request = ImageRequest.Builder(context)
                                 .data(thumbnailUrl)
