@@ -101,6 +101,11 @@ object YouTube {
         set(value) {
             innerTube.useLoginForBrowse = value
         }
+    var apiKey: String
+        get() = innerTube.apiKey
+        set(value) {
+            innerTube.apiKey = value
+        }
 
     private val clientAffinityMap = mutableMapOf<String, YouTubeClient>()
 

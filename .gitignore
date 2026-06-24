@@ -68,6 +68,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Security audit reports (may contain credentials)
+SECURITY_AUDIT_*.md
+
 # Antigravity artifacts
 .gemini/
 .antigravityignore

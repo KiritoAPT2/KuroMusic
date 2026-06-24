@@ -308,13 +308,6 @@ constructor(
         }
     }
 
-    val cachedSongsCount = database.allSongs().map { songs ->
-        // Contamos canciones que tengan formato pero no necesariamente descarga completa
-        // O simplemente usamos el total de la biblioteca si no hay una distinción clara de caché
-        // Para este caso, usaremos el total de canciones locales/en biblioteca
-        songs.size 
-    }
-
     val topValue =
         context.dataStore.data
             .map { it[TopSize] ?: "50" }

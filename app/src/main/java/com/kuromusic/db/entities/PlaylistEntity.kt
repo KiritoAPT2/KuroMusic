@@ -49,8 +49,7 @@ data class PlaylistEntity(
     fun toggleLike() = localToggleLike().also {
         CoroutineScope(Dispatchers.IO).launch {
             if (browseId != null)
-                YouTube.likePlaylist(browseId, bookmarkedAt == null)
-            this.cancel()
+                YouTube.likePlaylist(browseId, it.bookmarkedAt != null)
         }
     }
 }

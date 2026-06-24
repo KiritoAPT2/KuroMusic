@@ -57,6 +57,8 @@ class App : Application(), ImageLoaderFactory {
 
         val locale = Locale.getDefault()
         val languageTag = locale.toLanguageTag().replace("-Hant", "") // replace zh-Hant-* to zh-*
+        YouTube.apiKey = BuildConfig.INNER_TUBE_API_KEY
+
         YouTube.locale = YouTubeLocale(
             gl = dataStore[ContentCountryKey]?.takeIf { it != SYSTEM_DEFAULT }
                 ?: locale.country.takeIf { it in CountryCodeToName }

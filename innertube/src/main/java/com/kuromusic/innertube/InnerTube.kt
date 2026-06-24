@@ -21,9 +21,8 @@ import java.net.Proxy
 import java.util.*
 
 
-private val YT_API_KEY = "ECdY5TELK-LTCoJd47X6ayXddWjZ3LX9CySazIA".reversed()
-
 class InnerTube {
+    var apiKey: String = ""
     private var httpClient = createClient()
 
     var locale = YouTubeLocale(
@@ -246,7 +245,7 @@ class InnerTube {
         client: YouTubeClient,
         videoId: String,
     ) = httpClient.post("https://music.youtube.com/youtubei/v1/get_transcript") {
-        parameter("key", YT_API_KEY)
+        parameter("key", apiKey)
         headers {
             append("Content-Type", "application/json")
         }

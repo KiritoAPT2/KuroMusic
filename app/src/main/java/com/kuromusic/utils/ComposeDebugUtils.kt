@@ -1,5 +1,6 @@
 package com.kuromusic.utils
 
+import com.kuromusic.BuildConfig
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +26,8 @@ import kotlin.math.min
  * recompositions occur before a timeout.
  */
 @Stable
-fun Modifier.recomposeHighlighter(): Modifier = this.then(recomposeModifier)
+fun Modifier.recomposeHighlighter(): Modifier =
+    if (BuildConfig.DEBUG) this.then(recomposeModifier) else this
 
 // Use a single instance + @Stable to ensure that recompositions can enable skipping optimizations
 // Modifier.composed will still remember unique data per call site.
