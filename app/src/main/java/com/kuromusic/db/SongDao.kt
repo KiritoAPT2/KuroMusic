@@ -1,17 +1,32 @@
 package com.kuromusic.db
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
+import com.kuromusic.constants.ArtistSongSortType
 import com.kuromusic.constants.SongSortType
 import com.kuromusic.db.entities.Artist
+import com.kuromusic.db.entities.FormatEntity
+import com.kuromusic.db.entities.LyricsEntity
 import com.kuromusic.db.entities.PlaylistSong
+import com.kuromusic.db.entities.RelatedSongMap
+import com.kuromusic.db.entities.SetVideoIdEntity
 import com.kuromusic.db.entities.Song
+import com.kuromusic.db.entities.SongAlbumMap
 import com.kuromusic.db.entities.SongArtistMap
+import com.kuromusic.db.entities.SongEntity
 import com.kuromusic.extensions.reversed
+import com.kuromusic.models.MediaMetadata
+import com.kuromusic.models.toMediaMetadata
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.text.Collator
+import java.time.LocalDateTime
 import java.util.Locale
 
 @Dao
@@ -305,4 +320,87 @@ interface SongDao {
     """,
     )
     fun quickPicks(now: Long = System.currentTimeMillis()): Flow<List<Song>>
+
+    // ─── CRUD ─────────────────────────────────────────────────────────────────
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(song: SongEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsert(song: SongEntity)
+
+    @Update
+    fun update(song: SongEntity)
+
+    @Delete
+    fun delete(song: SongEntity)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(map: SongArtistMap)
+
+    @Delete
+    fun delete(songArtistMap: SongArtistMap)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(map: SongAlbumMap)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsert(map: SongAlbumMap)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(map: RelatedSongMap)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsert(lyrics: LyricsEntity)
+
+    @Delete
+    fun delete(lyrics: LyricsEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsert(format: FormatEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSetVideoId(setVideoIdEntity: SetVideoIdEntity)
+
+    @Query("SELECT * FROM set_video_id WHERE videoId = :videoId")
+    suspend fun getSetVideoId(videoId: String): SetVideoIdEntity?
+
+    @Transaction
+    @Query("SELECT * FROM format WHERE id = :id")
+    fun format(id: String?): Flow<FormatEntity?>
+
+    suspend fun getLyrics(id: String?): LyricsEntity? {
+        return lyrics(id).first()
+    }
+
+    @Transaction
+    @Query("SELECT * FROM lyrics WHERE id = :id")
+    fun lyrics(id: String?): Flow<LyricsEntity?>
+
+    @Transaction
+    @Query("UPDATE song SET inLibrary = :inLibrary WHERE id = :songId")
+    fun inLibrary(songId: String, inLibrary: LocalDateTime?)
+
+    // ─── Sorting facades ──────────────────────────────────────────────────────
+
+    @Transaction
+    @Query(
+        "SELECT song.* FROM song_artist_map JOIN song ON song_artist_map.songId = song.id WHERE artistId = :artistId AND inLibrary IS NOT NULL LIMIT :previewSize",
+    )
+    fun artistSongsPreview(artistId: String, previewSize: Int = 3): Flow<List<Song>>
+
+    fun artistSongs(
+        artistId: String,
+        sortType: ArtistSongSortType,
+        descending: Boolean,
+    ) = when (sortType) {
+        ArtistSongSortType.CREATE_DATE -> artistSongsByCreateDateAsc(artistId)
+        ArtistSongSortType.NAME ->
+            artistSongsByNameAsc(artistId).map { artistSongs ->
+                val collator = Collator.getInstance(Locale.getDefault())
+                collator.strength = Collator.PRIMARY
+                artistSongs.sortedWith(compareBy(collator) { it.song.title })
+            }
+
+        ArtistSongSortType.PLAY_TIME -> artistSongsByPlayTimeAsc(artistId)
+    }.map { it.reversed(descending) }
 }

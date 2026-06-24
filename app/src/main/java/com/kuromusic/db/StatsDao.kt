@@ -11,6 +11,8 @@ import com.kuromusic.db.entities.PlayCountEntity
 import com.kuromusic.db.entities.Song
 import com.kuromusic.db.entities.SongWithStats
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -205,4 +207,19 @@ interface StatsDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(playCountEntity: PlayCountEntity): Long
+
+    /** Increment by one the play count with today's year and month. */
+    fun incrementPlayCount(songId: String) {
+        val time = java.time.LocalDateTime.now().atOffset(java.time.ZoneOffset.UTC)
+        var oldCount: Int
+        runBlocking {
+            oldCount = getPlayCountByMonth(songId, time.year, time.monthValue).first()
+        }
+
+        // add new
+        if (oldCount <= 0) {
+            insert(PlayCountEntity(songId, time.year, time.monthValue, 0))
+        }
+        incrementPlayCount(songId, time.year, time.monthValue)
+    }
 }

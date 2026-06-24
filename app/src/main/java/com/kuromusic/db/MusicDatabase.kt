@@ -16,26 +16,47 @@ import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
+import com.kuromusic.constants.AlbumSortType
+import com.kuromusic.constants.ArtistSongSortType
+import com.kuromusic.constants.ArtistSortType
+import com.kuromusic.constants.PlaylistSortType
+import com.kuromusic.constants.SongSortType
+import com.kuromusic.db.entities.Album
 import com.kuromusic.db.entities.AlbumArtistMap
 import com.kuromusic.db.entities.AlbumEntity
+import com.kuromusic.db.entities.AlbumWithSongs
+import com.kuromusic.db.entities.Artist
 import com.kuromusic.db.entities.ArtistEntity
 import com.kuromusic.db.entities.Event
+import com.kuromusic.db.entities.EventWithSong
 import com.kuromusic.db.entities.FormatEntity
 import com.kuromusic.db.entities.LyricsEntity
 import com.kuromusic.db.entities.PlayCountEntity
+import com.kuromusic.db.entities.Playlist
 import com.kuromusic.db.entities.PlaylistEntity
+import com.kuromusic.db.entities.PlaylistSong
 import com.kuromusic.db.entities.PlaylistSongMap
 import com.kuromusic.db.entities.PlaylistSongMapPreview
 import com.kuromusic.db.entities.RelatedSongMap
 import com.kuromusic.db.entities.SearchHistory
 import com.kuromusic.db.entities.SetVideoIdEntity
+import com.kuromusic.db.entities.Song
 import com.kuromusic.db.entities.SongAlbumMap
 import com.kuromusic.db.entities.SongArtistMap
 import com.kuromusic.db.entities.SongEntity
+import com.kuromusic.db.entities.SongHistory
+import com.kuromusic.db.entities.SongWithStats
 import com.kuromusic.db.entities.SortedSongAlbumMap
 import com.kuromusic.db.entities.SortedSongArtistMap
-import com.kuromusic.db.entities.SongHistory
 import com.kuromusic.extensions.toSQLiteQuery
+import com.kuromusic.innertube.models.PlaylistItem as InnerTubePlaylistItem
+import com.kuromusic.innertube.models.SongItem
+import com.kuromusic.innertube.pages.AlbumPage
+import com.kuromusic.innertube.pages.ArtistPage
+import com.kuromusic.models.MediaMetadata
+import com.kuromusic.models.toMediaMetadata
+import com.kuromusic.ui.utils.resize
+import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -43,7 +64,7 @@ import java.util.Date
 
 class MusicDatabase(
     private val delegate: InternalDatabase,
-) : DatabaseDao by delegate.dao {
+) {
     val songDao: SongDao by delegate::songDao
     val artistDao: ArtistDao by delegate::artistDao
     val albumDao: AlbumDao by delegate::albumDao
@@ -70,6 +91,393 @@ class MusicDatabase(
         }
 
     fun close() = delegate.close()
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SongDao delegation
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun songs(sortType: SongSortType, descending: Boolean) =
+        songDao.songs(sortType, descending)
+
+    fun likedSongs(sortType: SongSortType, descending: Boolean) =
+        songDao.likedSongs(sortType, descending)
+
+    fun artistSongs(artistId: String, sortType: ArtistSongSortType, descending: Boolean) =
+        songDao.artistSongs(artistId, sortType, descending)
+
+    fun albumSongs(albumId: String) = songDao.albumSongs(albumId)
+    fun playlistSongs(playlistId: String) = songDao.playlistSongs(playlistId)
+    fun allSongs() = songDao.allSongs()
+    fun song(songId: String?) = songDao.song(songId)
+    fun getSongById(songId: String) = songDao.getSongById(songId)
+    fun recentlyPlayedSongs(limit: Int = 20) = songDao.recentlyPlayedSongs(limit)
+    fun essentialSongs(limit: Int = 20) = songDao.essentialSongs(limit)
+    fun quickPicks(now: Long = System.currentTimeMillis()) = songDao.quickPicks(now)
+    fun forgottenFavorites(now: Long = System.currentTimeMillis()) = songDao.forgottenFavorites(now)
+    fun recommendedAlbum(now: Long = System.currentTimeMillis(), limit: Int = 5, offset: Int = 0) =
+        songDao.recommendedAlbum(now, limit, offset)
+    fun searchSongs(query: String, previewSize: Int = Int.MAX_VALUE) =
+        songDao.searchSongs(query, previewSize)
+    fun topRecentArtist(since: Long = System.currentTimeMillis() - 604800000) =
+        songDao.topRecentArtist(since)
+    fun topRecentGenre(since: Long = System.currentTimeMillis() - 604800000) =
+        songDao.topRecentGenre(since)
+    fun hasRelatedSongs(songId: String) = songDao.hasRelatedSongs(songId)
+    fun getRelatedSongs(songId: String) = songDao.getRelatedSongs(songId)
+    fun relatedSongs(songId: String) = songDao.relatedSongs(songId)
+    fun artistSongsPreview(artistId: String, previewSize: Int = 3) =
+        songDao.artistSongsPreview(artistId, previewSize)
+
+    // Song CRUD
+    fun insert(song: SongEntity) = songDao.insert(song)
+    fun upsert(song: SongEntity) = songDao.upsert(song)
+    fun update(song: SongEntity) = songDao.update(song)
+    fun delete(song: SongEntity) = songDao.delete(song)
+    fun insert(map: SongArtistMap) = songDao.insert(map)
+    fun delete(map: SongArtistMap) = songDao.delete(map)
+    fun insert(map: SongAlbumMap) = songDao.insert(map)
+    fun upsert(map: SongAlbumMap) = songDao.upsert(map)
+    fun insert(map: RelatedSongMap) = songDao.insert(map)
+    fun upsert(lyrics: LyricsEntity) = songDao.upsert(lyrics)
+    fun delete(lyrics: LyricsEntity) = songDao.delete(lyrics)
+    fun upsert(format: FormatEntity) = songDao.upsert(format)
+    suspend fun insertSetVideoId(entity: SetVideoIdEntity) = songDao.insertSetVideoId(entity)
+    suspend fun getSetVideoId(videoId: String) = songDao.getSetVideoId(videoId)
+    fun format(id: String?) = songDao.format(id)
+    suspend fun getLyrics(id: String?) = songDao.getLyrics(id)
+    fun lyrics(id: String?) = songDao.lyrics(id)
+    fun inLibrary(songId: String, inLibrary: LocalDateTime?) =
+        songDao.inLibrary(songId, inLibrary)
+    fun songArtistMap(songId: String) = songDao.songArtistMap(songId)
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ArtistDao delegation
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun artists(sortType: ArtistSortType, descending: Boolean) =
+        artistDao.artists(sortType, descending)
+
+    fun artistsBookmarked(sortType: ArtistSortType, descending: Boolean) =
+        artistDao.artistsBookmarked(sortType, descending)
+
+    fun artist(id: String) = artistDao.artist(id)
+    fun artistByName(name: String) = artistDao.artistByName(name)
+    fun searchArtists(query: String, previewSize: Int = Int.MAX_VALUE) =
+        artistDao.searchArtists(query, previewSize)
+    fun allArtistsByPlayTime() = artistDao.allArtistsByPlayTime()
+    fun artistsInAA() = artistDao.artistsInAA()
+    suspend fun setArtistSongCount(artistId: String, count: Int) =
+        artistDao.setArtistSongCount(artistId, count)
+    suspend fun getSongCountForArtist(artistId: String) =
+        artistDao.getSongCountForArtist(artistId)
+    suspend fun getArtistsWithoutThumbnails() = artistDao.getArtistsWithoutThumbnails()
+    suspend fun updateArtistThumbnail(id: String, thumbnailUrl: String) =
+        artistDao.updateArtistThumbnail(id, thumbnailUrl)
+
+    // Artist CRUD
+    fun insert(artist: ArtistEntity) = artistDao.insert(artist)
+    fun upsert(artist: ArtistEntity) = artistDao.upsert(artist)
+    fun update(artist: ArtistEntity) = artistDao.update(artist)
+    fun delete(artist: ArtistEntity) = artistDao.delete(artist)
+    fun insert(map: AlbumArtistMap) = artistDao.insert(map)
+    fun delete(map: AlbumArtistMap) = artistDao.delete(map)
+
+    suspend fun refreshArtistSongCount(artistId: String) =
+        artistDao.refreshArtistSongCount(artistId)
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AlbumDao delegation
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun albums(sortType: AlbumSortType, descending: Boolean) =
+        albumDao.albums(sortType, descending)
+
+    fun albumsLiked(sortType: AlbumSortType, descending: Boolean) =
+        albumDao.albumsLiked(sortType, descending)
+
+    fun album(id: String) = albumDao.album(id)
+    fun albumWithSongs(albumId: String) = albumDao.albumWithSongs(albumId)
+    fun albumArtistMaps(albumId: String) = albumDao.albumArtistMaps(albumId)
+    fun searchAlbums(query: String, previewSize: Int = Int.MAX_VALUE) =
+        albumDao.searchAlbums(query, previewSize)
+    fun albumsInAA() = albumDao.albumsInAA()
+
+    // Album CRUD
+    fun insert(album: AlbumEntity) = albumDao.insert(album)
+    fun update(album: AlbumEntity) = albumDao.update(album)
+    fun delete(album: AlbumEntity) = albumDao.delete(album)
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PlaylistDao delegation
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun playlists(sortType: PlaylistSortType, descending: Boolean) =
+        playlistDao.playlists(sortType, descending)
+
+    fun playlist(playlistId: String) = playlistDao.playlist(playlistId)
+    fun playlistByBrowseId(browseId: String) = playlistDao.playlistByBrowseId(browseId)
+    fun searchPlaylists(query: String, previewSize: Int = Int.MAX_VALUE) =
+        playlistDao.searchPlaylists(query, previewSize)
+    fun editablePlaylistsByCreateDateAsc() = playlistDao.editablePlaylistsByCreateDateAsc()
+    fun checkInPlaylist(playlistId: String, songId: String) =
+        playlistDao.checkInPlaylist(playlistId, songId)
+    fun playlistDuplicates(playlistId: String, songIds: List<String>) =
+        playlistDao.playlistDuplicates(playlistId, songIds)
+    fun playlistSongMaps(songId: String) = playlistDao.playlistSongMaps(songId)
+    fun playlistSongMapsFrom(playlistId: String, from: Int) =
+        playlistDao.playlistSongMapsFrom(playlistId, from)
+    fun addSongToPlaylist(playlist: Playlist, songIds: List<String>) =
+        playlistDao.addSongToPlaylist(playlist, songIds)
+
+    // Playlist CRUD
+    fun insert(playlist: PlaylistEntity) = playlistDao.insert(playlist)
+    fun update(playlist: PlaylistEntity) = playlistDao.update(playlist)
+    fun delete(playlist: PlaylistEntity) = playlistDao.delete(playlist)
+    fun insert(map: PlaylistSongMap) = playlistDao.insert(map)
+    fun update(map: PlaylistSongMap) = playlistDao.update(map)
+    fun delete(map: PlaylistSongMap) = playlistDao.delete(map)
+    fun move(playlistId: String, fromPosition: Int, toPosition: Int) =
+        playlistDao.move(playlistId, fromPosition, toPosition)
+    fun clearPlaylist(playlistId: String) = playlistDao.clearPlaylist(playlistId)
+    fun deletePlaylistById(browseId: String) = playlistDao.deletePlaylistById(browseId)
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // HistoryDao delegation
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun events() = historyDao.events()
+    fun firstEvent() = historyDao.firstEvent()
+    fun clearListenHistory() = historyDao.clearListenHistory()
+    fun searchHistory(query: String = "") = historyDao.searchHistory(query)
+    fun clearSearchHistory() = historyDao.clearSearchHistory()
+    fun getRecentHistory(limit: Int = 10) = historyDao.getRecentHistory(limit)
+    suspend fun clearSongHistory() = historyDao.clearSongHistory()
+    suspend fun deleteSongHistory(songId: String) = historyDao.deleteSongHistory(songId)
+    suspend fun deleteSongHistoryOlderThan(cutoffTimestamp: Long) =
+        historyDao.deleteSongHistoryOlderThan(cutoffTimestamp)
+    suspend fun deleteHistoryOrphaned() = historyDao.deleteHistoryOrphaned()
+
+    // History CRUD
+    suspend fun insert(songHistory: SongHistory) = historyDao.insert(songHistory)
+    fun insert(event: Event) = historyDao.insert(event)
+    fun insert(searchHistory: SearchHistory) = historyDao.insert(searchHistory)
+    fun delete(searchHistory: SearchHistory) = historyDao.delete(searchHistory)
+    fun delete(event: Event) = historyDao.delete(event)
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // StatsDao delegation
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun mostPlayedSongsStats(
+        fromTimeStamp: Long,
+        limit: Int = 6,
+        offset: Int = 0,
+        toTimeStamp: Long? = java.time.LocalDateTime.now().toInstant(java.time.ZoneOffset.UTC).toEpochMilli(),
+    ) = statsDao.mostPlayedSongsStats(fromTimeStamp, limit, offset, toTimeStamp)
+    fun mostPlayedSongs(
+        fromTimeStamp: Long,
+        limit: Int = 6,
+        offset: Int = 0,
+        toTimeStamp: Long? = java.time.LocalDateTime.now().toInstant(java.time.ZoneOffset.UTC).toEpochMilli(),
+    ) = statsDao.mostPlayedSongs(fromTimeStamp, limit, offset, toTimeStamp)
+    fun mostPlayedArtists(
+        fromTimeStamp: Long,
+        limit: Int = 6,
+        offset: Int = 0,
+        toTimeStamp: Long? = java.time.LocalDateTime.now().toInstant(java.time.ZoneOffset.UTC).toEpochMilli(),
+    ) = statsDao.mostPlayedArtists(fromTimeStamp, limit, offset, toTimeStamp)
+    fun mostPlayedAlbums(
+        fromTimeStamp: Long,
+        limit: Int = 6,
+        offset: Int = 0,
+        toTimeStamp: Long? = java.time.LocalDateTime.now().toInstant(java.time.ZoneOffset.UTC).toEpochMilli(),
+    ) = statsDao.mostPlayedAlbums(fromTimeStamp, limit, offset, toTimeStamp)
+    fun getLifetimePlayCount(songId: String?) = statsDao.getLifetimePlayCount(songId)
+    fun getPlayCountByYear(songId: String?, year: Int) = statsDao.getPlayCountByYear(songId, year)
+    fun getPlayCountByMonth(songId: String?, year: Int, month: Int) =
+        statsDao.getPlayCountByMonth(songId, year, month)
+    fun eventCount() = statsDao.eventCount()
+    fun getTopGenres(limit: Int = 3) = statsDao.getTopGenres(limit)
+    fun getRecentPlayedIds(limit: Int = 100) = statsDao.getRecentPlayedIds(limit)
+    fun getSongsFromGenres(genres: List<String>, excludeIds: List<String>, limit: Int = 30) =
+        statsDao.getSongsFromGenres(genres, excludeIds, limit)
+    fun getUnplayedSongsFromGenres(genres: List<String>, limit: Int = 15) =
+        statsDao.getUnplayedSongsFromGenres(genres, limit)
+    fun incrementTotalPlayTime(songId: String, playTime: Long) =
+        statsDao.incrementTotalPlayTime(songId, playTime)
+    fun incrementPlayCount(songId: String, year: Int, month: Int) =
+        statsDao.incrementPlayCount(songId, year, month)
+    fun incrementPlayCount(songId: String) = statsDao.incrementPlayCount(songId)
+    fun insert(playCountEntity: PlayCountEntity) = statsDao.insert(playCountEntity)
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Complex multi-DAO operations (originally in DatabaseDao)
+    // ═══════════════════════════════════════════════════════════════════════════
+    fun checkpoint() {
+        delegate.queryExecutor.execute {
+            delegate.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(FULL)")
+        }
+    }
+
+    @androidx.room.Transaction
+    fun insert(mediaMetadata: MediaMetadata, block: (SongEntity) -> SongEntity = { it }) {
+        if (songDao.insert(mediaMetadata.toSongEntity().let(block)) == -1L) return
+        mediaMetadata.artists.forEachIndexed { index, artist ->
+            val artistId = artist.id ?: artistDao.artistByName(artist.name)?.id
+                ?: ArtistEntity.generateArtistId()
+            artistDao.insert(
+                ArtistEntity(id = artistId, name = artist.name),
+            )
+            songDao.insert(
+                SongArtistMap(songId = mediaMetadata.id, artistId = artistId, position = index),
+            )
+        }
+    }
+
+    @androidx.room.Transaction
+    fun upsert(mediaMetadata: MediaMetadata, block: (SongEntity) -> SongEntity = { it }) {
+        songDao.upsert(mediaMetadata.toSongEntity().let(block))
+        mediaMetadata.artists.forEachIndexed { index, artist ->
+            val artistId = artist.id ?: artistDao.artistByName(artist.name)?.id
+                ?: ArtistEntity.generateArtistId()
+            artistDao.upsert(ArtistEntity(id = artistId, name = artist.name))
+            songDao.insert(
+                SongArtistMap(songId = mediaMetadata.id, artistId = artistId, position = index),
+            )
+        }
+    }
+
+    @androidx.room.Transaction
+    fun insert(albumPage: AlbumPage) {
+        if (albumDao.insert(
+                com.kuromusic.db.entities.AlbumEntity(
+                    id = albumPage.album.browseId,
+                    playlistId = albumPage.album.playlistId,
+                    title = albumPage.album.title,
+                    year = albumPage.album.year,
+                    thumbnailUrl = albumPage.album.thumbnail,
+                    songCount = albumPage.songs.size,
+                    duration = albumPage.songs.sumOf { it.duration ?: 0 },
+                ),
+            ) == -1L
+        ) {
+            return
+        }
+        albumPage.songs
+            .map(SongItem::toMediaMetadata)
+            .onEach { insert(it) }
+            .onEach {
+                val existingSong = songDao.getSongById(it.id)
+                if (existingSong != null) {
+                    update(existingSong, it)
+                }
+            }.mapIndexed { index, song ->
+                SongAlbumMap(songId = song.id, albumId = albumPage.album.browseId, index = index)
+            }.forEach { songDao.upsert(it) }
+        albumPage.album.artists
+            ?.map { artist ->
+                ArtistEntity(
+                    id = artist.id ?: artistDao.artistByName(artist.name)?.id
+                        ?: ArtistEntity.generateArtistId(),
+                    name = artist.name,
+                )
+            }?.onEach { artistDao.insert(it) }
+            ?.mapIndexed { index, artist ->
+                AlbumArtistMap(albumId = albumPage.album.browseId, artistId = artist.id, order = index)
+            }?.forEach { artistDao.insert(it) }
+    }
+
+    @androidx.room.Transaction
+    fun update(song: Song, mediaMetadata: MediaMetadata) {
+        songDao.update(
+            song.song.copy(
+                title = mediaMetadata.title,
+                duration = mediaMetadata.duration,
+                thumbnailUrl = mediaMetadata.thumbnailUrl,
+                albumId = mediaMetadata.album?.id,
+                albumName = mediaMetadata.album?.title,
+            ),
+        )
+        songDao.songArtistMap(song.id).forEach { songDao.delete(it) }
+        mediaMetadata.artists.forEachIndexed { index, artist ->
+            val artistId = artist.id ?: artistDao.artistByName(artist.name)?.id
+                ?: ArtistEntity.generateArtistId()
+            artistDao.insert(ArtistEntity(id = artistId, name = artist.name))
+            songDao.insert(
+                SongArtistMap(songId = song.id, artistId = artistId, position = index),
+            )
+        }
+    }
+
+    @androidx.room.Transaction
+    fun update(
+        album: AlbumEntity,
+        albumPage: AlbumPage,
+        artists: List<ArtistEntity>? = emptyList(),
+    ) {
+        albumDao.update(
+            album.copy(
+                id = albumPage.album.browseId,
+                playlistId = albumPage.album.playlistId,
+                title = albumPage.album.title,
+                year = albumPage.album.year,
+                thumbnailUrl = albumPage.album.thumbnail,
+                songCount = albumPage.songs.size,
+                duration = albumPage.songs.sumOf { it.duration ?: 0 },
+            ),
+        )
+        if (artists?.size != albumPage.album.artists?.size) {
+            artists?.forEach { artistDao.delete(it) }
+        }
+        albumPage.songs
+            .map(SongItem::toMediaMetadata)
+            .onEach { insert(it) }
+            .onEach {
+                val existingSong = songDao.getSongById(it.id)
+                if (existingSong != null) {
+                    update(existingSong, it)
+                }
+            }.mapIndexed { index, song ->
+                SongAlbumMap(songId = song.id, albumId = albumPage.album.browseId, index = index)
+            }.forEach { songDao.upsert(it) }
+
+        albumPage.album.artists?.let { albumArtists ->
+            albumDao.albumArtistMaps(album.id).forEach { artistDao.delete(it) }
+            albumArtists
+                .map { artist ->
+                    ArtistEntity(
+                        id = artist.id ?: artistDao.artistByName(artist.name)?.id
+                            ?: ArtistEntity.generateArtistId(),
+                        name = artist.name,
+                    )
+                }.onEach { artistDao.insert(it) }
+                .mapIndexed { index, artist ->
+                    AlbumArtistMap(albumId = albumPage.album.browseId, artistId = artist.id, order = index)
+                }.forEach { artistDao.insert(it) }
+        }
+    }
+
+    fun update(playlistEntity: PlaylistEntity, playlistItem: InnerTubePlaylistItem) {
+        playlistDao.update(
+            playlistEntity.copy(
+                name = playlistItem.title,
+                browseId = playlistItem.id,
+                isEditable = playlistItem.isEditable,
+                remoteSongCount = playlistItem.songCountText?.let {
+                    Regex("""\d+""").find(it)?.value?.toIntOrNull()
+                },
+                playEndpointParams = playlistItem.playEndpoint?.params,
+                shuffleEndpointParams = playlistItem.shuffleEndpoint?.params,
+                radioEndpointParams = playlistItem.radioEndpoint?.params,
+            ),
+        )
+    }
+
+    fun upsertArtist(artist: ArtistEntity, artistPage: ArtistPage) =
+        artistDao.upsertArtist(artist, artistPage)
+
+    private fun MediaMetadata.toSongEntity() = com.kuromusic.db.entities.SongEntity(
+        id = id,
+        title = title,
+        duration = duration,
+        thumbnailUrl = thumbnailUrl,
+        albumId = album?.id,
+        albumName = album?.title,
+    )
 }
 
 @Database(
@@ -126,7 +534,6 @@ class MusicDatabase(
 )
 @TypeConverters(Converters::class)
 abstract class InternalDatabase : RoomDatabase() {
-    abstract val dao: DatabaseDao
     abstract val songDao: SongDao
     abstract val artistDao: ArtistDao
     abstract val albumDao: AlbumDao

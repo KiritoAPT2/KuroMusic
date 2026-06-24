@@ -1,11 +1,21 @@
 package com.kuromusic.db
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
+import com.kuromusic.constants.PlaylistSortType
 import com.kuromusic.db.entities.Playlist
+import com.kuromusic.db.entities.PlaylistEntity
 import com.kuromusic.db.entities.PlaylistSongMap
+import com.kuromusic.extensions.reversed
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import java.text.Collator
+import java.util.Locale
 
 @Dao
 interface PlaylistDao {
@@ -79,4 +89,57 @@ interface PlaylistDao {
     """,
     )
     fun move(playlistId: String, fromPosition: Int, toPosition: Int)
+
+    // ─── CRUD ─────────────────────────────────────────────────────────────────
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(playlist: PlaylistEntity)
+
+    @Update
+    fun update(playlist: PlaylistEntity)
+
+    @Delete
+    fun delete(playlist: PlaylistEntity)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(map: PlaylistSongMap)
+
+    @Update
+    fun update(map: PlaylistSongMap)
+
+    @Delete
+    fun delete(playlistSongMap: PlaylistSongMap)
+
+    @Query("DELETE FROM playlist WHERE browseId = :browseId")
+    fun deletePlaylistById(browseId: String)
+
+    @Transaction
+    fun addSongToPlaylist(playlist: Playlist, songIds: List<String>) {
+        var position = playlist.songCount
+        songIds.forEach { id ->
+            insert(
+                PlaylistSongMap(
+                    songId = id,
+                    playlistId = playlist.id,
+                    position = position++
+                )
+            )
+        }
+    }
+
+    // ─── Sorting facades ──────────────────────────────────────────────────────
+    fun playlists(
+        sortType: PlaylistSortType,
+        descending: Boolean,
+    ) = when (sortType) {
+        PlaylistSortType.CREATE_DATE -> playlistsByCreateDateAsc()
+        PlaylistSortType.NAME ->
+            playlistsByNameAsc().map { playlists ->
+                val collator = Collator.getInstance(Locale.getDefault())
+                collator.strength = Collator.PRIMARY
+                playlists.sortedWith(compareBy(collator) { it.playlist.name })
+            }
+
+        PlaylistSortType.SONG_COUNT -> playlistsBySongCountAsc()
+        PlaylistSortType.LAST_UPDATED -> playlistsByUpdatedDateAsc()
+    }.map { it.reversed(descending) }
 }

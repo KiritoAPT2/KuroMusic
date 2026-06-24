@@ -1,11 +1,24 @@
 package com.kuromusic.db
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
+import com.kuromusic.constants.ArtistSortType
+import com.kuromusic.db.entities.AlbumArtistMap
 import com.kuromusic.db.entities.Artist
 import com.kuromusic.db.entities.ArtistEntity
+import com.kuromusic.extensions.reversed
+import com.kuromusic.innertube.pages.ArtistPage
+import com.kuromusic.ui.utils.resize
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import java.text.Collator
+import java.time.LocalDateTime
+import java.util.Locale
 
 @Dao
 interface ArtistDao {
@@ -158,4 +171,80 @@ interface ArtistDao {
 
     @Query("UPDATE artist SET thumbnailUrl = :thumbnailUrl WHERE id = :id")
     suspend fun updateArtistThumbnail(id: String, thumbnailUrl: String)
+
+    // ─── CRUD ─────────────────────────────────────────────────────────────────
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(artist: ArtistEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsert(artist: ArtistEntity)
+
+    @Update
+    fun update(artist: ArtistEntity)
+
+    @Delete
+    fun delete(artist: ArtistEntity)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(map: AlbumArtistMap)
+
+    @Delete
+    fun delete(albumArtistMap: AlbumArtistMap)
+
+    @Transaction
+    suspend fun refreshArtistSongCount(artistId: String) {
+        val count = getSongCountForArtist(artistId)
+        setArtistSongCount(artistId, count)
+    }
+
+    fun upsertArtist(artist: ArtistEntity, artistPage: ArtistPage) {
+        update(
+            artist.copy(
+                name = artistPage.artist.title,
+                thumbnailUrl = artistPage.artist.thumbnail.resize(544, 544),
+                lastUpdateTime = LocalDateTime.now(),
+            ),
+        )
+    }
+
+    // ─── Sorting facades ──────────────────────────────────────────────────────
+    fun artists(
+        sortType: ArtistSortType,
+        descending: Boolean,
+    ) = when (sortType) {
+        ArtistSortType.CREATE_DATE -> artistsByCreateDateAsc()
+        ArtistSortType.NAME ->
+            artistsByNameAsc().map { artist ->
+                val collator = Collator.getInstance(Locale.getDefault())
+                collator.strength = Collator.PRIMARY
+                artist.sortedWith(compareBy(collator) { it.artist.name })
+            }
+
+        ArtistSortType.SONG_COUNT -> artistsBySongCountAsc()
+        ArtistSortType.PLAY_TIME -> artistsByPlayTimeAsc()
+    }.map { artists ->
+        artists
+            .filter { it.artist.isYouTubeArtist }
+            .reversed(descending)
+    }
+
+    fun artistsBookmarked(
+        sortType: ArtistSortType,
+        descending: Boolean,
+    ) = when (sortType) {
+        ArtistSortType.CREATE_DATE -> artistsBookmarkedByCreateDateAsc()
+        ArtistSortType.NAME ->
+            artistsBookmarkedByNameAsc().map { artist ->
+                val collator = Collator.getInstance(Locale.getDefault())
+                collator.strength = Collator.PRIMARY
+                artist.sortedWith(compareBy(collator) { it.artist.name })
+            }
+
+        ArtistSortType.SONG_COUNT -> artistsBookmarkedBySongCountAsc()
+        ArtistSortType.PLAY_TIME -> artistsBookmarkedByPlayTimeAsc()
+    }.map { artists ->
+        artists
+            .filter { it.artist.isYouTubeArtist }
+            .reversed(descending)
+    }
 }
