@@ -44,6 +44,8 @@ import java.util.Date
 class MusicDatabase(
     private val delegate: InternalDatabase,
 ) : DatabaseDao by delegate.dao {
+    val songDao: SongDao
+        get() = delegate.songDao
     val openHelper: SupportSQLiteOpenHelper
         get() = delegate.openHelper
 
@@ -121,6 +123,7 @@ class MusicDatabase(
 @TypeConverters(Converters::class)
 abstract class InternalDatabase : RoomDatabase() {
     abstract val dao: DatabaseDao
+    abstract val songDao: SongDao
 
     companion object {
         const val DB_NAME = "song.db"
