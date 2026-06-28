@@ -17,6 +17,7 @@ import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import com.kuromusic.utils.Updater
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -156,7 +157,7 @@ import androidx.core.util.Consumer
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
@@ -247,6 +248,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -519,9 +521,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                    val (lastSeenVersionCode) = rememberPreference(LastSeenVersionCodeKey, defaultValue = 0)
                     LaunchedEffect(Unit) {
-                        if (lastSeenVersionCode < BuildConfig.VERSION_CODE) {
+                        val versionCode = dataStore.data.first()[LastSeenVersionCodeKey] ?: 0
+                        if (versionCode < BuildConfig.VERSION_CODE) {
                             navController.navigate("welcome") {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
@@ -1546,32 +1548,7 @@ private fun openNotificationSettings(context: Context) {
     }
 }
 
-suspend fun checkForUpdates(): String? = withContext(Dispatchers.IO) {
-    try {
-        val url = URL("https://api.github.com/repos/KiritoAPT2/KuroMusic/releases/latest")
-        val connection = url.openConnection()
-        connection.connect()
-        val json = connection.getInputStream().bufferedReader().use { it.readText() }
-        val jsonObject = JSONObject(json)
-        return@withContext jsonObject.getString("tag_name")
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return@withContext null
-    }
-}
 
-fun isNewerVersion(remoteVersion: String, currentVersion: String): Boolean {
-    val remote = remoteVersion.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-    val current = currentVersion.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-
-    for (i in 0 until maxOf(remote.size, current.size)) {
-        val r = remote.getOrNull(i) ?: 0
-        val c = current.getOrNull(i) ?: 0
-        if (r > c) return true
-        if (r < c) return false
-    }
-    return false
-}
 
 @Composable
 fun ProfileIconWithUpdateBadge(
@@ -1607,11 +1584,13 @@ fun ProfileIconWithUpdateBadge(
         label = "alpha"
     )
 
-    // Control seguro de updates
+    // Control seguro de updates (CancellationException se ignora: composable salió de composición)
     LaunchedEffect(currentVersion) {
         try {
-            val latestVersion = withContext(Dispatchers.IO) { checkForUpdates() }
-            showUpdateBadge = latestVersion?.let { isNewerVersion(it, currentVersion) } ?: false
+            val latestVersion = withContext(Dispatchers.IO) { Updater.checkForUpdates() }
+            showUpdateBadge = latestVersion?.let { Updater.isNewerVersion(it, currentVersion) } ?: false
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e // No loguear cancelaciones esperadas
         } catch (e: Exception) {
             Timber.tag("ProfileIcon").e("Error checking for updates: ${e.message}")
         }

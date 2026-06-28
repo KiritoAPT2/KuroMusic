@@ -6,6 +6,7 @@ import com.kuromusic.innertube.YouTube
 import com.kuromusic.innertube.pages.MoodAndGenres
 import com.kuromusic.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,11 +14,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MoodAndGenresViewModel
 @Inject
-constructor() : ViewModel() {
+constructor(
+) : ViewModel() {
     val moodAndGenres = MutableStateFlow<List<MoodAndGenres>?>(null)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             YouTube
                 .moodAndGenres()
                 .onSuccess {

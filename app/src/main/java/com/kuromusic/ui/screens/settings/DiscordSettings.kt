@@ -79,26 +79,22 @@ import com.kuromusic.LocalPlayerAwareWindowInsets
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.R
 import com.kuromusic.constants.DiscordInfoDismissedKey
-import com.kuromusic.constants.DiscordNameKey
-import com.kuromusic.constants.DiscordTokenKey
 import com.kuromusic.constants.DiscordUseDetailsKey
-import com.kuromusic.constants.DiscordUsernameKey
 import com.kuromusic.constants.EnableDiscordRPCKey
 import com.kuromusic.constants.SliderStyle
 import com.kuromusic.constants.SliderStyleKey
 import com.kuromusic.db.entities.Song
+import com.kuromusic.discord.DiscordLoginDialog
+import com.kuromusic.discord.DiscordRpcManager
+import com.kuromusic.discord.DiscordRpcUser
+import com.kuromusic.discord.RpcStatus
 import com.kuromusic.ui.component.IconButton
-import com.kuromusic.ui.component.InfoLabel
-import com.kuromusic.ui.component.PreferenceEntry
 import com.kuromusic.ui.component.PreferenceGroupTitle
 import com.kuromusic.ui.component.SwitchPreference
-import com.kuromusic.ui.component.TextFieldDialog
 import com.kuromusic.ui.utils.backToMain
 import com.kuromusic.utils.makeTimeString
 import com.kuromusic.utils.rememberEnumPreference
 import com.kuromusic.utils.rememberPreference
-import com.kuromusic.kizzy.rpc.KizzyRPC
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -123,24 +119,15 @@ fun DiscordSettings(
     }
 
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    var discordToken by rememberPreference(DiscordTokenKey, "")
-    var discordUsername by rememberPreference(DiscordUsernameKey, "")
-    var discordName by rememberPreference(DiscordNameKey, "")
+    val connectionStatus by DiscordRpcManager.connectionStatus.collectAsState()
+    val currentUser by DiscordRpcManager.currentUser.collectAsState()
+    val lastError by DiscordRpcManager.lastError.collectAsState()
+
     var infoDismissed by rememberPreference(DiscordInfoDismissedKey, false)
 
     val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.DEFAULT)
-
-    LaunchedEffect(discordToken) {
-        val token = discordToken
-        if (token.isEmpty()) return@LaunchedEffect
-        coroutineScope.launch(Dispatchers.IO) {
-            KizzyRPC.getUserInfo(token).onSuccess {
-                discordUsername = it.username
-                discordName = it.name
-            }
-        }
-    }
 
     LaunchedEffect(playbackState) {
         if (playbackState == STATE_READY) {
@@ -162,24 +149,10 @@ fun DiscordSettings(
         defaultValue = false
     )
 
-    val isLoggedIn = remember(discordToken) { discordToken != "" }
-    var showTokenDialog by rememberSaveable { mutableStateOf(false) }
+    var showLoginDialog by remember { mutableStateOf(false) }
 
-    if (showTokenDialog) {
-        TextFieldDialog(
-            onDismiss = { showTokenDialog = false },
-            icon = { Icon(painterResource(R.drawable.token), null) },
-            onDone = {
-                discordToken = it
-                showTokenDialog = false
-            },
-            singleLine = true,
-            isInputValid = { it.isNotEmpty() },
-            extraContent = {
-                InfoLabel(text = stringResource(R.string.token_adv_login_description))
-            }
-        )
-    }
+    val isLoggedIn = connectionStatus == RpcStatus.Connected
+    val isAuthorizing = connectionStatus == RpcStatus.Authorizing
 
     Column(
         Modifier
@@ -288,48 +261,50 @@ fun DiscordSettings(
 
                 Spacer(Modifier.width(16.dp))
 
+                val user = currentUser
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (isLoggedIn) discordName else stringResource(R.string.not_logged_in),
+                        text = if (user != null) (user.name ?: user.username)
+                        else if (isAuthorizing) stringResource(R.string.authorizing)
+                        else stringResource(R.string.not_logged_in),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.alpha(if (isLoggedIn) 1f else 0.7f)
+                        modifier = Modifier.alpha(if (user != null || isAuthorizing) 1f else 0.7f)
                     )
-                    if (discordUsername.isNotEmpty()) {
+                    if (user?.username != null) {
                         Text(
-                            text = "@$discordUsername",
+                            text = "@${user.username}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (lastError != null && !isLoggedIn) {
+                        Text(
+                            text = lastError ?: "",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
 
                 if (isLoggedIn) {
                     OutlinedButton(
-                        onClick = {
-                            discordName = ""
-                            discordToken = ""
-                            discordUsername = ""
-                        }
+                        onClick = { DiscordRpcManager.logout() }
                     ) {
                         Text(stringResource(R.string.logout))
                     }
                 } else {
                     FilledTonalButton(
-                        onClick = { navController.navigate("settings/discord/login") }
+                        onClick = { showLoginDialog = true },
+                        enabled = !isAuthorizing
                     ) {
-                        Text(stringResource(R.string.action_login))
+                        Text(
+                            if (isAuthorizing) stringResource(R.string.authorizing)
+                            else stringResource(R.string.action_login)
+                        )
                     }
                 }
             }
-        }
-
-        if (!isLoggedIn) {
-            PreferenceEntry(
-                title = { Text(stringResource(R.string.advanced_login)) },
-                icon = { Icon(painterResource(R.drawable.token), null) },
-                onClick = { showTokenDialog = true }
-            )
         }
 
         // Opciones
@@ -362,6 +337,16 @@ fun DiscordSettings(
         )
 
         Spacer(Modifier.height(16.dp))
+    }
+
+    if (showLoginDialog) {
+        DiscordLoginDialog(
+            onToken = { token ->
+                DiscordRpcManager.setToken(token)
+                showLoginDialog = false
+            },
+            onDismiss = { showLoginDialog = false },
+        )
     }
 
     TopAppBar(

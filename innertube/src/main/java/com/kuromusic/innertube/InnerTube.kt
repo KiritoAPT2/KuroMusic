@@ -17,7 +17,10 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.encodeBase64
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import okhttp3.ConnectionPool
+import okhttp3.OkHttpClient
 import java.net.Proxy
+import java.util.concurrent.TimeUnit
 import java.util.*
 
 
@@ -64,9 +67,16 @@ class InnerTube {
             deflate(0.8F)
         }
 
-        if (proxy != null) {
-            engine {
+        engine {
+            if (proxy != null) {
                 proxy = this@InnerTube.proxy
+            }
+            config {
+                connectTimeout(15, TimeUnit.SECONDS)
+                readTimeout(30, TimeUnit.SECONDS)
+                writeTimeout(30, TimeUnit.SECONDS)
+                connectionPool(ConnectionPool(20, 5, TimeUnit.MINUTES))
+                retryOnConnectionFailure(true)
             }
         }
 

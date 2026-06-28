@@ -11,6 +11,7 @@ import com.kuromusic.innertube.pages.ArtistPage
 import com.kuromusic.db.MusicDatabase
 import com.kuromusic.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class ArtistViewModel @Inject constructor(
     }
 
     private fun fetchArtistsFromYTM() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             YouTube.artist(artistId)
                 .onSuccess {
                     artistPage = it

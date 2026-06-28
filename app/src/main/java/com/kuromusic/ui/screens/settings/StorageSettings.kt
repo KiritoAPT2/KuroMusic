@@ -50,9 +50,9 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import android.util.Log
+import timber.log.Timber
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -147,9 +147,9 @@ fun StorageSettings(
             coroutineScope.launch(Dispatchers.IO) {
                 try {
                     imageDiskCache.clear()
-                    Log.i("StorageSettings", "Coil cache cleared due to size change to ${maxImageCacheSize}MB")
+                    Timber.i("StorageSettings", "Coil cache cleared due to size change to ${maxImageCacheSize}MB")
                 } catch (e: Exception) {
-                    Log.w("StorageSettings", "Failed to clear Coil cache on size change", e)
+                    Timber.w("StorageSettings", "Failed to clear Coil cache on size change", e)
                 }
             }
         }

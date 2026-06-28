@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +53,7 @@ import com.kuromusic.ui.component.SwitchPreference
 import com.kuromusic.ui.component.TextFieldDialog
 import com.kuromusic.ui.utils.backToMain
 import com.kuromusic.utils.rememberPreference
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +62,7 @@ fun AccountSettings(
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val (accountName, onAccountNameChange) = rememberPreference(AccountNameKey, "")
     val (accountEmail, onAccountEmailChange) = rememberPreference(AccountEmailKey, "")
@@ -137,7 +141,7 @@ fun AccountSettings(
                                 onAccountChannelHandleChange("")
                                 onVisitorDataChange("")
                                 onDataSyncIdChange("")
-                                forgetAccount(context)
+                                scope.launch { forgetAccount(context) }
                             }
                             ) {
                                 Text(stringResource(R.string.logout))
@@ -271,12 +275,17 @@ fun AccountSettings(
         )
 
         SettingsGeneralCategory(
-            title = stringResource(R.string.discord),
+            title = "Integraciones",
             items = listOf(
                 {PreferenceEntry(
                     title = { Text(stringResource(R.string.discord_integration)) },
                     icon = { Icon(painterResource(R.drawable.discord), null) },
                     onClick = { navController.navigate("settings/discord") }
+                )},
+                {PreferenceEntry(
+                    title = { Text("Last.fm") },
+                    icon = { Icon(painterResource(R.drawable.lastfm), null) },
+                    onClick = { navController.navigate("settings/lastfm") }
                 )}
             )
         )

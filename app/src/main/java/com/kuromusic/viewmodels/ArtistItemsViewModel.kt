@@ -14,6 +14,7 @@ import com.kuromusic.utils.get
 import com.kuromusic.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ constructor(
     val itemsPage = MutableStateFlow<ItemsPage?>(null)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             YouTube
                 .artistItems(
                     BrowseEndpoint(
@@ -54,7 +55,7 @@ constructor(
     }
 
     fun loadMore() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val oldItemsPage = itemsPage.value ?: return@launch
             val continuation = oldItemsPage.continuation ?: return@launch
             YouTube

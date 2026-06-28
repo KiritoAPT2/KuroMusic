@@ -25,6 +25,8 @@ GOOGLE_API_KEY
 PO_TOKEN_REQUEST_KEY
 INNER_TUBE_API_KEY
 YOUTUBE_SESSION_COOKIES
+LASTFM_API_KEY
+LASTFM_SECRET
 ```
 
 The app connects **directly to YouTube/InnerTube** — no backend server. The user is **not logged in** (uses visitor data from DataStore).

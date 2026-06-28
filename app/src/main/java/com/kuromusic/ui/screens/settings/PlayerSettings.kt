@@ -35,6 +35,7 @@ import com.kuromusic.constants.SimilarContent
 import com.kuromusic.constants.SkipSilenceKey
 import com.kuromusic.constants.SoundProfileKey
 import com.kuromusic.constants.StopMusicOnTaskClearKey
+import com.kuromusic.constants.StreamOnWifiOnlyKey
 import com.kuromusic.playback.ProfileMode
 import com.kuromusic.playback.SoundProfile
 import com.kuromusic.ui.component.EnumListPreference
@@ -75,7 +76,7 @@ fun PlayerSettings(
     )
     val (similarContentEnabled, similarContentEnabledChange) = rememberPreference(
         key = SimilarContent,
-        defaultValue = true
+        defaultValue = false
     )
     val (autoSkipNextOnError, onAutoSkipNextOnErrorChange) = rememberPreference(
         AutoSkipNextOnErrorKey,
@@ -83,6 +84,10 @@ fun PlayerSettings(
     )
     val (stopMusicOnTaskClear, onStopMusicOnTaskClearChange) = rememberPreference(
         StopMusicOnTaskClearKey,
+        defaultValue = false
+    )
+    val (streamOnWifiOnly, onStreamOnWifiOnlyChange) = rememberPreference(
+        StreamOnWifiOnlyKey,
         defaultValue = false
     )
     val (forceAacFallback, onForceAacFallbackChange) = rememberPreference(
@@ -245,6 +250,14 @@ fun PlayerSettings(
                     icon = { Icon(painterResource(R.drawable.clear_all), null) },
                     checked = stopMusicOnTaskClear,
                     onCheckedChange = onStopMusicOnTaskClearChange
+                )},
+
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.stream_on_wifi_only)) },
+                    description = stringResource(R.string.stream_on_wifi_only_desc),
+                    icon = { Icon(painterResource(R.drawable.cloud_download), null) },
+                    checked = streamOnWifiOnly,
+                    onCheckedChange = onStreamOnWifiOnlyChange
                 )},
             )
         )

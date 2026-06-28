@@ -181,6 +181,18 @@ fun DynamicScheme.toColorScheme() =
         surfaceContainerHighest = Color(surfaceContainerHighest),
         surfaceContainerLow = Color(surfaceContainerLow),
         surfaceContainerLowest = Color(surfaceContainerLowest),
+        primaryFixed = Color(primaryPalette.tone(90)),
+        primaryFixedDim = Color(primaryPalette.tone(80)),
+        onPrimaryFixed = Color(primaryPalette.tone(10)),
+        onPrimaryFixedVariant = Color(primaryPalette.tone(30)),
+        secondaryFixed = Color(secondaryPalette.tone(90)),
+        secondaryFixedDim = Color(secondaryPalette.tone(80)),
+        onSecondaryFixed = Color(secondaryPalette.tone(10)),
+        onSecondaryFixedVariant = Color(secondaryPalette.tone(30)),
+        tertiaryFixed = Color(tertiaryPalette.tone(90)),
+        tertiaryFixedDim = Color(tertiaryPalette.tone(80)),
+        onTertiaryFixed = Color(tertiaryPalette.tone(10)),
+        onTertiaryFixedVariant = Color(tertiaryPalette.tone(30)),
     )
 
 fun ColorScheme.pureBlack(apply: Boolean, isDarkTheme: Boolean) =

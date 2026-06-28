@@ -119,6 +119,7 @@ fun MiniPlayer(
     val canSkipNext by playerConnection.canSkipNext.collectAsState()
     val canSkipPrevious by playerConnection.canSkipPrevious.collectAsState()
     val currentSong by playerConnection.currentSong.collectAsState(initial = null)
+    val isNetworkConnected by playerConnection.isNetworkConnected.collectAsState()
 
     // Obtener el estado del tema para calcular el color de fondo correcto
     val isSystemInDarkTheme = isSystemInDarkTheme()
@@ -444,6 +445,16 @@ fun MiniPlayer(
                                     fontSize = 10.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+
+                            if (!isNetworkConnected) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Offline",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
                                 )
                             }
                         }

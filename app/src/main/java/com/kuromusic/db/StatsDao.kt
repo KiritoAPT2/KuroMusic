@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RoomWarnings
 import androidx.room.Transaction
 import com.kuromusic.db.entities.Album
 import com.kuromusic.db.entities.Artist
@@ -75,6 +76,7 @@ interface StatsDao {
         OFFSET :offset
     """,
     )
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     fun mostPlayedSongs(
         fromTimeStamp: Long,
         limit: Int = 6,
@@ -110,7 +112,7 @@ interface StatsDao {
                       LIMIT :limit
                       OFFSET :offset)
                      ON artist.id = artistId
-    """,
+        """,
     )
     fun mostPlayedArtists(
         fromTimeStamp: Long,
@@ -152,6 +154,7 @@ interface StatsDao {
     LIMIT :limit OFFSET :offset
     """
     )
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     fun mostPlayedAlbums(
         fromTimeStamp: Long,
         limit: Int = 6,

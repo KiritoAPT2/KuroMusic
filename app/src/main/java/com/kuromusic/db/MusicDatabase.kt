@@ -330,11 +330,31 @@ class MusicDatabase(
 
     @androidx.room.Transaction
     fun upsert(mediaMetadata: MediaMetadata, block: (SongEntity) -> SongEntity = { it }) {
-        songDao.upsert(mediaMetadata.toSongEntity().let(block))
+        val existingSong = songDao.getSongById(mediaMetadata.id)
+        if (existingSong != null) {
+            songDao.update(
+                block(existingSong.song.copy(
+                    title = mediaMetadata.title,
+                    duration = mediaMetadata.duration,
+                    thumbnailUrl = mediaMetadata.thumbnailUrl,
+                    albumId = mediaMetadata.album?.id,
+                    albumName = mediaMetadata.album?.title,
+                )),
+            )
+        } else {
+            songDao.upsert(mediaMetadata.toSongEntity().let(block))
+        }
         mediaMetadata.artists.forEachIndexed { index, artist ->
             val artistId = artist.id ?: artistDao.artistByName(artist.name)?.id
                 ?: ArtistEntity.generateArtistId()
-            artistDao.upsert(ArtistEntity(id = artistId, name = artist.name))
+            val existingArtist = artistDao.artistById(artistId)
+            if (existingArtist != null) {
+                artistDao.update(
+                    existingArtist.copy(name = artist.name, lastUpdateTime = LocalDateTime.now()),
+                )
+            } else {
+                artistDao.upsert(ArtistEntity(id = artistId, name = artist.name))
+            }
             songDao.insert(
                 SongArtistMap(songId = mediaMetadata.id, artistId = artistId, position = index),
             )
@@ -470,7 +490,7 @@ class MusicDatabase(
     fun upsertArtist(artist: ArtistEntity, artistPage: ArtistPage) =
         artistDao.upsertArtist(artist, artistPage)
 
-    private fun MediaMetadata.toSongEntity() = com.kuromusic.db.entities.SongEntity(
+    private fun MediaMetadata.toSongEntityFromMedia() = com.kuromusic.db.entities.SongEntity(
         id = id,
         title = title,
         duration = duration,

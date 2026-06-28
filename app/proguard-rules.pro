@@ -48,6 +48,7 @@
 # @Serializable and @Polymorphic are used at runtime for polymorphic serialization.
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault,InnerClasses
 -dontnote kotlinx.serialization.AnnotationsKt
+-dontwarn kotlinx.serialization.**
 
 -dontwarn javax.servlet.ServletContainerInitializer
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
@@ -60,6 +61,21 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+
+## Coil image loading
+-keep class coil.** { *; }
+-keep interface coil.** { *; }
+-keep class coil.memory.** { *; }
+-keep class coil.disk.** { *; }
+-keep class coil.network.** { *; }
+-keep class coil.decode.** { *; }
+-keep class coil.fetch.** { *; }
+-keep class coil.key.** { *; }
+-keep class coil.size.** { *; }
+-keep class coil.target.** { *; }
+-keep class coil.transition.** { *; }
+-keep class coil.util.** { *; }
+-dontwarn coil.**
 
 ## Rules for NewPipeExtractor
 -keep class org.schabi.newpipe.extractor.timeago.patterns.** { *; }
@@ -133,9 +149,18 @@
 # Serialization
 -keep class com.kuromusic.innertube.utils.UtilsKt { *; }
 
+## Ktor and OkHttp engine
+-keep class io.ktor.** { *; }
+-dontwarn io.ktor.**
+-keep class okhttp3.** { *; }
+-dontwarn okhttp3.**
+-keep class org.bouncycastle.** { *; }
+-dontwarn org.bouncycastle.**
+
 # Auth classes
 -keep class com.kuromusic.innertube.YouTube { *; }
 -keep class com.kuromusic.innertube.InnerTube { *; }
+-keep class com.kuromusic.innertube.** { *; }
 -keep class com.kuromusic.playback.YouTubeSessionInterceptor { *; }
 -keepclassmembers class com.kuromusic.models.** {
     <fields>;

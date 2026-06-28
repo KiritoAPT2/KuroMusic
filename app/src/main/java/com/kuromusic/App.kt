@@ -35,11 +35,12 @@ import com.kuromusic.utils.dataStore
 import com.kuromusic.utils.get
 import com.kuromusic.utils.reportException
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -49,21 +50,25 @@ import java.util.Locale
 
 @HiltAndroidApp
 class App : Application(), ImageLoaderFactory {
-    @OptIn(DelicateCoroutinesApi::class)
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     override fun onCreate() {
         super.onCreate()
         instance = this;
         Timber.plant(Timber.DebugTree())
 
         val locale = Locale.getDefault()
-        val languageTag = locale.toLanguageTag().replace("-Hant", "") // replace zh-Hant-* to zh-*
+        val languageTag = locale.toLanguageTag().replace("-Hant", "")
         YouTube.apiKey = BuildConfig.INNER_TUBE_API_KEY
 
+        // Batch-read all needed DataStore preferences in one go
+        val prefs = runBlocking(Dispatchers.IO) { dataStore.data.first() }
+
         YouTube.locale = YouTubeLocale(
-            gl = dataStore[ContentCountryKey]?.takeIf { it != SYSTEM_DEFAULT }
+            gl = prefs[ContentCountryKey]?.takeIf { it != SYSTEM_DEFAULT }
                 ?: locale.country.takeIf { it in CountryCodeToName }
                 ?: "US",
-            hl = dataStore[ContentLanguageKey]?.takeIf { it != SYSTEM_DEFAULT }
+            hl = prefs[ContentLanguageKey]?.takeIf { it != SYSTEM_DEFAULT }
                 ?: locale.language.takeIf { it in LanguageCodeToName }
                 ?: languageTag.takeIf { it in LanguageCodeToName }
                 ?: "en"
@@ -72,11 +77,11 @@ class App : Application(), ImageLoaderFactory {
             KuGou.useTraditionalChinese = true
         }
 
-        if (dataStore[ProxyEnabledKey] == true) {
+        if (prefs[ProxyEnabledKey] == true) {
             try {
                 YouTube.proxy = Proxy(
-                    dataStore[ProxyTypeKey].toEnum(defaultValue = Proxy.Type.HTTP),
-                    dataStore[ProxyUrlKey]!!.toInetSocketAddress()
+                    prefs[ProxyTypeKey].toEnum(defaultValue = Proxy.Type.HTTP),
+                    prefs[ProxyUrlKey]!!.toInetSocketAddress()
                 )
             } catch (e: Exception) {
                 Toast.makeText(this, "Failed to parse proxy url.", LENGTH_SHORT).show()
@@ -84,31 +89,38 @@ class App : Application(), ImageLoaderFactory {
             }
         }
 
-        if (dataStore[UseLoginForBrowse] != false) {
+        if (prefs[UseLoginForBrowse] != false) {
             YouTube.useLoginForBrowse = true
         }
 
-        GlobalScope.launch {
+        val scope = applicationScope
+        scope.launch {
             dataStore.data
                 .map { it[VisitorDataKey] }
                 .distinctUntilChanged()
-                .collect { visitorData ->
-                    YouTube.visitorData = visitorData
-                        ?.takeIf { it != "null" } // Previously visitorData was sometimes saved as "null" due to a bug
-                        ?: YouTube.visitorData().onFailure {
+                .collect { storedData ->
+                    val cached = storedData?.takeIf { it != "null" }
+                    YouTube.visitorData = cached
+                    // Always refresh visitor data on startup — cached data expires over time
+                    YouTube.visitorData().onSuccess { newData ->
+                        YouTube.visitorData = newData
+                        if (newData != cached) {
+                            dataStore.edit { settings ->
+                                settings[VisitorDataKey] = newData
+                            }
+                        }
+                    }.onFailure {
+                        if (cached == null) {
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(this@App, "Failed to get visitorData.", LENGTH_SHORT)
                                     .show()
                             }
                             reportException(it)
-                        }.getOrNull()?.also { newVisitorData ->
-                            dataStore.edit { settings ->
-                                settings[VisitorDataKey] = newVisitorData
-                            }
                         }
+                    }
                 }
         }
-        GlobalScope.launch {
+        scope.launch {
             dataStore.data
                 .map { it[DataSyncIdKey] }
                 .distinctUntilChanged()
@@ -129,7 +141,7 @@ class App : Application(), ImageLoaderFactory {
                     }
                 }
         }
-        GlobalScope.launch {
+        scope.launch {
             dataStore.data
                 .map { it[InnerTubeCookieKey] }
                 .distinctUntilChanged()
@@ -158,10 +170,15 @@ class App : Application(), ImageLoaderFactory {
                 .build()
         }
 
+        val imageOkHttpClient = okhttp3.OkHttpClient.Builder()
+            .connectionPool(okhttp3.ConnectionPool(20, 30, java.util.concurrent.TimeUnit.SECONDS))
+            .build()
+
         return ImageLoader.Builder(this)
             .crossfade(true)
             .respectCacheHeaders(false)
             .allowHardware(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+            .okHttpClient(imageOkHttpClient)
             // Memory cache for instant image display (128MB)
             .memoryCache(
                 coil.memory.MemoryCache.Builder(this)
@@ -186,16 +203,14 @@ class App : Application(), ImageLoaderFactory {
         lateinit var instance: App
             private set
 
-        fun forgetAccount(context: Context) {
-            runBlocking {
-                context.dataStore.edit { settings ->
-                    settings.remove(InnerTubeCookieKey)
-                    settings.remove(VisitorDataKey)
-                    settings.remove(DataSyncIdKey)
-                    settings.remove(AccountNameKey)
-                    settings.remove(AccountEmailKey)
-                    settings.remove(AccountChannelHandleKey)
-                }
+        suspend fun forgetAccount(context: Context) {
+            context.dataStore.edit { settings ->
+                settings.remove(InnerTubeCookieKey)
+                settings.remove(VisitorDataKey)
+                settings.remove(DataSyncIdKey)
+                settings.remove(AccountNameKey)
+                settings.remove(AccountEmailKey)
+                settings.remove(AccountChannelHandleKey)
             }
         }
     }

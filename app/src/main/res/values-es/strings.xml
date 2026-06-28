@@ -268,6 +268,8 @@
     <string name="skip_silence">Saltar silencio</string>
     <string name="audio_normalization">Normalización del audio</string>
     <string name="stop_music_on_task_clear">Detener la música al borrar la tarea</string>
+    <string name="stream_on_wifi_only">Transmitir solo por Wi-Fi</string>
+    <string name="stream_on_wifi_only_desc">Solo descargar y transmitir audio a través de conexiones Wi-Fi</string>
     <string name="equalizer">Ecualizador</string>
 
     <string name="sound_profile">Perfil de sonido</string>

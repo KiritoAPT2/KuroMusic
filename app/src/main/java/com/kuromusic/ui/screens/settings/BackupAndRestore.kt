@@ -1,12 +1,11 @@
 package com.kuromusic.ui.screens.settings
 
-import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
+import timber.log.Timber
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -69,7 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import com.kuromusic.LocalPlayerConnection
@@ -101,8 +100,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
-@SuppressLint("LogNotTimber")
-@Composable
+    @Composable
 fun BackupAndRestore(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -307,7 +305,7 @@ fun BackupAndRestore(
                             showVisitorDataResetDialog = false
                         }
                     } catch (e: Exception) {
-                        Log.e("BackupRestore", "Error when resetting VISITOR_DATA", e)
+                        Timber.e("BackupRestore", "Error when resetting VISITOR_DATA", e)
                         withContext(Dispatchers.Main) {
                             isClearing = false
                             showVisitorDataResetDialog = false
@@ -708,7 +706,6 @@ private fun MinimalConfirmDialog(
 }
 
 // Filebin upload function (no significant changes)
-@SuppressLint("LogNotTimber")
 suspend fun uploadBackupToFilebin(
     context: Context,
     uri: Uri,
@@ -732,7 +729,7 @@ suspend fun uploadBackupToFilebin(
                         }
                     } ?: input.available().toLong()
                 } catch (e: Exception) {
-                    Log.w("BackupRestore", "The file size could not be obtained: ${e.message}")
+                    Timber.w("BackupRestore", "The file size could not be obtained: ${e.message}")
                     input.available().toLong()
                 }
 
@@ -789,14 +786,14 @@ suspend fun uploadBackupToFilebin(
             val response = client.newCall(request).execute()
 
             if (!response.isSuccessful) {
-                Log.e("BackupRestore", "Error in server response: ${response.code}")
+                Timber.e("BackupRestore", "Error in server response: ${response.code}")
                 return@withContext null
             }
 
             return@withContext "https://filebin.net/$binId/$fileName"
 
         } catch (e: Exception) {
-            Log.e("BackupRestore", "Error during upload", e)
+            Timber.e("BackupRestore", "Error during upload", e)
             return@withContext null
         } finally {
             if (tempFile.exists()) {
@@ -806,14 +803,13 @@ suspend fun uploadBackupToFilebin(
     }
 }
 
-@SuppressLint("LogNotTimber")
 fun copyToClipboard(context: Context, text: String) {
     try {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Backup URL", text)
         clipboard.setPrimaryClip(clip)
     } catch (e: Exception) {
-        Log.e("BackupRestore", "Error copying to clipboard: ${e.message}")
+        Timber.e("BackupRestore", "Error copying to clipboard: ${e.message}")
     }
 }
 

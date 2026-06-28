@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RoomWarnings
 import androidx.room.Transaction
 import androidx.room.Update
 import com.kuromusic.constants.ArtistSongSortType
@@ -192,6 +193,7 @@ interface SongDao {
         ON artist.id = top.artistId
     """,
     )
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     fun topRecentArtist(since: Long = System.currentTimeMillis() - 604800000): Flow<Artist?>
 
     @Query("SELECT genre FROM song JOIN event ON song.id = event.songId WHERE event.timestamp > :since AND genre IS NOT NULL GROUP BY genre ORDER BY COUNT(*) DESC LIMIT 1")

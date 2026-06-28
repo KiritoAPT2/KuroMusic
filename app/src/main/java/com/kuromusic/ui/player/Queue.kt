@@ -1,6 +1,8 @@
 package com.kuromusic.ui.player
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.text.format.Formatter
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -82,13 +84,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -117,7 +117,6 @@ import com.kuromusic.ui.menu.PlayerMenu
 import com.kuromusic.ui.menu.SelectionMediaMetadataMenu
 import com.kuromusic.utils.makeTimeString
 import com.kuromusic.utils.rememberPreference
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -139,7 +138,7 @@ fun Queue(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val clipboardManager = LocalClipboardManager.current
+    val clipboardManager = context.getSystemService(ClipboardManager::class.java)!!
     val menuState = LocalMenuState.current
 
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -166,8 +165,6 @@ fun Queue(
     var showLyrics by rememberPreference(ShowLyricsKey, defaultValue = false)
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var dismissJob: Job? by remember { mutableStateOf(null) }
-
     var showSleepTimerDialog by remember { mutableStateOf(false) }
     var sleepTimerValue by remember { mutableStateOf(30f) }
     val sleepTimerEnabled = remember(
@@ -247,7 +244,7 @@ fun Queue(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
                                     onClick = {
-                                        clipboardManager.setText(AnnotatedString(displayText))
+                                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, displayText))
                                         Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT)
                                             .show()
                                     },
@@ -393,36 +390,32 @@ fun Queue(
                                 positionalThreshold = { totalDistance ->
                                     totalDistance
                                 },
-                                confirmValueChange = { dismissValue ->
-                                    if (dismissValue == SwipeToDismissBoxValue.StartToEnd ||
-                                        dismissValue == SwipeToDismissBoxValue.EndToStart
-                                    ) {
-                                        playerConnection.player.removeMediaItem(currentItem.firstPeriodIndex)
-                                        dismissJob?.cancel()
-                                        dismissJob =
-                                            coroutineScope.launch {
-                                                val snackbarResult =
-                                                    snackbarHostState.showSnackbar(
-                                                        message =
-                                                            context.getString(
-                                                                R.string.removed_song_from_playlist,
-                                                                currentItem.mediaItem.metadata?.title,
-                                                            ),
-                                                        actionLabel = context.getString(R.string.undo),
-                                                        duration = SnackbarDuration.Short,
-                                                    )
-                                                if (snackbarResult == SnackbarResult.ActionPerformed) {
-                                                    playerConnection.player.addMediaItem(currentItem.mediaItem)
-                                                    playerConnection.player.moveMediaItem(
-                                                        mutableQueueWindows.size,
-                                                        currentItem.firstPeriodIndex,
-                                                    )
-                                                }
-                                            }
-                                    }
-                                    true
-                                },
                             )
+
+                        LaunchedEffect(dismissBoxState.currentValue) {
+                            if (dismissBoxState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                val removedIndex = currentItem.firstPeriodIndex
+                                val removedMediaItem = currentItem.mediaItem
+                                playerConnection.player.removeMediaItem(removedIndex)
+                                val snackbarResult =
+                                    snackbarHostState.showSnackbar(
+                                        message = context.getString(
+                                            R.string.removed_song_from_playlist,
+                                            removedMediaItem.metadata?.title,
+                                        ),
+                                        actionLabel = context.getString(R.string.undo),
+                                        duration = SnackbarDuration.Short,
+                                    )
+                                if (snackbarResult == SnackbarResult.ActionPerformed) {
+                                    playerConnection.player.addMediaItem(removedMediaItem)
+                                    playerConnection.player.moveMediaItem(
+                                        mutableQueueWindows.size,
+                                        removedIndex,
+                                    )
+                                }
+                                dismissBoxState.reset()
+                            }
+                        }
 
                         val content: @Composable () -> Unit = {
                             Row(

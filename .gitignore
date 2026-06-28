@@ -80,3 +80,14 @@ app/schemas/
 *.log
 .kotlin/
 !app/src/main/baseline-prof.txt
+
+# AI agent configs (OpenCode, etc.)
+.opencode/
+
+# Extracted library sources (not project code)
+coil/
+androidx/
+
+# AI-generated plans/documentation
+docs/opencode-skills/
+docs/CHANGELOG.md

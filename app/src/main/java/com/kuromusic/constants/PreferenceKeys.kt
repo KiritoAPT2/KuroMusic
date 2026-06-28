@@ -62,9 +62,13 @@ val DisableLoadMoreWhenRepeatAllKey = booleanPreferencesKey("disableLoadMoreWhen
 val ScrobbleDelayPercentKey = floatPreferencesKey("scrobbleDelayPercent")
 val ScrobbleMinSongDurationKey = intPreferencesKey("scrobbleMinSongDuration")
 val ScrobbleDelaySecondsKey = intPreferencesKey("scrobbleDelaySeconds")
+val LastFMSessionKey = stringPreferencesKey("lastfmSession")
+val LastFMUsernameKey = stringPreferencesKey("lastfmUsername")
 val EnableLastFMScrobblingKey = booleanPreferencesKey("enableLastFMScrobbling")
-val LastFMUseNowPlaying = booleanPreferencesKey("lastFMUseNowPlaying")
+val LastFMUseNowPlaying = booleanPreferencesKey("lastfmUseNowPlaying")
+val LastFMEnabledKey = booleanPreferencesKey("lastfmEnabled")
 val AudioOffload = booleanPreferencesKey("audioOffload")
+val StreamOnWifiOnlyKey = booleanPreferencesKey("streamOnWifiOnly")
 
 val PlayerTextAlignmentKey = stringPreferencesKey("playerTextAlignment")
 

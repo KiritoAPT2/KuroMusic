@@ -36,6 +36,9 @@ android {
         buildConfigField("String", "PO_TOKEN_REQUEST_KEY", "\"${localProperties.getProperty("PO_TOKEN_REQUEST_KEY") ?: ""}\"")
         buildConfigField("String", "INNER_TUBE_API_KEY", "\"${localProperties.getProperty("INNER_TUBE_API_KEY") ?: ""}\"")
         buildConfigField("String", "YOUTUBE_SESSION_COOKIES", "\"${localProperties.getProperty("YOUTUBE_SESSION_COOKIES") ?: ""}\"")
+        buildConfigField("long", "DISCORD_APP_ID", "${localProperties.getProperty("DISCORD_APP_ID") ?: "1411019391843172514"}L")
+        buildConfigField("String", "LASTFM_API_KEY", "\"${localProperties.getProperty("LASTFM_API_KEY") ?: ""}\"")
+        buildConfigField("String", "LASTFM_SECRET", "\"${localProperties.getProperty("LASTFM_SECRET") ?: ""}\"")
     }
 
     signingConfigs {
@@ -197,9 +200,12 @@ dependencies {
     implementation(projects.lrclib)
     implementation(projects.kizzy)
     implementation(project(":jossredconnect"))
+    implementation(projects.lastfm)
     baselineProfile(project(":baselineprofile"))
 
     implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation("androidx.browser:browser:1.8.0")
 
     coreLibraryDesugaring(libs.desugaring)
 

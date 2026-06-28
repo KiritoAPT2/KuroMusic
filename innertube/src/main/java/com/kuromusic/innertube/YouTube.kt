@@ -120,12 +120,23 @@ object YouTube {
     ): Result<T> {
         val preferred = clientAffinityMap[endpoint] ?: WEB_REMIX
         val clientsToTry = (listOf(preferred) + fallbackClients).distinct().take(4)
+        var lastError: Throwable? = null
         for (client in clientsToTry) {
             val result = runCatching { block(client) }
             if (result.isSuccess) {
                 clientAffinityMap[endpoint] = client
                 return result
             }
+            lastError = result.exceptionOrNull()
+            lastError?.let { System.err.println("[YouTube] $endpoint failed for $client: ${it.message}") }
+        }
+        lastError?.let { System.err.println("[YouTube] All clients failed for $endpoint: ${it.message}") }
+        // Refresh visitor data — may have expired (YouTube invalidates stale visitor data over time)
+        visitorData().onSuccess { newData ->
+            innerTube.visitorData = newData
+            System.err.println("[YouTube] Refreshed visitorData after $endpoint failure")
+        }.onFailure { refreshError ->
+            System.err.println("[YouTube] Failed to refresh visitorData after $endpoint failure: ${refreshError.message}")
         }
         return Result.failure(Exception("All clients failed for $endpoint"))
     }

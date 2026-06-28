@@ -9,6 +9,7 @@ import com.kuromusic.innertube.models.PlaylistItem
 import com.kuromusic.innertube.utils.completedLibraryPage
 import com.kuromusic.utils.reportException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +21,7 @@ class AccountViewModel @Inject constructor() : ViewModel() {
     val artists = MutableStateFlow<List<ArtistItem>?>(null)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             YouTube.library("FEmusic_liked_playlists").completedLibraryPage().onSuccess {
                 playlists.value = it.items.filterIsInstance<PlaylistItem>()
                     .filterNot { it.id == "SE" }

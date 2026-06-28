@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
+import com.kuromusic.utils.Updater
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -141,8 +142,8 @@ fun UpdateCard(latestVersion: String = "") {
     var showDownloadDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        val newVersion = checkForUpdates()
-        if (newVersion != null && isNewerVersion(newVersion, BuildConfig.VERSION_NAME)) {
+        val newVersion = Updater.checkForUpdates()
+        if (newVersion != null && Updater.isNewerVersion(newVersion, BuildConfig.VERSION_NAME)) {
             showUpdateCard = true
             currentLatestVersion = newVersion
         }
@@ -453,36 +454,7 @@ fun installApk(context: Context, apkUri: Uri) {
     context.startActivity(installIntent)
 }
 
-suspend fun checkForUpdates(): String? = withContext(Dispatchers.IO) {
-    try {
-        val url = URL("https://api.github.com/repos/KiritoAPT2/KuroMusic/releases/latest")
-        val connection = url.openConnection()
-        connection.connect()
-        val json = connection.getInputStream().bufferedReader().use { it.readText() }
-        val jsonObject = JSONObject(json)
-        return@withContext jsonObject.getString("tag_name")
-    } catch (e: java.io.FileNotFoundException) {
-        // Specific handling for 404/Repo not found
-        e.printStackTrace()
-        return@withContext null
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return@withContext null
-    }
-}
 
-fun isNewerVersion(remoteVersion: String, currentVersion: String): Boolean {
-    val remote = remoteVersion.removePrefix("v.").removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-    val current = currentVersion.removePrefix("v.").removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
-
-    for (i in 0 until maxOf(remote.size, current.size)) {
-        val r = remote.getOrNull(i) ?: 0
-        val c = current.getOrNull(i) ?: 0
-        if (r > c) return true
-        if (r < c) return false
-    }
-    return false
-}
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -668,7 +640,7 @@ fun SettingsScreen(
         var showDownloadDialog by remember { mutableStateOf(false) }
 
         if (showUpdateResultDialog && updateCheckResult != null) {
-            val isNewer = updateCheckResult?.let { isNewerVersion(it, BuildConfig.VERSION_NAME) } ?: false
+            val isNewer = updateCheckResult?.let { Updater.isNewerVersion(it, BuildConfig.VERSION_NAME) } ?: false
             AlertDialog(
                 onDismissRequest = { showUpdateResultDialog = false },
                 title = {
@@ -711,7 +683,7 @@ fun SettingsScreen(
                     description = { Text("v${BuildConfig.VERSION_NAME}") },
                     onClick = {
                         updateScope.launch {
-                            val result = checkForUpdates()
+                            val result = Updater.checkForUpdates()
                             updateCheckResult = result
                             showUpdateResultDialog = true
                         }
