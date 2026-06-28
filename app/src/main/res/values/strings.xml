@@ -300,6 +300,7 @@
     <string name="advanced_login">Advanced login (token)</string>
     <string name="logout">Logout</string>
     <string name="not_logged_in">Not logged in</string>
+    <string name="authorizing">Authorizing…</string>
     <string name="token_hidden">Tap to show token</string>
     <string name="token_shown">Tap again to copy or edit</string>
     <string name="token_adv_login_description">This is an ADVANCED login method. As an alternative to the web portal, you may directly enter or update your login token here. For example, this can speed up logging in on multiple devices. Please note that any invalid token formats the app fails to parse will not be accepted</string>
@@ -360,6 +361,8 @@
     <string name="auto_skip_next_on_error">Auto skip to next song when error occurs</string>
     <string name="auto_skip_next_on_error_desc">Ensure your continuous playback experience</string>
     <string name="stop_music_on_task_clear">Stop music on task clear</string>
+    <string name="stream_on_wifi_only">Stream on Wi-Fi only</string>
+    <string name="stream_on_wifi_only_desc">Only download and stream audio over Wi-Fi connections</string>
     <string name="equalizer">Equalizer</string>
 
     <string name="storage">Storage</string>

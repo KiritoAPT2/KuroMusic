@@ -27,6 +27,7 @@ import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.Response
 import okhttp3.Cache
+import okhttp3.ConnectionPool
 import android.content.Context
 import java.net.URLDecoder
 import java.io.File
@@ -36,7 +37,9 @@ import kotlinx.coroutines.Dispatchers
 import com.kuromusic.constants.InnerTubeCookieKey
 import com.kuromusic.constants.ForceAacFallbackKey
 import androidx.datastore.preferences.core.edit
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import com.kuromusic.utils.dataStore
 
 
@@ -44,9 +47,9 @@ object YTPlayerUtils {
     private const val logTag = "YTPlayerUtils"
 
     private val MUSIC_CLIENT_HEADERS = mapOf(
-        "User-Agent" to "com.google.android.apps.youtube.music/7.01.52 (Linux; U; Android 15; Pixel 9 Pro)",
+        "User-Agent" to "com.google.android.apps.youtube.music/9.25.50 (Linux; U; Android 15; Pixel 9 Pro)",
         "X-YouTube-Client-Name" to "21",
-        "X-YouTube-Client-Version" to "7.01.52",
+        "X-YouTube-Client-Version" to "9.25.50",
         "X-YouTube-API-Key" to BuildConfig.INNER_TUBE_API_KEY,
         "Accept-Language" to "es-419,es;q=0.9,en;q=0.8"
     )
@@ -64,6 +67,11 @@ object YTPlayerUtils {
 
     private fun createMusicClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectionPool(ConnectionPool(20, 5, TimeUnit.MINUTES))
+            .retryOnConnectionFailure(true)
         
         // Cache 50MB
         cacheDir?.let {
@@ -94,9 +102,9 @@ object YTPlayerUtils {
                     val merged = cookieMap.entries.joinToString("; ") { "${it.key}=${it.value}" }
                     YouTube.cookie = merged
                     
-                    // Persistir a DataStore
+                    // Persistir a DataStore (fire-and-forget, in-memory cookie already set above)
                     appContext?.let { ctx ->
-                        runBlocking {
+                        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
                             ctx.dataStore.edit { it[InnerTubeCookieKey] = merged }
                         }
                     }

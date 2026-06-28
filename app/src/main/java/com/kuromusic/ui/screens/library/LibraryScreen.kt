@@ -5,22 +5,37 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
 import androidx.navigation.NavController
 import com.kuromusic.R
 import com.kuromusic.constants.ChipSortTypeKey
 import com.kuromusic.constants.LibraryFilter
+import com.kuromusic.utils.dataStore
 import com.kuromusic.ui.component.ChipsRow
 import com.kuromusic.ui.component.VerticalFastScroller
 import com.kuromusic.utils.rememberEnumPreference
+import com.kuromusic.utils.dataStore
 
 @Composable
-fun LibraryScreen(navController: NavController) {
-    var filterType by rememberEnumPreference(ChipSortTypeKey, LibraryFilter.LIBRARY)
+fun LibraryScreen(navController: NavController, initialFilter: LibraryFilter? = null) {
+    val context = LocalContext.current
+
+    LaunchedEffect(initialFilter) {
+        initialFilter?.let {
+            context.dataStore.edit { preferences ->
+                preferences[ChipSortTypeKey] = it.name
+            }
+        }
+    }
+
+    var filterType by rememberEnumPreference(ChipSortTypeKey, initialFilter ?: LibraryFilter.LIBRARY)
 
     val lazyListState = rememberLazyListState()
 
@@ -29,10 +44,14 @@ fun LibraryScreen(navController: NavController) {
             ChipsRow(
                 chips =
                     listOf(
-                        LibraryFilter.DOWNLOADS to stringResource(R.string.filter_downloads), // Need R.string.filter_downloads or similar
+                        LibraryFilter.DOWNLOADS to stringResource(R.string.filter_downloads),
                         LibraryFilter.LOCAL to "Local",
-                        LibraryFilter.CACHED to "En caché", // Hardcoded for now if string missing, or use existing generic
+                        LibraryFilter.CACHED to "En caché",
+                        LibraryFilter.PLAYLISTS to stringResource(R.string.filter_playlists),
+                        LibraryFilter.SONGS to stringResource(R.string.filter_songs),
+                        LibraryFilter.ARTISTS to stringResource(R.string.filter_artists),
                         LibraryFilter.ALBUMS to stringResource(R.string.filter_albums),
+                        LibraryFilter.LIKED to stringResource(R.string.filter_liked),
                     ),
                 currentValue = filterType,
                 onValueUpdate = {

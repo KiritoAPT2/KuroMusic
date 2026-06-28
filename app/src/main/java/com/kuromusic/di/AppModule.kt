@@ -16,6 +16,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -23,9 +26,19 @@ import javax.inject.Singleton
 @Retention(AnnotationRetention.BINARY)
 annotation class PlayerCache
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ApplicationScope
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Singleton
+    @Provides
+    @ApplicationScope
+    fun provideApplicationScope(): CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     @Singleton
     @Provides
     fun provideDatabase(
@@ -45,17 +58,14 @@ object AppModule {
         @ApplicationContext context: Context,
         databaseProvider: DatabaseProvider,
     ): SimpleCache {
-        val constructor = {
-            SimpleCache(
-                context.filesDir.resolve("exoplayer"),
-                when (val cacheSize = context.dataStore[MaxSongCacheSizeKey] ?: 250) {
-                    -1 -> NoOpCacheEvictor()
-                    else -> LeastRecentlyUsedCacheEvictor(cacheSize * 1024 * 1024L)
-                },
-                databaseProvider,
-            )
-        }
-        constructor().release()
-        return constructor()
+        val cacheSize = context.dataStore[MaxSongCacheSizeKey] ?: 250
+        return SimpleCache(
+            context.filesDir.resolve("exoplayer"),
+            when (cacheSize) {
+                -1 -> NoOpCacheEvictor()
+                else -> LeastRecentlyUsedCacheEvictor(cacheSize * 1024 * 1024L)
+            },
+            databaseProvider,
+        )
     }
 }

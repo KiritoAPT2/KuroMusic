@@ -1,5 +1,7 @@
 package com.kuromusic.ui.player
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.res.Configuration
 import android.graphics.drawable.BitmapDrawable
 import android.text.format.Formatter
@@ -104,13 +106,11 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -192,7 +192,7 @@ fun BottomSheetPlayer(
     val database = LocalDatabase.current
     val menuState = LocalMenuState.current
 
-    val clipboardManager = LocalClipboardManager.current
+    val clipboardManager = context.getSystemService(ClipboardManager::class.java)!!
 
     var showFullscreenLyrics by remember { mutableStateOf(false) }
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -778,7 +778,7 @@ fun BottomSheetPlayer(
             val onTitleLongClickRemembered = remember(mediaMetadata, clipboardManager, context) {
                 {
                     mediaMetadata?.title?.let { title ->
-                        clipboardManager.setText(AnnotatedString(title))
+                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, title))
                         Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
                     }
                     Unit
@@ -954,12 +954,14 @@ fun BottomSheetPlayer(
                                 playbackState = playbackState,
                                 currentSongLiked = currentSong?.song?.liked == true,
                                 beatBuddyType = beatBuddyType,
+                                sleepTimerEnabled = sleepTimerEnabled,
                                 onTitleClick = onTitleClickRemembered,
                                 onTitleLongClick = onTitleLongClickRemembered,
                                 onArtistClick = { id -> onArtistClickRemembered(id) },
                                 onToggleLike = onToggleLikeRemembered,
                                 onDownloadClick = onDownloadClickRemembered,
                                 onMoreClick = onMoreClickRemembered,
+                                onSleepTimerClick = { showSleepTimerDialog = true },
                                 onPlayPause = onPlayPauseRemembered,
                                 onSkipPrevious = onSkipPreviousRemembered,
                                 onSkipNext = onSkipNextRemembered
@@ -1018,12 +1020,14 @@ fun BottomSheetPlayer(
                             playbackState = playbackState,
                             currentSongLiked = currentSong?.song?.liked == true,
                             beatBuddyType = beatBuddyType,
+                            sleepTimerEnabled = sleepTimerEnabled,
                             onTitleClick = onTitleClickRemembered,
                             onTitleLongClick = onTitleLongClickRemembered,
                             onArtistClick = { id -> onArtistClickRemembered(id) },
                             onToggleLike = onToggleLikeRemembered,
                             onDownloadClick = onDownloadClickRemembered,
                             onMoreClick = onMoreClickRemembered,
+                            onSleepTimerClick = { showSleepTimerDialog = true },
                             onPlayPause = onPlayPauseRemembered,
                             onSkipPrevious = onSkipPreviousRemembered,
                             onSkipNext = onSkipNextRemembered
@@ -1127,7 +1131,7 @@ private fun SongDetailsDialog(
     playerConnection: com.kuromusic.playback.PlayerConnection,
     useBlackBackground: Boolean,
     context: android.content.Context,
-    clipboardManager: androidx.compose.ui.platform.ClipboardManager
+    clipboardManager: ClipboardManager
 ) {
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
     
@@ -1187,7 +1191,7 @@ private fun SongDetailsDialog(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
                                     onClick = {
-                                        clipboardManager.setText(AnnotatedString(displayText))
+                                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, displayText))
                                         Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT)
                                             .show()
                                     },
@@ -1398,12 +1402,14 @@ fun PlayerControls(
     playbackState: Int,
     currentSongLiked: Boolean,
     beatBuddyType: BeatBuddyType,
+    sleepTimerEnabled: Boolean,
     onTitleClick: () -> Unit,
     onTitleLongClick: () -> Unit,
     onArtistClick: (String?) -> Unit,
     onToggleLike: () -> Unit,
     onDownloadClick: () -> Unit,
     onMoreClick: () -> Unit,
+    onSleepTimerClick: () -> Unit,
     onPlayPause: () -> Unit,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit
@@ -1514,6 +1520,29 @@ fun PlayerControls(
                     Download.STATE_COMPLETED -> Icon(painter = painterResource(R.drawable.offline), contentDescription = null, tint = resolvedOnBackgroundColor, modifier = Modifier.size(28.dp))
                     Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = resolvedOnBackgroundColor)
                     else -> Icon(painter = painterResource(R.drawable.download), contentDescription = null, tint = resolvedOnBackgroundColor, modifier = Modifier.size(28.dp))
+                }
+            }
+
+            // Botón Sleep Timer
+            Box {
+                IconButton(
+                    onClick = onSleepTimerClick,
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.bedtime),
+                        contentDescription = null,
+                        tint = if (sleepTimerEnabled) MaterialTheme.colorScheme.primary else resolvedOnBackgroundColor,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                if (sleepTimerEnabled) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(8.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    )
                 }
             }
 
@@ -1672,14 +1701,16 @@ fun PlayerControls(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                painter = painterResource(
-                    if (isPlaying) R.drawable.pause else R.drawable.play
-                ),
-                contentDescription = null,
-                tint = iconButtonColor,
-                modifier = Modifier.size(40.dp)
-            )
+            androidx.compose.runtime.key(isPlaying) {
+                Icon(
+                    painter = painterResource(
+                        if (isPlaying) R.drawable.pause else R.drawable.play
+                    ),
+                    contentDescription = null,
+                    tint = iconButtonColor,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(32.dp))

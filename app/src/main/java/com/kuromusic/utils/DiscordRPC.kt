@@ -1,20 +1,20 @@
 package com.kuromusic.utils
 
-import android.content.Context
-import com.kuromusic.R
 import com.kuromusic.db.entities.Song
-import com.kuromusic.kizzy.rpc.KizzyRPC
-import com.kuromusic.kizzy.rpc.RpcImage
+import com.kuromusic.discord.DiscordRpcManager
 
-class DiscordRPC(
-    val context: Context,
-    token: String,
-) : KizzyRPC(token) {
-    suspend fun updateSong(song: Song, currentPlaybackTimeMillis: Long, playbackSpeed: Float = 1.0f, useDetails: Boolean = false) = runCatching {
+class DiscordRPC {
+    suspend fun updateSong(
+        song: Song,
+        currentPlaybackTimeMillis: Long,
+        playbackSpeed: Float = 1.0f,
+        useDetails: Boolean = false,
+    ) {
         val currentTime = System.currentTimeMillis()
-
         val adjustedPlaybackTime = (currentPlaybackTimeMillis / playbackSpeed).toLong()
         val calculatedStartTime = currentTime - adjustedPlaybackTime
+        val remainingDuration = song.song.duration * 1000L - currentPlaybackTimeMillis
+        val adjustedRemainingDuration = (remainingDuration / playbackSpeed).toLong()
 
         val songTitleWithRate = if (playbackSpeed != 1.0f) {
             "${song.song.title} [${String.format("%.2fx", playbackSpeed)}]"
@@ -22,32 +22,29 @@ class DiscordRPC(
             song.song.title
         }
 
-        val remainingDuration = song.song.duration * 1000L - currentPlaybackTimeMillis
-        val adjustedRemainingDuration = (remainingDuration / playbackSpeed).toLong()
-
-        setActivity(
-            name = context.getString(R.string.app_name).removeSuffix(" Debug"),
+        DiscordRpcManager.setActivity(
+            name = "KuroMusic",
+            type = 2,
             details = songTitleWithRate,
             state = song.artists.joinToString { it.name },
-            detailsUrl = "https://music.youtube.com/watch?v=${song.song.id}",
-            largeImage = song.song.thumbnailUrl?.let { RpcImage.ExternalImage(it) },
-            smallImage = song.artists.firstOrNull()?.thumbnailUrl?.let { RpcImage.ExternalImage(it) },
+            largeImage = song.song.thumbnailUrl,
             largeText = song.album?.title,
+            smallImage = song.artists.firstOrNull()?.thumbnailUrl,
             smallText = song.artists.firstOrNull()?.name,
+            startMs = calculatedStartTime,
+            endMs = currentTime + adjustedRemainingDuration,
             buttons = listOf(
                 "Listen on KuroMusic" to "https://music.youtube.com/watch?v=${song.song.id}",
                 "Visit KuroMusic" to "https://github.com/KiritoAPT2/KuroMusic"
             ),
-            type = Type.LISTENING,
-            statusDisplayType = if (useDetails) StatusDisplayType.DETAILS else StatusDisplayType.STATE,
-            since = currentTime,
-            startTime = calculatedStartTime,
-            endTime = currentTime + adjustedRemainingDuration,
-            applicationId = APPLICATION_ID
+            songId = song.song.id,
+            isPlaying = true,
         )
     }
 
-    companion object {
-        private const val APPLICATION_ID = "1411019391843172514"
+    fun stopActivity() {
+        DiscordRpcManager.clear()
     }
+
+    fun isRpcRunning(): Boolean = DiscordRpcManager.isReady()
 }

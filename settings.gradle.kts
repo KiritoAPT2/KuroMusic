@@ -31,6 +31,7 @@ include(":lrclib")
 include(":kizzy")
 include(":material-color-utilities")
 include(":jossredconnect")
+include(":lastfm")
 include(":baselineprofile")
 
 // Use a local copy of NewPipe Extractor by uncommenting the lines below.

@@ -1,5 +1,6 @@
 package com.kuromusic.extensions
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -24,4 +25,8 @@ fun <T> Flow<T>.collectLatest(
     }
 }
 
-val SilentHandler = CoroutineExceptionHandler { _, _ -> }
+private const val TAG = "CoroutineExt"
+
+val SilentHandler = CoroutineExceptionHandler { _, e ->
+    Log.e(TAG, "Unhandled coroutine exception", e)
+}

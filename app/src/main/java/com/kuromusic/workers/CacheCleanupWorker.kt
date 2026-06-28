@@ -28,7 +28,7 @@ class CacheCleanupWorker(
 
             cacheDir.walkTopDown().forEach { file ->
                 val parentName = file.parentFile?.name
-                if (parentName == "media" || parentName == "exoplayer") return@forEach
+                if (parentName == "media" || parentName == "exoplayer" || parentName == "coil") return@forEach
                 if (file.isFile && file.lastModified() < cutoff) {
                     val size = file.length()
                     if (file.delete()) {
@@ -36,15 +36,6 @@ class CacheCleanupWorker(
                         reclaimedBytes += size
                     }
                 }
-            }
-
-            // Clear Coil disk cache via API
-            try {
-                val coilCache = applicationContext.imageLoader.diskCache
-                coilCache?.clear()
-                Log.i("CacheCleanup", "Coil disk cache cleared via API")
-            } catch (e: Exception) {
-                Log.w("CacheCleanup", "Could not clear Coil cache via API", e)
             }
 
             // Prune old song history from Room DB (keep last 30 days)

@@ -82,6 +82,9 @@ class PlayerConnection(
         player.playWhenReady && player.playbackState == STATE_READY
     )
 
+    // Estado de conexión de red
+    val isNetworkConnected: StateFlow<Boolean> = service.isNetworkConnected.asStateFlow()
+
     // Estados de conexión y salud del reproductor
     private val _isConnected = MutableStateFlow(true)
     val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()

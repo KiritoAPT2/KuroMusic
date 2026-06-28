@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OnlinePlaylistViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    database: MusicDatabase
+    database: MusicDatabase,
 ) : ViewModel() {
     private val playlistId = savedStateHandle.get<String>("playlistId")!!
 

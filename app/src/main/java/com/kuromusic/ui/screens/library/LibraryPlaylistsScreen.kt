@@ -1,8 +1,6 @@
 package com.kuromusic.ui.screens.library
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,9 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kuromusic.innertube.utils.parseCookieString
@@ -57,15 +54,11 @@ import com.kuromusic.constants.PlaylistSortType
 import com.kuromusic.constants.PlaylistSortTypeKey
 import com.kuromusic.constants.PlaylistViewTypeKey
 import com.kuromusic.constants.YtmSyncKey
-import com.kuromusic.db.entities.Playlist
-import com.kuromusic.db.entities.PlaylistEntity
 import com.kuromusic.ui.component.CreatePlaylistDialog
 import com.kuromusic.ui.component.HideOnScrollFAB
 import com.kuromusic.ui.component.LibraryPlaylistGridItem
 import com.kuromusic.ui.component.LibraryPlaylistListItem
 import com.kuromusic.ui.component.LocalMenuState
-import com.kuromusic.ui.component.PlaylistGridItem
-import com.kuromusic.ui.component.PlaylistListItem
 import com.kuromusic.ui.component.SortHeader
 import com.kuromusic.utils.rememberEnumPreference
 import com.kuromusic.utils.rememberPreference
@@ -78,7 +71,7 @@ import java.util.UUID
 @Composable
 fun LibraryPlaylistsScreen(
     navController: NavController,
-    filterContent: @Composable () -> Unit,
+    filterContent: @Composable () -> Unit = {},
     viewModel: LibraryPlaylistsViewModel = hiltViewModel(),
     initialTextFieldValue: String? = null,
     allowSyncing: Boolean = true,
@@ -101,48 +94,6 @@ fun LibraryPlaylistsScreen(
     val gridItemSize by rememberEnumPreference(GridItemsSizeKey, GridItemSize.BIG)
 
     val playlists by viewModel.allPlaylists.collectAsState()
-
-    val topSize by viewModel.topValue.collectAsState(initial = 50)
-
-    val likedPlaylist =
-        Playlist(
-            playlist = PlaylistEntity(
-                id = UUID.randomUUID().toString(),
-                name = stringResource(R.string.liked)
-            ),
-            songCount = 0,
-            thumbnails = emptyList(),
-        )
-
-    val downloadPlaylist =
-        Playlist(
-            playlist = PlaylistEntity(
-                id = UUID.randomUUID().toString(),
-                name = stringResource(R.string.offline)
-            ),
-            songCount = 0,
-            thumbnails = emptyList(),
-        )
-
-    val topPlaylist =
-        Playlist(
-            playlist = PlaylistEntity(
-                id = UUID.randomUUID().toString(),
-                name = stringResource(R.string.my_top) + " $topSize"
-            ),
-            songCount = 0,
-            thumbnails = emptyList(),
-        )
-
-    val cachePlaylist =
-        Playlist(
-            playlist = PlaylistEntity(
-                id = UUID.randomUUID().toString(),
-                name = stringResource(R.string.cached_playlist)
-            ),
-            songCount = 0,
-            thumbnails = emptyList(),
-        )
 
     val lazyListState = rememberLazyListState()
     val lazyGridState = rememberLazyGridState()
@@ -261,78 +212,6 @@ fun LibraryPlaylistsScreen(
                         headerContent()
                     }
 
-                    item(
-                        key = "likedPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistListItem(
-                            playlist = likedPlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("auto_playlist/liked")
-                                    }
-                                    .animateItem(),
-                        )
-                    }
-
-                    item(
-                        key = "downloadedPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistListItem(
-                            playlist = downloadPlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("auto_playlist/downloaded")
-                                    }
-                                    .animateItem(),
-                        )
-                    }
-
-                    item(
-                        key = "TopPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistListItem(
-                            playlist = topPlaylist,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.navigate("top_playlist/$topSize")
-                                    }
-                                    .animateItem(),
-                        )
-                    }
-
-                    item(
-                        key = "cachePlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistGridItem(
-                            playlist = cachePlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("cache_playlist/cached")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
-                        )
-                    }
-
                     playlists.let { playlists ->
                         if (playlists.isEmpty()) {
                             item {
@@ -387,90 +266,6 @@ fun LibraryPlaylistsScreen(
                         contentType = CONTENT_TYPE_HEADER,
                     ) {
                         headerContent()
-                    }
-
-                    item(
-                        key = "likedPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistGridItem(
-                            playlist = likedPlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("auto_playlist/liked")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
-                        )
-                    }
-
-                    item(
-                        key = "downloadedPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistGridItem(
-                            playlist = downloadPlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("auto_playlist/downloaded")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
-                        )
-                    }
-
-                    item(
-                        key = "TopPlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistGridItem(
-                            playlist = topPlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("top_playlist/$topSize")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
-                        )
-                    }
-
-                    item(
-                        key = "cachePlaylist",
-                        contentType = { CONTENT_TYPE_PLAYLIST },
-                    ) {
-                        PlaylistGridItem(
-                            playlist = cachePlaylist,
-                            fillMaxWidth = true,
-                            autoPlaylist = true,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate("cache_playlist/cached")
-                                        },
-                                    )
-                                    .animateItem(),
-                            context = LocalContext.current // Pasamos el contexto actual para obtener la URI de la miniatura
-                        )
                     }
 
                     playlists.let { playlists ->

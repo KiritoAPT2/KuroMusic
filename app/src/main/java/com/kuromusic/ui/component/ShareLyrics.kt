@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +68,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.kuromusic.R
 import com.kuromusic.models.MediaMetadata
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.min
 import androidx.compose.ui.res.stringResource
@@ -316,6 +318,7 @@ fun LyricsImageCard(
     modifier: Modifier = Modifier
 ) {
     var isGenerating by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     Column(
@@ -331,8 +334,8 @@ fun LyricsImageCard(
                 onSaveImage = {
                     isGenerating = true
                     onSaveImage()
-                    kotlinx.coroutines.GlobalScope.launch {
-                        kotlinx.coroutines.delay(1500)
+                    scope.launch {
+                        delay(1500)
                         isGenerating = false
                     }
                 },

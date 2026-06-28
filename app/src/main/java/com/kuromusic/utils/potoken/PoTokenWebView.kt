@@ -339,6 +339,8 @@ class PoTokenWebView private constructor(
 
         private val httpClient = OkHttpClient.Builder()
             .proxy(YouTube.proxy)
+            .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .build()
 
         suspend fun getNewPoTokenGenerator(context: Context): PoTokenWebView {

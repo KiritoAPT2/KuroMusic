@@ -79,35 +79,35 @@ data class YouTubeClient(
 
         val IOS = YouTubeClient(
             clientName = "IOS",
-            clientVersion = "20.13.1",
+            clientVersion = "21.03.2",
             clientId = "5",
-            userAgent = "com.google.ios.youtube/20.13.1 (iPhone17,2; U; CPU iOS 19_0_0 like Mac OS X;)",
-            osVersion = "19.0.0.22D82",
+            userAgent = "com.google.ios.youtube/21.03.2 (iPhone16,2; U; CPU iOS 18_7_2 like Mac OS X;)",
+            osVersion = "18.7.2.22H124",
         )
 
         val MOBILE = YouTubeClient(
             clientName = "ANDROID",
-            clientVersion = "19.21.37",
+            clientVersion = "21.03.36",
             clientId = "3",
-            userAgent = "com.google.android.youtube/19.21.37 (Linux; U; Android 15; Pixel 9)",
+            userAgent = "com.google.android.youtube/21.03.36 (Linux; U; Android 15; Pixel 9 Pro)",
             loginSupported = true,
             useSignatureTimestamp = true
         )
 
         val ANDROID_MUSIC = YouTubeClient(
             clientName = "ANDROID_MUSIC",
-            clientVersion = "7.01.52",
+            clientVersion = "9.25.50",
             clientId = "21",
-            userAgent = "com.google.android.apps.youtube.music/7.01.52 (Linux; U; Android 15; Pixel 9 Pro)",
+            userAgent = "com.google.android.apps.youtube.music/9.25.50 (Linux; U; Android 15; Pixel 9 Pro)",
             loginSupported = true,
             useSignatureTimestamp = true
         )
 
         val ANDROID_VR_NO_AUTH = YouTubeClient(
             clientName = "ANDROID_VR",
-            clientVersion = "1.62.52",
+            clientVersion = "1.66.55",
             clientId = "28",
-            userAgent = "com.google.android.apps.youtube.vr.oculus/1.62.52 (Linux; U; Android 15; en_US; Oculus Quest 3; Build/AP4A.250605.001; Cronet/135.0.6808.3)",
+            userAgent = "com.google.android.apps.youtube.vr.oculus/1.66.55 (Linux; U; Android 15; en_US; Oculus Quest 3; Build/AP4A.250605.001; Cronet/135.0.6808.3)",
             loginSupported = false,
             useSignatureTimestamp = false
         )

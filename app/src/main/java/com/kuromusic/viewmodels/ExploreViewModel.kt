@@ -2,12 +2,12 @@ package com.kuromusic.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.kuromusic.innertube.YouTube
 import com.kuromusic.innertube.models.filterExplicit
 import com.kuromusic.innertube.pages.ExplorePage
 import com.kuromusic.constants.HideExplicitKey
 import com.kuromusic.db.MusicDatabase
+import androidx.lifecycle.viewModelScope
 import com.kuromusic.utils.dataStore
 import com.kuromusic.utils.get
 import com.kuromusic.utils.reportException

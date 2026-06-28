@@ -1,6 +1,6 @@
 package com.kuromusic.playback
 
-import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.media.AudioDeviceInfo
@@ -23,7 +23,8 @@ class DeviceAudioStateHolder(private val context: Context) {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
 
         val btAdapter = try {
-            BluetoothAdapter.getDefaultAdapter()
+            val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            bluetoothManager.adapter
         } catch (_: SecurityException) {
             null
         }

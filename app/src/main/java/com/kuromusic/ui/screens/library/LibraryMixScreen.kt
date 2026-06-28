@@ -52,7 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kuromusic.LocalPlayerAwareWindowInsets
@@ -230,6 +230,16 @@ fun LibraryMixScreen(
                     iconRes = R.drawable.download,
                     gradientColors = listOf(Color(0xFF00C9FF), Color(0xFF92FE9D)),
                     onClick = { navController.navigate("auto_playlist/downloaded") }
+                )
+            }
+
+            item(key = "pinned_stats") {
+                LibraryListItem(
+                    title = "Estadísticas",
+                    subtitle = "Top canciones, artistas y álbumes",
+                    iconRes = R.drawable.trending_up,
+                    gradientColors = listOf(Color(0xFF667eea), Color(0xFF764ba2)),
+                    onClick = { navController.navigate("stats") }
                 )
             }
 

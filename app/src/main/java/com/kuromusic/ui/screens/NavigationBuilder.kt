@@ -8,15 +8,28 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.compose.composable
 import com.kuromusic.BuildConfig
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.ui.component.Lyrics
@@ -24,6 +37,7 @@ import com.kuromusic.ui.screens.artist.ArtistItemsScreen
 import com.kuromusic.ui.screens.artist.ArtistScreen
 import com.kuromusic.ui.screens.artist.ArtistSongsScreen
 import com.kuromusic.ui.screens.library.CachePlaylistScreen
+import com.kuromusic.ui.screens.library.LibraryPlaylistsScreen
 import com.kuromusic.ui.screens.library.LibraryScreen
 import com.kuromusic.ui.screens.playlist.AutoPlaylistScreen
 import com.kuromusic.ui.screens.playlist.LocalPlaylistScreen
@@ -35,8 +49,9 @@ import com.kuromusic.ui.screens.settings.AccountSettings
 import com.kuromusic.ui.screens.settings.AppearanceSettings
 import com.kuromusic.ui.screens.settings.BackupAndRestore
 import com.kuromusic.ui.screens.settings.ContentSettings
-import com.kuromusic.ui.screens.settings.DiscordLoginScreen
+
 import com.kuromusic.ui.screens.settings.DiscordSettings
+import com.kuromusic.ui.screens.settings.LastFmSettings
 import com.kuromusic.ui.screens.settings.PlayerSettings
 import com.kuromusic.ui.screens.settings.PrivacySettings
 import com.kuromusic.ui.screens.settings.SettingsScreen
@@ -57,10 +72,37 @@ fun NavGraphBuilder.navigationBuilder(
     composable(Screens.Home.route) {
         HomeScreen(navController)
     }
-    composable(
-        Screens.Library.route,
-    ) {
+    composable(Screens.Library.route) {
         LibraryScreen(navController)
+    }
+    composable(
+        route = "playlists",
+        enterTransition = { fadeIn(tween(250)) },
+        exitTransition = { fadeOut(tween(200)) },
+        popEnterTransition = { fadeIn(tween(250)) },
+        popExitTransition = { fadeOut(tween(200)) },
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LibraryPlaylistsScreen(navController)
+
+            TopAppBar(
+                title = { Text(stringResource(com.kuromusic.R.string.playlists)) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        }
     }
     composable(Screens.Explore.route) {
         ExploreScreen(navController,scrollBehavior)
@@ -297,8 +339,8 @@ fun NavGraphBuilder.navigationBuilder(
     composable("settings/discord") {
         DiscordSettings(navController, scrollBehavior)
     }
-    composable("settings/discord/login") {
-        DiscordLoginScreen(navController)
+    composable("settings/lastfm") {
+        LastFmSettings(navController, scrollBehavior)
     }
     composable("settings/about") {
         AboutScreen(navController, scrollBehavior)

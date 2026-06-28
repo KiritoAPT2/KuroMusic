@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RoomWarnings
 import androidx.room.Transaction
 import androidx.room.Update
 import com.kuromusic.constants.AlbumSortType
@@ -19,6 +20,7 @@ import java.text.Collator
 import java.util.Locale
 
 @Dao
+@SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
 interface AlbumDao {
     @Transaction
     @Query(

@@ -47,6 +47,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -70,7 +72,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.ImageLoader
@@ -92,6 +94,7 @@ import com.kuromusic.R
 import com.kuromusic.constants.AccountNameKey
 import com.kuromusic.constants.GridThumbnailHeight
 import com.kuromusic.constants.InnerTubeCookieKey
+import com.kuromusic.constants.SimilarContent
 import com.kuromusic.constants.ListItemHeight
 import com.kuromusic.constants.ListThumbnailSize
 import com.kuromusic.constants.ThumbnailCornerRadius
@@ -173,6 +176,8 @@ fun HomeScreen(
     val accountName by rememberPreference(AccountNameKey, "")
     val showAnimaxSection by rememberPreference(ShowAnimaxSectionKey, true)
     val enableDynamicTheme by rememberPreference(DynamicThemeKey, false)
+    val similarContentEnabled by rememberPreference(SimilarContent, false)
+    var dismissAutomixBanner by remember { mutableStateOf(false) }
     val animaxSectionTitle = if (showAnimaxSection) "Animax L Music" else "Canciones Recomendadas"
     val accountImageUrl by viewModel.accountImageUrl.collectAsState()
     val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
@@ -363,7 +368,7 @@ fun HomeScreen(
                         chips = listOfNotNull(
                             Pair("history", stringResource(R.string.history)),
                             Pair("stats", stringResource(R.string.stats)),
-                            Pair("liked", stringResource(R.string.liked)),
+                            Pair("playlists", "Playlist"),
                             Pair("downloads", stringResource(R.string.offline)),
                             if (isLoggedIn) Pair(
                                 "account",
@@ -375,13 +380,53 @@ fun HomeScreen(
                             when (value) {
                                 "history" -> navController.navigate("history")
                                 "stats" -> navController.navigate("stats")
-                                "liked" -> navController.navigate("auto_playlist/liked")
+                                "playlists" -> navController.navigate("playlists")
                                 "downloads" -> navController.navigate("auto_playlist/downloaded")
                                 "account" -> if (isLoggedIn) navController.navigate("account")
                             }
                         },
                         containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f)
                     )
+                }
+            }
+
+            if (similarContentEnabled && !dismissAutomixBanner) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.info),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "El Contenido similar agrega canciones automáticas a la cola al final de tu playlist. Podés desactivarlo en Ajustes → Audio.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = { dismissAutomixBanner = true }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.close),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -395,13 +440,12 @@ fun HomeScreen(
                 item { RecentsMiniShimmer() }
             }
 
-            // --- BLOQUE 1: ANIMAX L MUSIC (ESTRUCTURA DE CUADRÍCULA HORIZONTAL IDENTICA A YT) ---
+            // --- BLOQUE 1: ANIMAX L MUSIC / RECOMENDACIONES (HERO SECTION) ---
             animaxVideos?.takeIf { it.isNotEmpty() }?.let { videos ->
                 item {
                     SectionHeader(
                         title = animaxSectionTitle,
                         subtitle = if (showAnimaxSection) "Contenido oficial" else "Según tu historial",
-                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
                 
@@ -419,7 +463,6 @@ fun HomeScreen(
                         flingBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
                     ) {
                         items(songGroups) { group ->
-                            // Cada columna contiene 4 canciones una encima de otra (85% del ancho)
                             Column(
                                 modifier = Modifier.fillParentMaxWidth(0.85f)
                             ) {
@@ -451,7 +494,6 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     SectionHeader(
                         title = "Escuchado Recientemente",
-                        modifier = Modifier
                     )
                 }
                 
@@ -492,9 +534,63 @@ fun HomeScreen(
                         }
                     }
                 }
+            } else {
+                // Empty state for first-time users
+                item {
+                    SectionHeader(title = "Escuchado Recientemente")
+                }
+                item {
+                    Text(
+                        text = "Empieza a escuchar música para ver tu historial",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    )
+                }
             }
 
-            // --- BLOQUE 2.5: RECOMENDACIONES (SIN CUENTA) ---
+            // --- BLOQUE 3: QUICK PICKS (RECOMENDACIONES LOCALES + DESCUBRIMIENTO) ---
+            if (localRecommendations.isNotEmpty() && homePage != null && essentialSongs.isNotEmpty()) {
+                val quickPicks = essentialSongs.asSequence()
+                    .filter { s -> localRecommendations.none { it.id == s.id } }
+                    .take(6)
+                    .toList()
+
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    SectionHeader(
+                        title = "Para ti",
+                        subtitle = "Quick picks",
+                        modifier = Modifier.animateItem()
+                    )
+                }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(
+                            items = quickPicks,
+                            key = { "quickpick_${it.id}" }
+                        ) { song ->
+                            SongGridItem(
+                                song = song,
+                                isActive = song.id == mediaMetadata?.id,
+                                isPlaying = isPlaying,
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .clickable {
+                                        playerConnection.playQueue(YouTubeQueue.radio(song.toMediaMetadata()))
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // --- BLOQUE 4: RECOMENDACIONES LOCALES (SIN CUENTA, FALLBACK) ---
             if (homePage == null && localRecommendations.isNotEmpty()) {
                 item {
                     Spacer(modifier = Modifier.height(24.dp))

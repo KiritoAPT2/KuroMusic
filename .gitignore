@@ -80,3 +80,27 @@ app/schemas/
 *.log
 .kotlin/
 !app/src/main/baseline-prof.txt
+
+# Editor configs
+.vscode/
+.github/
+
+# AI agent configs (OpenCode, etc.)
+.opencode/
+AGENTS.md
+opencode.json
+
+# Node.js dev tooling (not part of Android project)
+package.json
+package-lock.json
+
+# Extracted library sources (not project code)
+coil/
+androidx/
+
+# Obsolete scripts (see AGENTS.md)
+scrub.cmd
+
+# AI-generated plans/documentation
+docs/opencode-skills/
+docs/CHANGELOG.md

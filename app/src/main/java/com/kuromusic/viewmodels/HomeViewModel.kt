@@ -2,7 +2,6 @@ package com.kuromusic.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.kuromusic.innertube.YouTube
 import com.kuromusic.innertube.models.ArtistItem
 import com.kuromusic.innertube.models.SongItem
@@ -16,6 +15,7 @@ import com.kuromusic.db.entities.Artist
 import com.kuromusic.db.entities.Playlist
 import com.kuromusic.db.entities.Song
 import com.kuromusic.constants.ShowAnimaxSectionKey
+import androidx.lifecycle.viewModelScope
 import com.kuromusic.utils.dataStore
 import com.kuromusic.utils.get
 import com.kuromusic.utils.reportException
@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import timber.log.Timber
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
@@ -63,54 +64,92 @@ class HomeViewModel @Inject constructor(
     // Dynamic gradient color extracted from album art
     val dynamicGradientColor = MutableStateFlow(androidx.compose.ui.graphics.Color(0xFF121212))
 
-    private suspend fun load() = kotlinx.coroutines.withContext(Dispatchers.IO) {
-        isLoading.value = true
+    companion object {
+        private const val FRESH_TTL_MS = 5 * 60 * 1000L
+        private const val STALE_TTL_MS = 30 * 60 * 1000L
+    }
 
+    private var lastLoadTimestamp = 0L
+
+    private suspend fun load() = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        val now = System.currentTimeMillis()
+        val elapsed = now - lastLoadTimestamp
+        val hasData = homePage.value != null
+
+        when {
+            // Cache fresco (< 5 min): mostrar datos sin hacer fetch
+            hasData && elapsed < FRESH_TTL_MS -> {
+                Timber.tag("HomeCache").d("Cache HIT (fresh): %ds old", elapsed / 1000)
+                return@withContext
+            }
+
+            // Cache stale (5-30 min): mostrar stale, refrescar en background
+            hasData && elapsed < STALE_TTL_MS -> {
+                Timber.tag("HomeCache").d("Cache STALE (%.0fmin): background refresh", elapsed / 60000.0)
+                performApiLoad(showLoading = false)
+                return@withContext
+            }
+
+            // Sin cache o expirado: fetch completo con indicator
+            else -> {
+                Timber.tag("HomeCache").d("Cache MISS: fetching full data")
+                isLoading.value = true
+                performApiLoad(showLoading = true)
+                isLoading.value = false
+            }
+        }
+    }
+
+    private suspend fun performApiLoad(showLoading: Boolean) = kotlinx.coroutines.withContext(Dispatchers.IO) {
         val showAnimax = appContext.dataStore.get(ShowAnimaxSectionKey, true)
 
-        // **PARALLEL LOADING**: Launch all network requests concurrently
-        val animaxDeferred = if (showAnimax) {
-            async { loadAnimaxVideos() }
-        } else {
-            async { }
-        }
-        
-        val homePageDeferred = async {
-            YouTube.home().onSuccess { page ->
-                val filteredSections = page.sections.filter { section ->
-                    !section.title.contains("Animax", ignoreCase = true)
-                }
-                homePage.value = page.copy(sections = filteredSections)
-            }.onFailure {
-                reportException(it)
+        // **PARALLEL LOADING**: Launch all network requests concurrently within structured scope
+        kotlinx.coroutines.coroutineScope {
+            val animaxDeferred = if (showAnimax) {
+                async { loadAnimaxVideos() }
+            } else {
+                async { }
             }
-        }
-        
-        val explorePageDeferred = async {
-            YouTube.explore().onSuccess { page ->
-                explorePage.value = page
-            }.onFailure {
-                reportException(it)
-            }
-        }
-        
-        val forYouMixDeferred = async {
-            YouTube.browse("FEmusic_home", "w6lsAUIB").onSuccess { result ->
-                forYouMix.value = result.items.flatMap { it.items }
-            }
-        }
-        
-        val globalRecsDeferred = async {
-            val historyCount = database.statsDao.eventCount().first()
-            if (historyCount < 5) {
-                YouTube.browse("FEmusic_charts", null).onSuccess { result ->
-                    globalRecommendations.value = result.items.flatMap { it.items }.take(15)
+            
+            val homePageDeferred = async {
+                YouTube.home().onSuccess { page ->
+                    val filteredSections = page.sections.filter { section ->
+                        !section.title.contains("Animax", ignoreCase = true)
+                    }
+                    homePage.value = page.copy(sections = filteredSections)
+                }.onFailure {
+                    reportException(it)
                 }
             }
-        }
+            
+            val explorePageDeferred = async {
+                YouTube.explore().onSuccess { page ->
+                    explorePage.value = page
+                }.onFailure {
+                    reportException(it)
+                }
+            }
+            
+            val forYouMixDeferred = async {
+                YouTube.browse("FEmusic_home", "w6lsAUIB").onSuccess { result ->
+                    forYouMix.value = result.items.flatMap { it.items }
+                }.onFailure {
+                    reportException(it)
+                }
+            }
+            
+            val globalRecsDeferred = async {
+                val historyCount = database.statsDao.eventCount().first()
+                if (historyCount < 5) {
+                    YouTube.browse("FEmusic_charts", null).onSuccess { result ->
+                        globalRecommendations.value = result.items.flatMap { it.items }.take(15)
+                    }
+                }
+            }
 
-        // Wait for all to complete
-        awaitAll(animaxDeferred, homePageDeferred, explorePageDeferred, forYouMixDeferred, globalRecsDeferred)
+            // Wait for all to complete
+            awaitAll(animaxDeferred, homePageDeferred, explorePageDeferred, forYouMixDeferred, globalRecsDeferred)
+        }
 
         // Cargar recomendaciones DESPUÉS de que todos los datos están listos (evita race condition)
         if (!showAnimax) {
@@ -121,7 +160,8 @@ class HomeViewModel @Inject constructor(
             computeLocalRecommendations()
         }
 
-        isLoading.value = false
+        lastLoadTimestamp = System.currentTimeMillis()
+        Timber.tag("HomeCache").d("Cache updated at %d", lastLoadTimestamp)
     }
 
     private suspend fun computeLocalRecommendations() {
@@ -238,6 +278,8 @@ class HomeViewModel @Inject constructor(
         lastRefreshTime = currentTime
         viewModelScope.launch(Dispatchers.IO) {
             isRefreshing.value = true
+            // Force full reload: reset cache timestamp so load() doesn't short-circuit
+            lastLoadTimestamp = 0L
             load()
             if (homePage.value == null) {
                 computeLocalRecommendations()

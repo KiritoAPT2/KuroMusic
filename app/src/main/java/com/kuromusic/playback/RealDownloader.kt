@@ -94,7 +94,7 @@ object RealDownloader {
         progress: ProgressCallback? = null,
     ): File {
         Timber.tag(TAG).d("Starting download: ${destination.name}")
-        Timber.tag(TAG).d("URL: ${url.take(100)}...")
+        Timber.tag(TAG).d("URL length: ${url.length}")
 
         destination.parentFile?.mkdirs()
 
