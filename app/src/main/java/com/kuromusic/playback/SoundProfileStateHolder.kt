@@ -9,7 +9,7 @@ class SoundProfileStateHolder {
     var state: ProfileState = ProfileState(ProfileMode.AUTO, null)
         private set
 
-    private val autoGainMap = mutableMapOf<SoundProfile, Float>()
+    private val autoGainMap = java.util.Collections.synchronizedMap(mutableMapOf<SoundProfile, Float>())
 
     fun update(newProfile: SoundProfile) {
         profile = newProfile

@@ -1,6 +1,8 @@
 package com.kuromusic.ui.player
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.SharedTransitionScope
@@ -48,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -77,6 +80,7 @@ import com.kuromusic.constants.PlayerBackgroundStyleKey
 import com.kuromusic.constants.PlayerHorizontalPadding
 import com.kuromusic.constants.SwipeThumbnailKey
 import com.kuromusic.ui.component.AppConfig // AÑADIR ESTE IMPORT
+import com.kuromusic.constants.AnimatingThumbnailKey
 import com.kuromusic.ui.theme.extractThemeColor
 import com.kuromusic.utils.rememberEnumPreference
 import com.kuromusic.utils.rememberPreference
@@ -348,6 +352,19 @@ private fun AlbumArtItem(
     onColorExtracted: (Color) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val playerConnection = LocalPlayerConnection.current
+    val normalizedAmplitude by (playerConnection?.visualizerEngine?.normalizedAmplitude
+        ?: remember { kotlinx.coroutines.flow.MutableStateFlow(0f) }).collectAsState()
+    val isPlaying by (playerConnection?.isPlaying ?: remember { kotlinx.coroutines.flow.MutableStateFlow(false) }).collectAsState()
+    val animatingThumbnailEnabled by rememberPreference(AnimatingThumbnailKey, false)
+
+    val thumbnailScale by animateFloatAsState(
+        targetValue = if (animatingThumbnailEnabled && isPlaying && isCurrentItem)
+            1f + (normalizedAmplitude.coerceIn(0f, 1f) * 0.04f)
+        else 1f,
+        animationSpec = tween(durationMillis = 80),
+        label = "thumbnailPulse",
+    )
 
     Box(
         modifier = Modifier
@@ -373,7 +390,13 @@ private fun AlbumArtItem(
             modifier = Modifier
                 .size(containerMaxWidth - (PlayerHorizontalPadding * 2))
                 .aspectRatio(1f)
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(28.dp))
+                .scale(thumbnailScale)
+                .shadow(
+                    elevation = 20.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    ambientColor = Color(0x1A000000),
+                    spotColor = Color(0x30000000),
+                )
                 .clip(RoundedCornerShape(28.dp))
         ) {
             Box(

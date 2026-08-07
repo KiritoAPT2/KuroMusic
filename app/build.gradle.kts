@@ -29,8 +29,8 @@ android {
         applicationId = "com.kuromusic"
         minSdk = 24
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.0.9"
+        versionCode = 12
+        versionName = "1.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GOOGLE_API_KEY", "\"${localProperties.getProperty("GOOGLE_API_KEY") ?: ""}\"")
         buildConfigField("String", "PO_TOKEN_REQUEST_KEY", "\"${localProperties.getProperty("PO_TOKEN_REQUEST_KEY") ?: ""}\"")
@@ -173,6 +173,7 @@ dependencies {
     implementation(libs.media3)
     implementation(libs.media3.session)
     implementation(libs.media3.okhttp)
+    implementation(libs.media3.ui)
     implementation(libs.squigglyslider)
 
     implementation(libs.room.runtime)
@@ -201,6 +202,7 @@ dependencies {
     implementation(projects.kizzy)
     implementation(project(":jossredconnect"))
     implementation(projects.lastfm)
+    implementation(projects.canvas)
     baselineProfile(project(":baselineprofile"))
 
     implementation(libs.ktor.client.core)

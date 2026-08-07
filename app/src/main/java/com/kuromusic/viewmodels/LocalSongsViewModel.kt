@@ -10,6 +10,7 @@ import com.kuromusic.db.entities.AlbumEntity
 import com.kuromusic.db.entities.ArtistEntity
 import com.kuromusic.db.entities.Song
 import com.kuromusic.db.entities.SongEntity
+import com.kuromusic.playback.RealDownloader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +47,8 @@ class LocalSongsViewModel @Inject constructor(
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.ALBUM
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.COMPOSER,
         )
         val selection = "(${MediaStore.Audio.Media.IS_MUSIC} != 0 OR " +
                 "${MediaStore.Audio.Media.MIME_TYPE} LIKE 'audio/%') AND " +
@@ -69,15 +71,22 @@ class LocalSongsViewModel @Inject constructor(
                     val duration = cursor.getInt(durationColumn)
                     val albumId = cursor.getLong(albumIdColumn)
                     val albumName = cursor.getString(albumColumn) ?: "Unknown Album"
+                    val composer = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER))
 
                     val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id).toString()
-                    val albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId).toString()
+                    var thumbnailUrl = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId).toString()
+
+                    if (!composer.isNullOrBlank()) {
+                        val customThumb = RealDownloader.getThumbnailUri(context, composer)
+                        thumbnailUrl = customThumb?.toString()
+                            ?: "https://img.youtube.com/vi/$composer/hqdefault.jpg"
+                    }
 
                     val songEntity = SongEntity(
-                        id = contentUri, // Use content URI as ID for player
+                        id = contentUri,
                         title = title,
                         duration = duration / 1000,
-                        thumbnailUrl = albumArtUri,
+                        thumbnailUrl = thumbnailUrl,
                         albumId = albumId.toString(),
                         albumName = albumName
                     )

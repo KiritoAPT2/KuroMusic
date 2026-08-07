@@ -37,6 +37,7 @@ import com.kuromusic.utils.reportException
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -50,7 +51,7 @@ import java.util.Locale
 
 @HiltAndroidApp
 class App : Application(), ImageLoaderFactory {
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -120,6 +121,18 @@ class App : Application(), ImageLoaderFactory {
                     }
                 }
         }
+        // Periodic visitor data refresh every 30 min so long sessions don't lose playback
+        scope.launch {
+            while (true) {
+                delay(30 * 60 * 1000L)
+                YouTube.visitorData().onSuccess { newData ->
+                    YouTube.visitorData = newData
+                    dataStore.edit { settings ->
+                        settings[VisitorDataKey] = newData
+                    }
+                }
+            }
+        }
         scope.launch {
             dataStore.data
                 .map { it[DataSyncIdKey] }
@@ -154,6 +167,13 @@ class App : Application(), ImageLoaderFactory {
                         forgetAccount(this@App)
                     }
                 }
+        }
+
+        // Persistir la cookie cuando cambia (p. ej. cuando YTPlayerUtils la mergea)
+        YouTube.onCookieRefreshed = { cookie ->
+            scope.launch {
+                dataStore.edit { it[InnerTubeCookieKey] = cookie }
+            }
         }
     }
 

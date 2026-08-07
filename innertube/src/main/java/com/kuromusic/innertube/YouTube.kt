@@ -71,6 +71,8 @@ import kotlin.random.Random
 object YouTube {
     private val innerTube = InnerTube()
 
+    var onCookieRefreshed: ((String) -> Unit)? = null
+
     var locale: YouTubeLocale
         get() = innerTube.locale
         set(value) {
@@ -90,6 +92,9 @@ object YouTube {
         get() = innerTube.cookie
         set(value) {
             innerTube.cookie = value
+            if (value != null) {
+                onCookieRefreshed?.invoke(value)
+            }
         }
     var proxy: Proxy?
         get() = innerTube.proxy
@@ -693,8 +698,17 @@ object YouTube {
         innerTube.deletePlaylist(client, playlistId)
     }
 
-    suspend fun player(videoId: String, playlistId: String? = null, client: YouTubeClient, signatureTimestamp: Int? = null): Result<PlayerResponse> = runCatching {
-        innerTube.player(client, videoId, playlistId, signatureTimestamp).body<PlayerResponse>()
+    suspend fun player(videoId: String, playlistId: String? = null, client: YouTubeClient, signatureTimestamp: Int? = null, poToken: String? = null): Result<PlayerResponse> {
+        val first = runCatching {
+            innerTube.player(client, videoId, playlistId, signatureTimestamp, poToken).body<PlayerResponse>()
+        }
+        if (first.isSuccess) return first
+        visitorData().onSuccess { newData ->
+            innerTube.visitorData = newData
+        }
+        return runCatching {
+            innerTube.player(client, videoId, playlistId, signatureTimestamp, poToken).body<PlayerResponse>()
+        }
     }
 
     suspend fun registerPlayback(playlistId: String? = null, playbackTracking: String) = runCatching {

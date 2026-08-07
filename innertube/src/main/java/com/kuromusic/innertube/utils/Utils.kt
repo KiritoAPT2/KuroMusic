@@ -50,12 +50,14 @@ fun sha1(str: String): String = MessageDigest.getInstance("SHA-1").digest(str.to
 
 fun parseCookieString(cookie: String): Map<String, String> =
     cookie
-        .split("; ")
+        .split(";")
+        .map { it.trim() }
         .filter { it.isNotEmpty() }
-        .associate {
-            val (key, value) = it.split("=")
-            key to value
+        .mapNotNull { segment ->
+            val parts = segment.split("=", limit = 2)
+            if (parts.size == 2 && parts[0].isNotBlank()) parts[0] to parts[1] else null
         }
+        .toMap()
 
 fun String.parseTime(): Int? {
     try {

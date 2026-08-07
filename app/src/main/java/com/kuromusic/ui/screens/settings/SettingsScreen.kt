@@ -15,10 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -489,64 +485,61 @@ fun SettingsScreen(
         }
 
 
-        // KuroMusic Header (Stylized)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
-            shape = RoundedCornerShape(28.dp),
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-             Column(
-                 modifier = Modifier
-                     .fillMaxWidth()
-                     .padding(vertical = 24.dp),
-                 horizontalAlignment = Alignment.CenterHorizontally,
-                 verticalArrangement = Arrangement.Center
-             ) {
-                 // Logo
-                 Box(
-                     modifier = Modifier
-                         .size(80.dp)
-                         .clip(CircleShape)
-                         .background(
-                             brush = Brush.radialGradient(
-                                 colors = listOf(
-                                     MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                     MaterialTheme.colorScheme.surface
-                                 )
-                             )
-                         )
-                         .padding(16.dp),
-                     contentAlignment = Alignment.Center
-                 ) {
-                     Icon(
-                         painter = painterResource(R.drawable.drawable_ic_kuro),
-                         contentDescription = null,
-                         tint = MaterialTheme.colorScheme.primary,
-                         modifier = Modifier.fillMaxSize()
-                     )
-                 }
-                 
-                 Spacer(modifier = Modifier.height(12.dp))
-                 
-                 Text(
-                     text = "KuroMusic",
-                     style = MaterialTheme.typography.headlineMedium,
-                     fontWeight = FontWeight.Bold,
-                     color = MaterialTheme.colorScheme.onSurface
-                 )
-                 
-                 Text(
-                     text = "v${getAppVersion(context)}",
-                     style = MaterialTheme.typography.titleSmall, // Elegant small font
-                     fontWeight = FontWeight.Medium,
-                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                 )
-             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                    MaterialTheme.colorScheme.surfaceContainerHigh
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.drawable_ic_kuro),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                Column {
+                    Text(
+                        text = "KuroMusic",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "v${getAppVersion(context)}",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    )
+                }
+            }
         }
 
         // Bloque 1: Personalización
@@ -613,27 +606,7 @@ fun SettingsScreen(
         )
         Spacer(Modifier.height(16.dp))
 
-        // Comunidad
-        val pinkColor = Color(0xFFFF4081).copy(alpha = 0.8f) // Pinkish
-        val blueColor = Color(0xFF40C4FF).copy(alpha = 0.8f) // Cyan/Blue
-        
-        SettingsCategory(
-            title = stringResource(R.string.community),
-            items = listOf(
-                SettingsCategoryItem(
-                    icon = painterResource(R.drawable.telegram),
-                    title = { Text("KiritoDev - Donaciones ❤️") },
-                    iconTint = blueColor,
-                    iconContainerColor = blueColor.copy(alpha = 0.1f),
-                    borderStroke = BorderStroke(1.5.dp, blueColor.copy(alpha = 0.3f)),
-                    onClick = { uriHandler.openUri("https://t.me/KiritoAPT2") }
-                )
-            )
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        // Actualizaciones
+        // Actualizaciones e Información
         val updateScope = rememberCoroutineScope()
         var updateCheckResult by remember { mutableStateOf<String?>(null) }
         var showUpdateResultDialog by remember { mutableStateOf(false) }
@@ -675,7 +648,7 @@ fun SettingsScreen(
         }
 
         SettingsCategory(
-            title = "Actualizaciones",
+            title = "Información",
             items = listOf(
                 SettingsCategoryItem(
                     icon = painterResource(R.drawable.update),
@@ -688,6 +661,14 @@ fun SettingsScreen(
                             showUpdateResultDialog = true
                         }
                     }
+                ),
+                SettingsCategoryItem(
+                    icon = painterResource(R.drawable.telegram),
+                    title = { Text("KiritoDev - Donaciones") },
+                    iconTint = Color(0xFF40C4FF).copy(alpha = 0.8f),
+                    iconContainerColor = Color(0xFF40C4FF).copy(alpha = 0.1f),
+                    borderStroke = BorderStroke(1.5.dp, Color(0xFF40C4FF).copy(alpha = 0.3f)),
+                    onClick = { uriHandler.openUri("https://t.me/KiritoAPT2") }
                 )
             )
         )
@@ -699,23 +680,16 @@ fun SettingsScreen(
             )
         }
 
-        // Card de actualización disponible (auto)
-        if (!showUpdateResultDialog) {
-            UpdateCard()
-        }
+        UpdateCard()
 
-        // Card de versión
+        Spacer(Modifier.height(8.dp))
 
-
-        Spacer(Modifier.height(16.dp))
-
-        // Footer
         Text(
-            text = "KuroMusic v${BuildConfig.VERSION_NAME}-stable | Team Animax ❤️",
+            text = "KuroMusic v${BuildConfig.VERSION_NAME}-stable | Team Animax",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.outline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier.padding(bottom = 100.dp).fillMaxWidth() // Extra bottom padding for MiniPlayer
+            modifier = Modifier.padding(bottom = 100.dp).fillMaxWidth()
         )
 
     }

@@ -53,7 +53,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -86,7 +85,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -101,6 +99,8 @@ import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import androidx.navigation.NavController
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.R
+import com.kuromusic.ui.icons.BrokenIcon
+import com.kuromusic.ui.icons.BrokenIcons
 import com.kuromusic.constants.ListItemHeight
 import com.kuromusic.constants.QueueEditLockKey
 import com.kuromusic.constants.ShowLyricsKey
@@ -193,8 +193,8 @@ fun Queue(
             properties = DialogProperties(usePlatformDefaultWidth = false),
             onDismissRequest = { showDetailsDialog = false },
             icon = {
-                Icon(
-                    painter = painterResource(R.drawable.info),
+                BrokenIcon(
+                    codePoint = BrokenIcons.infoCircle,
                     contentDescription = null,
                 )
             },
@@ -280,8 +280,8 @@ fun Queue(
                         ),
             ) {
                 IconButton(onClick = { state.expandSoft() }) {
-                    Icon(
-                        painter = painterResource(R.drawable.expand_less),
+                    BrokenIcon(
+                        codePoint = BrokenIcons.arrowDown2,
                         tint = onBackgroundColor,
                         contentDescription = null,
                     )
@@ -433,8 +433,8 @@ fun Queue(
                                                 modifier =
                                                     Modifier.draggableHandle(),
                                             ) {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.drag_handle),
+                                                BrokenIcon(
+                                                    codePoint = BrokenIcons.more,
                                                     contentDescription = null,
                                                 )
                                             }
@@ -454,8 +454,8 @@ fun Queue(
                                                 }
                                             },
                                         ) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.more_vert),
+                                            BrokenIcon(
+                                                codePoint = BrokenIcons.more,
                                                 contentDescription = null,
                                                 tint = LocalContentColor.current,
                                             )
@@ -539,8 +539,8 @@ fun Queue(
                                             )
                                         },
                                     ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.playlist_play),
+                                        BrokenIcon(
+                                            codePoint = BrokenIcons.playAdd,
                                             contentDescription = null,
                                         )
                                     }
@@ -552,8 +552,8 @@ fun Queue(
                                             )
                                         },
                                     ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.queue_music),
+                                        BrokenIcon(
+                                            codePoint = BrokenIcons.musicPlaylist,
                                             contentDescription = null,
                                         )
                                     }
@@ -625,8 +625,8 @@ fun Queue(
                             onClick = { locked = !locked },
                             modifier = Modifier.padding(horizontal = 6.dp),
                         ) {
-                            Icon(
-                                painter = painterResource(if (locked) R.drawable.lock else R.drawable.lock_open),
+                            BrokenIcon(
+                                codePoint = if (locked) BrokenIcons.lock else BrokenIcons.unlock,
                                 contentDescription = null,
                             )
                         }
@@ -670,8 +670,8 @@ fun Queue(
                             selection = false
                         },
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.close),
+                        BrokenIcon(
+                            codePoint = BrokenIcons.closeCircle,
                             contentDescription = null,
                         )
                     }
@@ -694,15 +694,13 @@ fun Queue(
                             }
                         },
                     ) {
-                        Icon(
-                            painter =
-                                painterResource(
-                                    if (count == mutableQueueWindows.size) {
-                                        R.drawable.deselect
-                                    } else {
-                                        R.drawable.select_all
-                                    },
-                                ),
+                        BrokenIcon(
+                            codePoint =
+                                if (count == mutableQueueWindows.size) {
+                                    BrokenIcons.minus
+                                } else {
+                                    BrokenIcons.check
+                                },
                             contentDescription = null,
                         )
                     }
@@ -722,8 +720,8 @@ fun Queue(
                             }
                         },
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.more_vert),
+                        BrokenIcon(
+                            codePoint = BrokenIcons.more,
                             contentDescription = null,
                             tint = LocalContentColor.current,
                         )
@@ -768,15 +766,15 @@ fun Queue(
                         }
                 },
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.shuffle),
+                BrokenIcon(
+                    codePoint = BrokenIcons.shuffle,
                     contentDescription = null,
                     modifier = Modifier.alpha(if (shuffleModeEnabled) 1f else 0.5f),
                 )
             }
 
-            Icon(
-                painter = painterResource(R.drawable.expand_more),
+            BrokenIcon(
+                codePoint = BrokenIcons.arrowDown,
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.Center),
             )
@@ -785,17 +783,15 @@ fun Queue(
                 modifier = Modifier.align(Alignment.CenterEnd),
                 onClick = playerConnection.player::toggleRepeatMode,
             ) {
-                Icon(
-                    painter =
-                        painterResource(
-                            when (repeatMode) {
-                                Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                                Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
-                                else -> throw IllegalStateException()
-                            },
-                        ),
+                BrokenIcon(
+                    codePoint =
+                        when (repeatMode) {
+                            Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> BrokenIcons.repeat
+                            Player.REPEAT_MODE_ONE -> BrokenIcons.repeateOne
+                            else -> throw IllegalStateException()
+                        },
                     contentDescription = null,
-                    modifier = Modifier.alpha(if (repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f),
+                    tint = LocalContentColor.current.copy(alpha = if (repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f),
                 )
             }
         }
@@ -852,12 +848,12 @@ fun ItemWithGlowingIcon() {
                 .fillMaxWidth()
         ) {
             Box {
-                Icon(
-                    painter = painterResource(R.drawable.ia_icon),
+                BrokenIcon(
+                    codePoint = BrokenIcons.magicStar,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
+                    size = 30.dp,
                     modifier = Modifier
-                        .size(30.dp)
                         .scale(scale)
                         .alpha(alpha)
                 )

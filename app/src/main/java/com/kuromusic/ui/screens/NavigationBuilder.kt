@@ -30,15 +30,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import com.kuromusic.BuildConfig
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.ui.component.Lyrics
+import com.kuromusic.ui.screens.equalizer.EqScreen
+import com.kuromusic.ui.screens.equalizer.axion.AxionEqScreen
+
 import com.kuromusic.ui.screens.artist.ArtistItemsScreen
 import com.kuromusic.ui.screens.artist.ArtistScreen
 import com.kuromusic.ui.screens.artist.ArtistSongsScreen
 import com.kuromusic.ui.screens.library.CachePlaylistScreen
 import com.kuromusic.ui.screens.library.LibraryPlaylistsScreen
 import com.kuromusic.ui.screens.library.LibraryScreen
+import com.kuromusic.ui.screens.library.OfflineScreen
 import com.kuromusic.ui.screens.playlist.AutoPlaylistScreen
 import com.kuromusic.ui.screens.playlist.LocalPlaylistScreen
 import com.kuromusic.ui.screens.playlist.OnlinePlaylistScreen
@@ -74,6 +79,9 @@ fun NavGraphBuilder.navigationBuilder(
     }
     composable(Screens.Library.route) {
         LibraryScreen(navController)
+    }
+    composable(Screens.Offline.route) {
+        OfflineScreen(navController)
     }
     composable(
         route = "playlists",
@@ -308,6 +316,16 @@ fun NavGraphBuilder.navigationBuilder(
         Lyrics(
             sliderPositionProvider = { playerConnection.player.currentPosition },
             onNavigateBack = { navController.popBackStack() }
+        )
+    }
+
+    dialog("equalizer") {
+        EqScreen(navController = navController)
+    }
+
+    dialog("settings/equalizer") {
+        AxionEqScreen(
+            onBackClick = { navController.popBackStack() }
         )
     }
 

@@ -570,14 +570,7 @@ fun PlayerMenu(
                                     )
                                 },
                                 onClick = {
-                                    val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
-                                        putExtra(AudioEffect.EXTRA_AUDIO_SESSION, playerConnection.player.audioSessionId)
-                                        putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
-                                        putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-                                    }
-                                    if (intent.resolveActivity(context.packageManager) != null) {
-                                        activityResultLauncher.launch(intent)
-                                    }
+                                    navController.navigate("equalizer")
                                     onDismiss()
                                 }
                             )

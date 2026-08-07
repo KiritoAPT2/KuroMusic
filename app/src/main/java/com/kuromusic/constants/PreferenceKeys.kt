@@ -20,7 +20,15 @@ enum class SliderStyle {
     DEFAULT,
     SQUIGGLY,
     SLIM,
+    WAVEFORM,
 }
+
+val WaveformBarsCountKey = intPreferencesKey("waveformBarsCount")
+const val DefaultWaveformBarsCount = 48
+val AnimatingThumbnailKey = booleanPreferencesKey("animatingThumbnail")
+val AnimatingThumbnailIntensityKey = stringPreferencesKey("animatingThumbnailIntensity")
+val MiniplayerEdgeGlowKey = booleanPreferencesKey("miniplayerEdgeGlow")
+val MiniplayerPartyModeKey = booleanPreferencesKey("miniplayerPartyMode")
 
 const val SYSTEM_DEFAULT = "SYSTEM_DEFAULT"
 val ContentLanguageKey = stringPreferencesKey("contentLanguage")
@@ -46,6 +54,7 @@ enum class AudioQuality {
 
 val PersistentQueueKey = booleanPreferencesKey("persistentQueue")
 val SkipSilenceKey = booleanPreferencesKey("skipSilence")
+val CrossfadeDurationKey = intPreferencesKey("crossfadeDuration")
 val SoundProfileKey = stringPreferencesKey("soundProfile")
 val ProfileModeKey = stringPreferencesKey("profileMode")
 val AudioNormalizationKey = booleanPreferencesKey("audioNormalization")
@@ -300,6 +309,7 @@ val TopSize = stringPreferencesKey("topSize")
 val HistoryDuration = floatPreferencesKey("historyDuration")
 
 val PlayerBackgroundStyleKey = stringPreferencesKey("playerBackgroundStyle")
+val CanvasEnabledKey = booleanPreferencesKey("canvasEnabled")
 val ShowLyricsKey = booleanPreferencesKey("showLyrics")
 val LyricsTextPositionKey = stringPreferencesKey("lyricsTextPosition")
 val LyricsClickKey = booleanPreferencesKey("lyricsClick")
@@ -308,6 +318,11 @@ val TranslateLyricsKey = booleanPreferencesKey("translateLyrics")
 val PlayerVolumeKey = floatPreferencesKey("playerVolume")
 val RepeatModeKey = intPreferencesKey("repeatMode")
 val PlayerButtonsStyleKey = stringPreferencesKey("player_buttons_style")
+
+val EqualizerEnabledKey = booleanPreferencesKey("equalizerEnabled")
+val EqualizerBandsKey = stringPreferencesKey("equalizerBands")
+val EqualizerPresetKey = intPreferencesKey("equalizerPreset")
+val EqualizerCustomBandsKey = stringPreferencesKey("equalizerCustomBands")
 
 val BeatBuddyTypeKey = stringPreferencesKey("beatBuddyType")
 

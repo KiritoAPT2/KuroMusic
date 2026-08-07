@@ -1,8 +1,11 @@
 package com.kuromusic.ui.screens.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -10,10 +13,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +35,7 @@ import com.kuromusic.constants.AudioQuality
 import com.kuromusic.constants.AudioQualityKey
 import com.kuromusic.constants.AutoLoadMoreKey
 import com.kuromusic.constants.AutoSkipNextOnErrorKey
+import com.kuromusic.constants.CrossfadeDurationKey
 import com.kuromusic.constants.ForceAacFallbackKey
 import com.kuromusic.constants.BeatBuddyType
 import com.kuromusic.constants.BeatBuddyTypeKey
@@ -65,6 +75,10 @@ fun PlayerSettings(
     val (skipSilence, onSkipSilenceChange) = rememberPreference(
         SkipSilenceKey,
         defaultValue = false
+    )
+    val (crossfadeDuration, onCrossfadeDurationChange) = rememberPreference(
+        CrossfadeDurationKey,
+        defaultValue = 0
     )
     val (audioNormalization, onAudioNormalizationChange) = rememberPreference(
         AudioNormalizationKey,
@@ -143,6 +157,31 @@ fun PlayerSettings(
                     checked = skipSilence,
                     onCheckedChange = onSkipSilenceChange
                 )},
+
+                {SwitchPreference(
+                    title = { Text("Crossfade") },
+                    icon = { Icon(painterResource(R.drawable.fast_forward), null) },
+                    checked = crossfadeDuration > 0,
+                    onCheckedChange = { enabled ->
+                        onCrossfadeDurationChange(if (enabled) 5 else 0)
+                    }
+                )},
+
+                {AnimatedVisibility(visible = crossfadeDuration > 0) {
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                        Text(
+                            text = "Duración: ${crossfadeDuration}s",
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
+                        )
+                        Slider(
+                            value = crossfadeDuration.toFloat(),
+                            onValueChange = { onCrossfadeDurationChange(it.toInt()) },
+                            valueRange = 1f..15f,
+                            steps = 14,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }},
 
                 {SwitchPreference(
                     title = { Text(stringResource(R.string.audio_normalization)) },

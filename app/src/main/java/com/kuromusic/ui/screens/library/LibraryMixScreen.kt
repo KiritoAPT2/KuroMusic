@@ -117,7 +117,6 @@ fun LibraryMixScreen(
     val topSize by viewModel.topValue.collectAsState(initial = 50)
     
     val likedSongsCount by viewModel.likedSongsCount.collectAsState(initial = 0)
-    val downloadedSongsCount by viewModel.downloadedSongsCount.collectAsState(initial = 0)
 
     val albums = viewModel.albums.collectAsState()
     val artist = viewModel.artists.collectAsState()
@@ -220,16 +219,6 @@ fun LibraryMixScreen(
                     iconRes = R.drawable.favorite,
                     gradientColors = listOf(Color(0xFFFF0D86), Color(0xFF6B11CB)),
                     onClick = { navController.navigate("auto_playlist/liked") }
-                )
-            }
-
-            item(key = "pinned_offline") {
-                LibraryListItem(
-                    title = stringResource(R.string.offline),
-                    subtitle = "Playlist • $downloadedSongsCount ${stringResource(R.string.songs).lowercase()}",
-                    iconRes = R.drawable.download,
-                    gradientColors = listOf(Color(0xFF00C9FF), Color(0xFF92FE9D)),
-                    onClick = { navController.navigate("auto_playlist/downloaded") }
                 )
             }
 

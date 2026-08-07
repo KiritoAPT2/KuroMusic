@@ -61,9 +61,6 @@ class HomeViewModel @Inject constructor(
     
     val localRecommendations = MutableStateFlow<List<Song>>(emptyList())
     
-    // Dynamic gradient color extracted from album art
-    val dynamicGradientColor = MutableStateFlow(androidx.compose.ui.graphics.Color(0xFF121212))
-
     companion object {
         private const val FRESH_TTL_MS = 5 * 60 * 1000L
         private const val STALE_TTL_MS = 30 * 60 * 1000L

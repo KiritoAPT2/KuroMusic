@@ -197,7 +197,7 @@ fun Lyrics(
     val database = LocalDatabase.current
 
     val isFullscreen = onNavigateBack != null
-    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.DEFAULT)
+    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.WAVEFORM)
     val landscapeOffset = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val lyricsTextPosition by rememberEnumPreference(LyricsTextPositionKey, LyricsPosition.CENTER)
     val changeLyrics by rememberPreference(LyricsClickKey, true)
@@ -521,7 +521,7 @@ fun Lyrics(
             return@LaunchedEffect
         }
         while (isActive) {
-            delay(50)
+            delay(150)
             val sliderPos = sliderPositionProvider()
             isSeeking = sliderPos != null
             currentLineIndex = findCurrentLineIndex(
@@ -1364,6 +1364,26 @@ fun Lyrics(
                     }
 
                     SliderStyle.SLIM -> {
+                        Slider(
+                            value = (sliderPosition ?: position).toFloat(),
+                            valueRange = 0f..(if (duration == C.TIME_UNSET) 0f else duration.toFloat()),
+                            onValueChange = { sliderPosition = it.toLong() },
+                            onValueChangeFinished = {
+                                sliderPosition?.let {
+                                    playerConnection.player.seekTo(it)
+                                    position = it
+                                }
+                                sliderPosition = null
+                            },
+                            thumb = { Spacer(modifier = Modifier.size(0.dp)) },
+                            colors = androidx.compose.material3.SliderDefaults.colors(
+                                activeTrackColor = textBackgroundColor,
+                                inactiveTrackColor = textBackgroundColor.copy(alpha = 0.3f)
+                            )
+                        )
+                    }
+
+                    SliderStyle.WAVEFORM -> {
                         Slider(
                             value = (sliderPosition ?: position).toFloat(),
                             valueRange = 0f..(if (duration == C.TIME_UNSET) 0f else duration.toFloat()),

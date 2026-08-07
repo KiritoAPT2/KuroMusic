@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,8 +37,6 @@ import com.kuromusic.ui.component.IconButton
 import com.kuromusic.ui.utils.backToMain
 import com.kuromusic.utils.rememberPreference
 import com.kuromusic.utils.reportException
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -47,7 +46,7 @@ private const val MAX_RETRY_ATTEMPTS = 3
 private const val RETRY_DELAY_MS = 1000L
 
 @SuppressLint("SetJavaScriptEnabled")
-@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
     var visitorData by rememberPreference(VisitorDataKey, "")
@@ -58,6 +57,7 @@ fun LoginScreen(navController: NavController) {
 
     var webView: WebView? = null
     var isLoadingAccountInfo by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     suspend fun fetchAccountInfoWithRetry(retryCount: Int = 0) {
         try {
@@ -139,8 +139,7 @@ fun LoginScreen(navController: NavController) {
                                 innerTubeCookie = youTubeCookieString
                                 isLoadingAccountInfo = true
 
-                                GlobalScope.launch {
-                                    // Pequeña espera para asegurar que las cookies se establezcan correctamente
+                                scope.launch {
                                     delay(500)
                                     fetchAccountInfoWithRetry()
                                 }
@@ -148,7 +147,6 @@ fun LoginScreen(navController: NavController) {
                                 // Obtener visitor data
                                 loadUrl("javascript:Android.onRetrieveVisitorData(window.yt.config_.VISITOR_DATA)")
                             } else {
-                                innerTubeCookie = ""
                                 Timber.tag("WebView").e("SAPISID not found in cookies")
                             }
                         }

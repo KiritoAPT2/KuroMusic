@@ -1,12 +1,19 @@
 package com.kuromusic.ui.screens.library
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -17,11 +24,10 @@ import androidx.navigation.NavController
 import com.kuromusic.R
 import com.kuromusic.constants.ChipSortTypeKey
 import com.kuromusic.constants.LibraryFilter
-import com.kuromusic.utils.dataStore
 import com.kuromusic.ui.component.ChipsRow
 import com.kuromusic.ui.component.VerticalFastScroller
-import com.kuromusic.utils.rememberEnumPreference
 import com.kuromusic.utils.dataStore
+import com.kuromusic.utils.rememberEnumPreference
 
 @Composable
 fun LibraryScreen(navController: NavController, initialFilter: LibraryFilter? = null) {
@@ -39,31 +45,35 @@ fun LibraryScreen(navController: NavController, initialFilter: LibraryFilter? = 
 
     val lazyListState = rememberLazyListState()
 
+    val chips = listOf(
+        LibraryFilter.PLAYLISTS to stringResource(R.string.filter_playlists),
+        LibraryFilter.SONGS to stringResource(R.string.filter_songs),
+        LibraryFilter.ARTISTS to stringResource(R.string.filter_artists),
+        LibraryFilter.ALBUMS to stringResource(R.string.filter_albums),
+    )
+
     val filterContent = @Composable {
-        Row {
-            ChipsRow(
-                chips =
-                    listOf(
-                        LibraryFilter.DOWNLOADS to stringResource(R.string.filter_downloads),
-                        LibraryFilter.LOCAL to "Local",
-                        LibraryFilter.CACHED to "En caché",
-                        LibraryFilter.PLAYLISTS to stringResource(R.string.filter_playlists),
-                        LibraryFilter.SONGS to stringResource(R.string.filter_songs),
-                        LibraryFilter.ARTISTS to stringResource(R.string.filter_artists),
-                        LibraryFilter.ALBUMS to stringResource(R.string.filter_albums),
-                        LibraryFilter.LIKED to stringResource(R.string.filter_liked),
-                    ),
-                currentValue = filterType,
-                onValueUpdate = {
-                    filterType =
-                        if (filterType == it) {
-                            LibraryFilter.LIBRARY
-                        } else {
-                            it
-                        }
-                },
-                modifier = Modifier.weight(1f),
-            )
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                ChipsRow(
+                    chips = chips,
+                    currentValue = filterType,
+                    onValueUpdate = {
+                        filterType =
+                            if (filterType == it) {
+                                LibraryFilter.LIBRARY
+                            } else {
+                                it
+                            }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                )
+            }
         }
     }
 
@@ -76,7 +86,9 @@ fun LibraryScreen(navController: NavController, initialFilter: LibraryFilter? = 
             endContentPadding = 0.dp
         ) {
             when (filterType) {
-                LibraryFilter.LIBRARY -> LibraryMixScreen(navController, filterContent)
+                LibraryFilter.LIBRARY -> {
+                    LibraryMixScreen(navController, filterContent)
+                }
                 LibraryFilter.PLAYLISTS -> LibraryPlaylistsScreen(navController, filterContent)
                 LibraryFilter.SONGS -> LibrarySongsScreen(
                     navController,
@@ -90,28 +102,9 @@ fun LibraryScreen(navController: NavController, initialFilter: LibraryFilter? = 
                     navController,
                     { filterType = LibraryFilter.LIBRARY })
 
-                LibraryFilter.DOWNLOADS -> LibrarySongsScreen(
-                    navController = navController,
-                    onDeselect = { filterType = LibraryFilter.LIBRARY },
-                    initialFilter = com.kuromusic.constants.SongFilter.DOWNLOADED
-                )
-
-                LibraryFilter.CACHED -> LibrarySongsScreen(
-                    navController = navController,
-                    onDeselect = { filterType = LibraryFilter.LIBRARY },
-                    initialFilter = com.kuromusic.constants.SongFilter.DOWNLOADED // Mapping Cached -> Downloaded
-                )
-                
-                LibraryFilter.LIKED -> LibrarySongsScreen(
-                    navController = navController,
-                    onDeselect = { filterType = LibraryFilter.LIBRARY },
-                    initialFilter = com.kuromusic.constants.SongFilter.LIKED
-                )
-                
-                LibraryFilter.LOCAL -> LibraryLocalSongsScreen(
-                    navController = navController,
-                    onDeselect = { filterType = LibraryFilter.LIBRARY }
-                )
+                else -> {
+                    LibraryMixScreen(navController, filterContent)
+                }
             }
         }
     }

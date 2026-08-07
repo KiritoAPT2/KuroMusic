@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
@@ -66,7 +67,6 @@ import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -97,18 +97,21 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -134,6 +137,8 @@ import com.kuromusic.LocalDatabase
 import com.kuromusic.LocalDownloadUtil
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.R
+import com.kuromusic.ui.icons.BrokenIcon
+import com.kuromusic.ui.icons.BrokenIcons
 import com.kuromusic.constants.DarkModeKey
 import com.kuromusic.constants.DefaultPlayPauseButtonShape
 import com.kuromusic.constants.DefaultSmallButtonsShape
@@ -152,6 +157,8 @@ import com.kuromusic.constants.SliderStyleKey
 import com.kuromusic.constants.SmallButtonsShapeKey
 import com.kuromusic.constants.BeatBuddyType
 import com.kuromusic.constants.BeatBuddyTypeKey
+import com.kuromusic.constants.CanvasEnabledKey
+import com.kuromusic.canvas.CanvasRepository
 import me.saket.squiggles.SquigglySlider
 import com.kuromusic.extensions.togglePlayPause
 import com.kuromusic.extensions.toggleRepeatMode
@@ -236,24 +243,36 @@ fun BottomSheetPlayer(
     val canSkipNext by playerConnection.canSkipNext.collectAsState()
 
     val showLyrics by rememberPreference(ShowLyricsKey, defaultValue = false)
-    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.SLIM)
+    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.WAVEFORM)
     val beatBuddyType by rememberEnumPreference(BeatBuddyTypeKey, BeatBuddyType.CAT)
 
-    // State Hoisting: Use '=' to keep the State object, do NOT read .longValue here!
-    // NOTE: No key — positionState must be a single stable object so both
-    // LaunchedEffects (mediaMetadata and playbackState) always mutate the same
-    // MutableLongState. Using playbackState as key would re-create it on every
-    // state transition (3→2→3 during skip), causing stale reference bugs.
-    val positionState = rememberSaveable {
+    val positionState = remember {
         mutableLongStateOf(0L)
     }
     val durationState = remember {
-        mutableLongStateOf(-1L)
+        mutableLongStateOf(0L)
     }
-    // Observe _duration StateFlow from PlayerConnection (updated via onTimelineChanged)
+
+    // Poll position from ExoPlayer every 100ms
     LaunchedEffect(Unit) {
-        playerConnection.duration.collect { duration ->
-            durationState.longValue = duration
+        while (isActive) {
+            delay(100)
+            try {
+                positionState.longValue = playerConnection.player.currentPosition
+                val pd = playerConnection.player.duration
+                if (pd > 0L) durationState.longValue = pd
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    // Snap on track/state changes for immediate response
+    LaunchedEffect(playbackState, mediaMetadata) {
+        try {
+            positionState.longValue = playerConnection.player.currentPosition
+            val pd = playerConnection.player.duration
+            if (pd > 0L) durationState.longValue = pd
+        } catch (_: Exception) {
         }
     }
 
@@ -268,6 +287,10 @@ fun BottomSheetPlayer(
     var gradientColors by remember {
         mutableStateOf<List<Color>>(emptyList())
     }
+
+    val canvasRepository = remember { CanvasRepository() }
+    var canvasVideoUrl by remember { mutableStateOf<String?>(null) }
+    val canvasEnabled by rememberPreference(CanvasEnabledKey, defaultValue = true)
 
 
 
@@ -357,9 +380,24 @@ fun BottomSheetPlayer(
         }
     }
 
+    LaunchedEffect(mediaMetadata, canvasEnabled, playerBackground) {
+        if (playerBackground == PlayerBackgroundStyle.APPLE_MUSIC && canvasEnabled) {
+            canvasVideoUrl = withContext(Dispatchers.IO) {
+                val song = mediaMetadata?.title ?: return@withContext null
+                val artist = mediaMetadata?.artists?.firstOrNull()?.name ?: return@withContext null
+                val albumTitle = mediaMetadata?.album?.title
+                val artwork = canvasRepository.getCanvas(song, artist, albumTitle)
+                artwork?.preferredAnimationUrl
+            }
+        } else {
+            canvasVideoUrl = null
+        }
+    }
+
     val onBackgroundColor = remember(playerBackground, gradientColors, useDarkTheme) {
         when (playerBackground) {
-            PlayerBackgroundStyle.DEFAULT -> Color.Unspecified 
+            PlayerBackgroundStyle.DEFAULT -> Color.Unspecified
+            PlayerBackgroundStyle.APPLE_MUSIC -> Color.White
             else -> {
                 if (gradientColors.isNotEmpty()) {
                     val luminance = ColorUtils.calculateLuminance(gradientColors[0].toArgb())
@@ -382,6 +420,7 @@ fun BottomSheetPlayer(
         when (playerBackground) {
             PlayerBackgroundStyle.DEFAULT -> Color.Unspecified // Placeholder
             PlayerBackgroundStyle.BLUR -> Color.Black
+            PlayerBackgroundStyle.APPLE_MUSIC -> Color.Black
             else -> finalOnBackgroundColor
         }
     }
@@ -391,6 +430,7 @@ fun BottomSheetPlayer(
         when (playerBackground) {
             PlayerBackgroundStyle.DEFAULT -> Color.Unspecified
             PlayerBackgroundStyle.BLUR -> Color.White
+            PlayerBackgroundStyle.APPLE_MUSIC -> Color.White
             else -> {
                 val whiteContrast =
                     if (gradientColors.size >= 2) {
@@ -545,18 +585,7 @@ fun BottomSheetPlayer(
     }
 
     LaunchedEffect(mediaMetadata) {
-        // Reset to 0 when a new track starts — player.currentPosition during
-        // transition may still report the previous track's position.
         positionState.longValue = 0L
-    }
-
-    LaunchedEffect(playbackState) {
-        if (playbackState == STATE_READY) {
-            while (isActive) {
-                delay(100)
-                positionState.longValue = playerConnection.player.currentPosition
-            }
-        }
     }
 
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
@@ -585,7 +614,7 @@ fun BottomSheetPlayer(
 
     val bottomSheetBackgroundColor = when {
         useBlackBackground -> Color.Black
-        playerBackground == PlayerBackgroundStyle.BLUR || playerBackground == PlayerBackgroundStyle.GRADIENT ->
+        playerBackground == PlayerBackgroundStyle.BLUR || playerBackground == PlayerBackgroundStyle.GRADIENT || playerBackground == PlayerBackgroundStyle.APPLE_MUSIC ->
             MaterialTheme.colorScheme.surfaceContainer
         else -> MaterialTheme.colorScheme.surfaceContainer
     }
@@ -682,12 +711,12 @@ fun BottomSheetPlayer(
                                             )
                                     )
                                 } else {
-                                    // STANDARD DARK MODE: Vertical premium gradient
+                                    // STANDARD DARK MODE: Vertical premium gradient (Namida-style)
                                     val topColor = colors[0].copy(alpha = 1f).let { 
                                         Color(
-                                            red = it.red * 0.6f,
-                                            green = it.green * 0.6f,
-                                            blue = it.blue * 0.6f,
+                                            red = (it.red * 0.85f).coerceIn(0f, 1f),
+                                            green = (it.green * 0.85f).coerceIn(0f, 1f),
+                                            blue = (it.blue * 0.85f).coerceIn(0f, 1f),
                                             alpha = 1f
                                         )
                                     }
@@ -708,9 +737,90 @@ fun BottomSheetPlayer(
                             }
                         }
                     }
-                    else -> {
-                        PlayerBackgroundStyle.DEFAULT
+                    PlayerBackgroundStyle.APPLE_MUSIC -> {
+                        val thumbnailUrl = mediaMetadata?.thumbnailUrl
+                        val effectiveUrl = canvasVideoUrl
+                        AnimatedContent(
+                            targetState = thumbnailUrl,
+                            transitionSpec = {
+                                fadeIn(tween(1200)).togetherWith(fadeOut(tween(1200)))
+                            },
+                            label = "appleMusicBackground"
+                        ) { url ->
+                            Box(modifier = Modifier.alpha(backgroundAlpha)) {
+                                // Layer 1: Blurred fullscreen background
+                                if (url != null) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(context)
+                                            .data(url)
+                                            .size(200)
+                                            .allowHardware(false)
+                                            .build(),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .blur(150.dp)
+                                    )
+                                }
+
+                                // Layer 2: Clear artwork overlay (top 65%) fundido con disolución
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight(0.65f)
+                                        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                                        .drawWithContent {
+                                            drawContent()
+                                            drawRect(
+                                                brush = Brush.verticalGradient(
+                                                    colorStops = arrayOf(
+                                                        0.00f to Color.Black,
+                                                        0.75f to Color.Black,
+                                                        0.92f to Color.Black.copy(alpha = 0.4f),
+                                                        1.00f to Color.Transparent,
+                                                    )
+                                                ),
+                                                blendMode = BlendMode.DstIn
+                                            )
+                                        }
+                                ) {
+                                    if (url != null) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(context)
+                                                .data(url)
+                                                .allowHardware(false)
+                                                .build(),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                    }
+                                    // Canvas video encima del arte
+                                    if (effectiveUrl != null) {
+                                        BackgroundVideoView(
+                                            videoUrl = effectiveUrl,
+                                            modifier = Modifier.fillMaxSize(),
+                                        )
+                                    }
+                                }
+
+                                // Layer 3: Bottom dark overlay for controls area
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                0.6f to Color.Black.copy(alpha = 0f),
+                                                0.75f to Color.Black.copy(alpha = 0.4f),
+                                                1f to Color.Black,
+                                            )
+                                        )
+                                )
+                            }
+                        }
                     }
+                    else -> {}
                 }
             }
         },
@@ -964,7 +1074,8 @@ fun BottomSheetPlayer(
                                 onSleepTimerClick = { showSleepTimerDialog = true },
                                 onPlayPause = onPlayPauseRemembered,
                                 onSkipPrevious = onSkipPreviousRemembered,
-                                onSkipNext = onSkipNextRemembered
+                                onSkipNext = onSkipNextRemembered,
+                                accentColor = gradientColors.firstOrNull() ?: Color.Unspecified
                             )
                         }
 
@@ -974,6 +1085,10 @@ fun BottomSheetPlayer(
             }
 
             else -> {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier =
@@ -990,7 +1105,7 @@ fun BottomSheetPlayer(
                             modifier = Modifier.nestedScroll(state.preUpPostDownNestedScrollConnection)
                         ) {
                             AnimatedVisibility(
-                                visible = state.isExpanded,
+                                visible = state.isExpanded && playerBackground != PlayerBackgroundStyle.APPLE_MUSIC,
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {
@@ -1000,11 +1115,11 @@ fun BottomSheetPlayer(
                                     animatedVisibilityScope = this
                                 )
                             }
+
                         }
                     }
 
                     mediaMetadata?.let {
-                        // Pass remembered lambdas here
                         PlayerControls(
                             mediaMetadata = it,
                             playerConnection = playerConnection,
@@ -1030,11 +1145,11 @@ fun BottomSheetPlayer(
                             onSleepTimerClick = { showSleepTimerDialog = true },
                             onPlayPause = onPlayPauseRemembered,
                             onSkipPrevious = onSkipPreviousRemembered,
-                            onSkipNext = onSkipNextRemembered
+                            onSkipNext = onSkipNextRemembered,
+                            accentColor = gradientColors.firstOrNull() ?: Color.Unspecified
                         )
                     }
-
-                    Spacer(Modifier.height(30.dp))
+                }
                 }
             }
         }
@@ -1070,9 +1185,9 @@ private fun SleepTimerDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
         icon = {
-            Icon(
-                painter = painterResource(R.drawable.bedtime),
-                contentDescription = null
+            BrokenIcon(
+                codePoint = BrokenIcons.moon,
+                contentDescription = null,
             )
         },
         title = { Text(stringResource(R.string.sleep_timer)) },
@@ -1140,8 +1255,8 @@ private fun SongDetailsDialog(
             onDismissRequest = onDismiss,
             containerColor = if (useBlackBackground) Color.Black else AlertDialogDefaults.containerColor,
             icon = {
-                Icon(
-                    painter = painterResource(R.drawable.info),
+                BrokenIcon(
+                    codePoint = BrokenIcons.infoCircle,
                     contentDescription = null,
                 )
             },
@@ -1230,7 +1345,8 @@ fun PlayerSlider(
     durationState: androidx.compose.runtime.MutableLongState,
     onBackgroundColor: Color,
     sliderStyle: SliderStyle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    accentColor: Color = Color.Unspecified
 ) {
     // Internal slider position for smooth dragging
     var sliderPosition by remember {
@@ -1318,6 +1434,14 @@ fun PlayerSlider(
                     )
                 )
             }
+            SliderStyle.WAVEFORM -> {
+                WaveformSeekbar(
+                    positionState = positionState,
+                    durationState = durationState,
+                    onBackgroundColor = onBackgroundColor,
+                    accentColor = accentColor,
+                )
+            }
             SliderStyle.SLIM -> {
                 Slider(
                     value = progress,
@@ -1356,31 +1480,32 @@ fun PlayerSlider(
             }
         }
 
-        Spacer(Modifier.height(4.dp))
+        if (sliderStyle != SliderStyle.WAVEFORM) {
+            Spacer(Modifier.height(4.dp))
 
-        // Tiempos
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-        ) {
-            Text(
-                text = currentPositionText,
-                style = MaterialTheme.typography.labelMedium,
-                color = onBackgroundColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+            ) {
+                Text(
+                    text = currentPositionText,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = onBackgroundColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
-            Text(
-                text = totalDurationText,
-                style = MaterialTheme.typography.labelMedium,
-                color = onBackgroundColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+                Text(
+                    text = totalDurationText,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = onBackgroundColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
@@ -1412,7 +1537,8 @@ fun PlayerControls(
     onSleepTimerClick: () -> Unit,
     onPlayPause: () -> Unit,
     onSkipPrevious: () -> Unit,
-    onSkipNext: () -> Unit
+    onSkipNext: () -> Unit,
+    accentColor: Color = Color.Unspecified
 ) {
     // --- Título y Artistas (Debajo de la carátula) ---
     Row(
@@ -1488,123 +1614,11 @@ fun PlayerControls(
                 }
             }
         }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // BOTONES DE ACCIÓN (Like, Download, More — horizontal)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Botón Like
-            IconButton(
-                onClick = onToggleLike,
-                modifier = Modifier.size(28.dp)
-            ) {
-                Icon(
-                    painter = painterResource(
-                        if (currentSongLiked) R.drawable.favorite else R.drawable.favorite_border
-                    ),
-                    contentDescription = null,
-                    tint = if (currentSongLiked) MaterialTheme.colorScheme.error else resolvedOnBackgroundColor,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-
-            // Botón Download
-            IconButton(
-                onClick = onDownloadClick,
-                modifier = Modifier.size(28.dp)
-            ) {
-                when (downloadState?.state) {
-                    Download.STATE_COMPLETED -> Icon(painter = painterResource(R.drawable.offline), contentDescription = null, tint = resolvedOnBackgroundColor, modifier = Modifier.size(28.dp))
-                    Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = resolvedOnBackgroundColor)
-                    else -> Icon(painter = painterResource(R.drawable.download), contentDescription = null, tint = resolvedOnBackgroundColor, modifier = Modifier.size(28.dp))
-                }
-            }
-
-            // Botón Sleep Timer
-            Box {
-                IconButton(
-                    onClick = onSleepTimerClick,
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.bedtime),
-                        contentDescription = null,
-                        tint = if (sleepTimerEnabled) MaterialTheme.colorScheme.primary else resolvedOnBackgroundColor,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-                if (sleepTimerEnabled) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(8.dp)
-                            .background(MaterialTheme.colorScheme.primary, CircleShape)
-                    )
-                }
-            }
-
-            // Botón More Options
-            IconButton(
-                onClick = onMoreClick,
-                modifier = Modifier.size(28.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.more_vert),
-                    contentDescription = null,
-                    tint = resolvedOnBackgroundColor,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-        }
-    }
-
-    Spacer(Modifier.height(16.dp))
-
-    // Separador de diseño
-    Box(
-        modifier = Modifier
-            .padding(horizontal = PlayerHorizontalPadding + 8.dp)
-            .fillMaxWidth()
-            .height(0.5.dp)
-            .background(resolvedOnBackgroundColor.copy(alpha = 0.08f))
-    )
-
-    Spacer(Modifier.height(16.dp))
-
-    // Slider Estilizado
-
-    // PlayerSlider extracted (Using State objects)
-    PlayerSlider(
-        playerConnection = playerConnection,
-        positionState = positionState,
-        durationState = durationState,
-        onBackgroundColor = resolvedOnBackgroundColor,
-        sliderStyle = sliderStyle,
-        modifier = Modifier.padding(horizontal = PlayerHorizontalPadding)
-    )
-
-    Spacer(Modifier.height(8.dp))
-
-    // Beat Buddy
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = PlayerHorizontalPadding + 4.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-        BeatBuddy(
-            type = beatBuddyType,
-            isPlaying = isPlaying,
-            color = resolvedOnBackgroundColor,
-        )
     }
 
     Spacer(Modifier.height(4.dp))
 
-    // CONTROLES DE REPRODUCCIÓN CON ANIMACIONES AL PRESIONAR
+    // CONTROLES DE REPRODUCCIÓN (Namida-style: prev/next planos, seekbar abajo)
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -1620,15 +1634,6 @@ fun PlayerControls(
         val isNextPressed by nextInteractionSource.collectIsPressedAsState()
 
         // Pesos animados con spring animation
-        val playPauseWeight by animateFloatAsState(
-            targetValue = when {
-                isPlayPausePressed -> 1.9f
-                isBackPressed || isNextPressed -> 1.1f
-                else -> 1.3f
-            },
-            animationSpec = spring(dampingRatio = 0.5f, stiffness = 400f),
-            label = "playPauseWeight"
-        )
         val backButtonWeight by animateFloatAsState(
             targetValue = when {
                 isBackPressed -> 0.65f
@@ -1648,26 +1653,28 @@ fun PlayerControls(
             label = "nextButtonWeight"
         )
 
-        // Colores de botones laterales (Más discretos y sin bordes pesados)
+        // Colores de botones laterales
         val sideButtonContentColor = resolvedOnBackgroundColor.copy(alpha = 0.8f)
 
-        // Botón Previous
-        IconButton(
-            onClick = onSkipPrevious,
-            enabled = canSkipPrevious,
-            modifier = Modifier.size(56.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.skip_previous),
-                contentDescription = null,
-                tint = sideButtonContentColor.copy(
-                    alpha = if (canSkipPrevious) 1f else 0.3f
-                ),
-                modifier = Modifier.size(36.dp)
-            )
-        }
+        // Botón Previous (Namida-style: ícono plano sin fondo)
+        BrokenIcon(
+            codePoint = BrokenIcons.previous,
+            contentDescription = null,
+            tint = sideButtonContentColor.copy(
+                alpha = if (canSkipPrevious) 1f else 0.3f
+            ),
+            size = 32.dp,
+            modifier = Modifier
+                .size(48.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = backInteractionSource,
+                    onClick = onSkipPrevious
+                )
+                .padding(8.dp)
+        )
 
-        Spacer(modifier = Modifier.width(32.dp))
+        Spacer(modifier = Modifier.weight(backButtonWeight))
 
         // Play button pulse when playing
         val playButtonScale by animateFloatAsState(
@@ -1686,14 +1693,46 @@ fun PlayerControls(
             label = "pulse"
         )
 
-        // Botón Play/Pause (Círculo grande, limpio y sin texto)
+        // Botón Play/Pause (gradiente + brillo tipo Namida)
+        val playBtnGradient = if (accentColor != Color.Unspecified) {
+            Brush.linearGradient(
+                colors = listOf(
+                    accentColor,
+                    Color(
+                        red = (accentColor.red * 0.65f).coerceIn(0f, 1f),
+                        green = (accentColor.green * 0.65f).coerceIn(0f, 1f),
+                        blue = (accentColor.blue * 0.65f).coerceIn(0f, 1f),
+                        alpha = accentColor.alpha
+                    )
+                ),
+                start = Offset(0f, 0f),
+                end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+            )
+        } else {
+            Brush.linearGradient(
+                colors = listOf(
+                    resolvedOnBackgroundColor,
+                    resolvedOnBackgroundColor.copy(alpha = 0.65f)
+                ),
+                start = Offset(0f, 0f),
+                end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+            )
+        }
+        val playBtnIconTint = if (accentColor != Color.Unspecified) Color.White else iconButtonColor
+        val playBtnShadowColor = if (accentColor != Color.Unspecified) accentColor.copy(alpha = 0.4f) else resolvedOnBackgroundColor.copy(alpha = 0.3f)
+
         Box(
             modifier = Modifier
                 .size(80.dp)
                 .scale(if (isPlaying && !isPlayPausePressed) pulseAnim else playButtonScale)
-                .shadow(8.dp, CircleShape, spotColor = resolvedOnBackgroundColor.copy(alpha = 0.3f))
+                .shadow(
+                    elevation = 12.dp,
+                    shape = CircleShape,
+                    spotColor = playBtnShadowColor,
+                    ambientColor = playBtnShadowColor.copy(alpha = 0.15f)
+                )
                 .clip(CircleShape)
-                .background(resolvedOnBackgroundColor)
+                .background(brush = playBtnGradient)
                 .clickable(
                     indication = null,
                     interactionSource = playPauseInteractionSource,
@@ -1702,32 +1741,122 @@ fun PlayerControls(
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.runtime.key(isPlaying) {
-                Icon(
-                    painter = painterResource(
-                        if (isPlaying) R.drawable.pause else R.drawable.play
-                    ),
+                BrokenIcon(
+                    codePoint = if (isPlaying) BrokenIcons.pause else BrokenIcons.play,
                     contentDescription = null,
-                    tint = iconButtonColor,
-                    modifier = Modifier.size(40.dp)
+                    tint = playBtnIconTint,
+                    size = 40.dp,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(32.dp))
+        Spacer(modifier = Modifier.weight(nextButtonWeight))
 
-        // Botón Next
-        IconButton(
-            onClick = onSkipNext,
-            enabled = canSkipNext,
-            modifier = Modifier.size(56.dp)
+        // Botón Next (Namida-style: ícono plano sin fondo)
+        BrokenIcon(
+            codePoint = BrokenIcons.next,
+            contentDescription = null,
+            tint = sideButtonContentColor.copy(
+                alpha = if (canSkipNext) 1f else 0.3f
+            ),
+            size = 32.dp,
+            modifier = Modifier
+                .size(48.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = nextInteractionSource,
+                    onClick = onSkipNext
+                )
+                .padding(8.dp)
+        )
+    }
+
+    Spacer(Modifier.height(4.dp))
+
+    // Seekbar (Namida-style: debajo de controles, al fondo del panel)
+    PlayerSlider(
+        playerConnection = playerConnection,
+        positionState = positionState,
+        durationState = durationState,
+        onBackgroundColor = resolvedOnBackgroundColor,
+        sliderStyle = sliderStyle,
+        accentColor = accentColor,
+        modifier = Modifier.padding(horizontal = PlayerHorizontalPadding)
+    )
+
+    Spacer(Modifier.height(4.dp))
+
+    // Fila inferior: BeatBuddy izq + Acciones der (Namida-style)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = PlayerHorizontalPadding + 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BeatBuddy(
+            type = beatBuddyType,
+            isPlaying = isPlaying,
+            color = resolvedOnBackgroundColor,
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = painterResource(R.drawable.skip_next),
+            // Like
+            BrokenIcon(
+                codePoint = BrokenIcons.heart,
+                filled = currentSongLiked,
                 contentDescription = null,
-                tint = sideButtonContentColor.copy(
-                    alpha = if (canSkipNext) 1f else 0.3f
-                ),
-                modifier = Modifier.size(36.dp)
+                tint = if (currentSongLiked) MaterialTheme.colorScheme.error else resolvedOnBackgroundColor,
+                size = 22.dp,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable(onClick = onToggleLike)
+                    .padding(8.dp)
+            )
+
+            // Download
+            Box(modifier = Modifier.size(40.dp).clickable(onClick = onDownloadClick).padding(8.dp)) {
+                when (downloadState?.state) {
+                    Download.STATE_COMPLETED -> BrokenIcon(codePoint = BrokenIcons.cloud, contentDescription = null, tint = resolvedOnBackgroundColor, size = 22.dp)
+                    Download.STATE_QUEUED, Download.STATE_DOWNLOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = resolvedOnBackgroundColor)
+                    else -> BrokenIcon(codePoint = BrokenIcons.import, contentDescription = null, tint = resolvedOnBackgroundColor, size = 22.dp)
+                }
+            }
+
+            // Sleep Timer
+            Box(modifier = Modifier.size(40.dp)) {
+                BrokenIcon(
+                    codePoint = BrokenIcons.moon,
+                    contentDescription = null,
+                    tint = if (sleepTimerEnabled) MaterialTheme.colorScheme.primary else resolvedOnBackgroundColor,
+                    size = 22.dp,
+                    modifier = Modifier
+                        .clickable(onClick = onSleepTimerClick)
+                        .padding(8.dp)
+                )
+                if (sleepTimerEnabled) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(8.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    )
+                }
+            }
+
+            // More
+            BrokenIcon(
+                codePoint = BrokenIcons.more,
+                contentDescription = null,
+                tint = resolvedOnBackgroundColor,
+                size = 22.dp,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable(onClick = onMoreClick)
+                    .padding(8.dp)
             )
         }
     }

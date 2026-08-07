@@ -50,7 +50,7 @@ class DeviceCompensationAudioProcessor(
         val out = replaceOutputBuffer(inputBuffer.remaining())
 
         if (gainComp == 1.0f && bassComp == 1.0f && midComp == 1.0f) {
-            out.put(inputBuffer)
+            out.put(inputBuffer.duplicate())
             inputBuffer.position(inputBuffer.limit())
             out.flip()
             return
@@ -59,7 +59,7 @@ class DeviceCompensationAudioProcessor(
         when (currentEncoding) {
             C.ENCODING_PCM_FLOAT -> processFloat(inputBuffer, out)
             C.ENCODING_PCM_16BIT -> processShort(inputBuffer, out)
-            else -> out.put(inputBuffer)
+            else -> out.put(inputBuffer.duplicate())
         }
 
         inputBuffer.position(inputBuffer.limit())

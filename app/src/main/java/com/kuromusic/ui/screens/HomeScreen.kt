@@ -37,6 +37,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -88,6 +89,7 @@ import com.kuromusic.innertube.models.WatchEndpoint
 import com.kuromusic.innertube.models.YTItem
 import com.kuromusic.innertube.utils.parseCookieString
 import com.kuromusic.LocalDatabase
+import com.kuromusic.LocalThemeColor
 import com.kuromusic.LocalPlayerAwareWindowInsets
 import com.kuromusic.LocalPlayerConnection
 import com.kuromusic.R
@@ -167,15 +169,12 @@ fun HomeScreen(
     val animaxVideos by viewModel.animaxVideos.collectAsState()
     val globalRecommendations by viewModel.globalRecommendations.collectAsState()
     val localRecommendations by viewModel.localRecommendations.collectAsState()
-    val dynamicGradientColor by viewModel.dynamicGradientColor.collectAsState()
-
     val isLoading: Boolean by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullToRefreshState()
 
     val accountName by rememberPreference(AccountNameKey, "")
     val showAnimaxSection by rememberPreference(ShowAnimaxSectionKey, true)
-    val enableDynamicTheme by rememberPreference(DynamicThemeKey, false)
     val similarContentEnabled by rememberPreference(SimilarContent, false)
     var dismissAutomixBanner by remember { mutableStateOf(false) }
     val animaxSectionTitle = if (showAnimaxSection) "Animax L Music" else "Canciones Recomendadas"
@@ -273,75 +272,17 @@ fun HomeScreen(
         contentAlignment = Alignment.TopStart
     ) {
         val pureBlack by rememberPreference(PureBlackKey, false)
-        
-        // Aurora Color State
-        var auroraColor by remember { mutableStateOf(Color.Black) }
-        val context = LocalContext.current
-        
-        // **OPTIMIZATION**: Cache ImageLoader singleton instead of creating new instances
-        val imageLoader = remember { coil.ImageLoader(context) }
-        
-        // **OPTIMIZATION**: Cache color extraction results per URL to avoid re-processing
-        val colorCache = remember { mutableMapOf<String, Pair<Color, Color>>() }
-        
-        // Extract color for Aurora and Dynamic Gradient
-        LaunchedEffect(mediaMetadata?.thumbnailUrl) {
-            if (!enableDynamicTheme) return@LaunchedEffect
-            val url = mediaMetadata?.thumbnailUrl ?: return@LaunchedEffect
-            
-            // Check cache first
-            colorCache[url]?.let { (aurora, gradient) ->
-                auroraColor = aurora
-                viewModel.dynamicGradientColor.value = gradient
-                return@LaunchedEffect
-            }
-            
-            // Ejecutamos en Default para no bloquear el hilo de UI
-            withContext(Dispatchers.Default) {
-                val request = ImageRequest.Builder(context)
-                    .data(url)
-                    .size(120, 120) // Redimensionar aquí ahorra muchísima memoria y CPU
-                    .allowHardware(false)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .build()
-                    
-                val result = imageLoader.execute(request)
-                if (result is SuccessResult) {
-                    result.drawable.toBitmapOrNull()?.let { bitmap ->
-                        // Extract for Aurora effect
-                        val extracted = bitmap.extractThemeColor()
-                        
-                        // Extract for Dynamic Gradient using Palette API
-                        val dynamicColor = com.kuromusic.ui.utils.DynamicColorExtractor.extractDominantColor(bitmap)
-                        
-                        // Cache the results
-                        colorCache[url] = extracted to dynamicColor
-                        
-                        // Volvemos al Main para actualizar el estado
-                        withContext(Dispatchers.Main) {
-                            auroraColor = extracted
-                            viewModel.dynamicGradientColor.value = dynamicColor
-                        }
-                    }
-                }
-            }
-        }
+        val themeColor = LocalThemeColor.current
 
         AuroraBackground(
-            isVisible = true, // Always visible - handles theme internally
-            color = dynamicGradientColor,
+            isVisible = true,
+            color = themeColor,
             scrollOffsetProvider = {
                 if (lazylistState.firstVisibleItemIndex > 0) 1000f 
                 else lazylistState.firstVisibleItemScrollOffset.toFloat()
             }
         ) {
 
-        val horizontalLazyGridItemWidthFactor = remember(maxWidth) {
-            if (maxWidth * 0.475f >= 320.dp) 0.475f else 0.9f
-        }
-        val horizontalLazyGridItemWidth = remember(maxWidth, horizontalLazyGridItemWidthFactor) {
-            maxWidth * horizontalLazyGridItemWidthFactor
-        }
         LazyColumn(
             state = lazylistState,
             contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
@@ -528,7 +469,7 @@ fun HomeScreen(
                                     style = MaterialTheme.typography.labelMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -804,43 +745,10 @@ fun HomeScreen(
                 }
             }
 
-            // Contextual (More from Artist / Genre)
-            topArtist?.let { artist ->
-                item {
-                    NavigationTitle(
-                        title = "Más de ${artist.title}",
-                        modifier = Modifier
-                    )
-                }
-                // Need to fetch or use DB for artist songs?
-                // I can use `artistSongsPreview`. Or existing `artist` object doesn't have songs list.
-                // I'll skip implementation DETAIL for song list here to avoid DB query complexity in UI
-                // unless I expose a Flow for "Top Artist Songs".
-                // User said "crea automáticamente una fila".
-                // I will placeholder or remove if too complex without new ViewMOdel flow.
-                // Actually `similarRecommendations` has `artistRecommendations`.
-                // I'll accept `recentActivity` or `similarRecommendations` usage for now.
-            }
-            
+
 
         }
         }
-
-        HideOnScrollFAB(
-            visible = homePage != null,
-            lazyListState = lazylistState,
-            icon = R.drawable.shuffle,
-            onClick = {
-                val allYtSongs = homePage?.sections
-                    ?.flatMap { it.items }
-                    ?.filterIsInstance<SongItem>() ?: emptyList()
-                scope.launch(Dispatchers.Main) {
-                    allYtSongs.randomOrNull()?.let { luckyItem ->
-                        playerConnection.playQueue(YouTubeQueue.radio(luckyItem.toMediaMetadata()))
-                    }
-                }
-            }
-        )
 
         Indicator(
             isRefreshing = isRefreshing,
@@ -852,9 +760,6 @@ fun HomeScreen(
     }
 }
 
-/**
- * SectionHeader - Elegant title component with optional subtitle
- */
 @Composable
 fun SectionHeader(
     title: String,
@@ -881,6 +786,19 @@ fun SectionHeader(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+fun LazyListScope.HomeSection(
+    title: String,
+    subtitle: String? = null,
+    content: @Composable () -> Unit,
+) {
+    item {
+        SectionHeader(title = title, subtitle = subtitle)
+    }
+    item {
+        content()
     }
 }
 

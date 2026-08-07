@@ -212,6 +212,10 @@ interface SongDao {
     fun songArtistMap(songId: String): List<SongArtistMap>
 
     @Transaction
+    @Query("SELECT * FROM song WHERE id IN (:ids)")
+    fun songsByIds(ids: List<String>): Flow<List<Song>>
+
+    @Transaction
     @Query("SELECT * FROM song")
     fun allSongs(): Flow<List<Song>>
 

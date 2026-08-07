@@ -14,6 +14,7 @@ import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Player.STATE_READY
 import androidx.media3.common.Timeline
+import com.kuromusic.MusicWidget
 import com.kuromusic.MusicWidget.Companion.ACTION_STATE_CHANGED
 import com.kuromusic.MusicWidget.Companion.ACTION_UPDATE_PROGRESS
 import com.kuromusic.db.MusicDatabase
@@ -65,6 +66,8 @@ class PlayerConnection(
 
     val service = binder.service
     val player = service.player
+    val visualizerEngine = service.visualizerEngine
+    val equalizerService = service.equalizerService
 
     // Estados básicos del reproductor
     private val _playbackState = MutableStateFlow(player.playbackState)
@@ -161,7 +164,8 @@ class PlayerConnection(
     val error: StateFlow<PlaybackException?> = _error.asStateFlow()
 
     // Control de actualizaciones
-    private val updateScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val updateJob = SupervisorJob()
+    private val updateScope = CoroutineScope(Dispatchers.Main + updateJob)
     private val progressUpdateHandler = Handler(Looper.getMainLooper())
     private var progressUpdateRunnable: Runnable? = null
     private val isUpdatingProgress = AtomicBoolean(false)
@@ -596,17 +600,17 @@ class PlayerConnection(
         _currentMediaItemIndex.value = player.currentMediaItemIndex
         _currentWindowIndex.value = player.getCurrentQueueIndex()
 
-        // Seed duration from metadata immediately (before timeline resolves stream)
-        val meta = mediaItem?.metadata
-        if (meta != null && meta.duration > 0) {
-            _duration.value = meta.duration * 1000L
-        } else {
-            _duration.value = -1L
-        }
+        // Duration will be resolved by the UI polling + onTimelineChanged
+        _duration.value = -1L
 
         // Actualizar estado de like cuando cambia la canción
         updateScope.launch {
             updateLikeStatusForCurrentSong()
+        }
+
+        val artworkUri = mediaItem?.mediaMetadata?.artworkUri?.toString()
+        if (!artworkUri.isNullOrEmpty()) {
+            MusicWidget.preloadAlbumArt(context, artworkUri)
         }
 
         if (lastMediaItemIndex != player.currentMediaItemIndex) {
@@ -734,6 +738,7 @@ class PlayerConnection(
 
         // Cancelar actualizaciones pendientes
         pendingWidgetUpdate?.let { widgetUpdateHandler.removeCallbacks(it) }
+        updateJob.cancel()
 
         try {
             player.removeListener(this)

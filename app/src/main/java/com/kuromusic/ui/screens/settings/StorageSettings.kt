@@ -100,7 +100,7 @@ fun StorageSettings(
 
     var imageCacheSize by remember { mutableLongStateOf(imageDiskCache.size) }
     var playerCacheSize by remember { mutableLongStateOf(tryOrNull { playerCache.cacheSpace } ?: 0) }
-    var downloadCacheSize by remember { mutableLongStateOf(RealDownloader.getTotalDownloadSize(context)) }
+    var downloadCacheSize by remember { mutableLongStateOf(RealDownloader.getMediaStoreTotalSize(context)) }
 
     val animatedImageCacheSize by animateFloatAsState(
         targetValue = if (maxImageCacheSize == -1) 0f
@@ -136,7 +136,7 @@ fun StorageSettings(
     LaunchedEffect(Unit) {
         while (isActive) {
             delay(2000)
-            downloadCacheSize = RealDownloader.getTotalDownloadSize(context)
+            downloadCacheSize = RealDownloader.getMediaStoreTotalSize(context)
         }
     }
 
@@ -173,6 +173,9 @@ fun StorageSettings(
                 onClearClick = {
                     coroutineScope.launch(Dispatchers.IO) {
                         try {
+                            RealDownloader.listMediaStoreIds(context).forEach { id ->
+                                RealDownloader.deleteFromMediaStore(context, id)
+                            }
                             val songsDir = RealDownloader.getSongDir(context)
                             songsDir.listFiles()?.forEach { file ->
                                 if (file.isFile && (file.extension == "opus" || file.extension == "m4a")) {

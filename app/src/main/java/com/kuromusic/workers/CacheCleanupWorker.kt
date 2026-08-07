@@ -28,7 +28,7 @@ class CacheCleanupWorker(
 
             cacheDir.walkTopDown().forEach { file ->
                 val parentName = file.parentFile?.name
-                if (parentName == "media" || parentName == "exoplayer" || parentName == "coil") return@forEach
+                if (parentName == "coil") return@forEach
                 if (file.isFile && file.lastModified() < cutoff) {
                     val size = file.length()
                     if (file.delete()) {

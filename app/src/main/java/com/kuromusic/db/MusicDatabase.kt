@@ -107,6 +107,7 @@ class MusicDatabase(
     fun albumSongs(albumId: String) = songDao.albumSongs(albumId)
     fun playlistSongs(playlistId: String) = songDao.playlistSongs(playlistId)
     fun allSongs() = songDao.allSongs()
+    fun songsByIds(ids: List<String>) = songDao.songsByIds(ids)
     fun song(songId: String?) = songDao.song(songId)
     fun getSongById(songId: String) = songDao.getSongById(songId)
     fun recentlyPlayedSongs(limit: Int = 20) = songDao.recentlyPlayedSongs(limit)
@@ -569,15 +570,26 @@ abstract class InternalDatabase : RoomDatabase() {
 
         fun newInstance(context: Context): MusicDatabase {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: MusicDatabase(
-                    delegate =
-                    Room
-                        .databaseBuilder(context.applicationContext, InternalDatabase::class.java, DB_NAME)
-                        .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
-                        .addMigrations(MIGRATION_1_2)
-                        .fallbackToDestructiveMigration()
-                        .build(),
-                ).also { INSTANCE = it }
+                INSTANCE ?: run {
+                    val appContext = context.applicationContext
+                    val dbFile = appContext.getDatabasePath(DB_NAME)
+                    // Backup DB before migration in case fallbackToDestructiveMigration fires
+                    if (dbFile.exists()) {
+                        val backupFile = java.io.File(dbFile.parent, "${DB_NAME}.backup")
+                        try {
+                            dbFile.copyTo(backupFile, overwrite = true)
+                        } catch (_: Exception) { }
+                    }
+                    MusicDatabase(
+                        delegate =
+                        Room
+                            .databaseBuilder(appContext, InternalDatabase::class.java, DB_NAME)
+                            .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
+                            .addMigrations(MIGRATION_1_2)
+                            .fallbackToDestructiveMigration()
+                            .build(),
+                    ).also { INSTANCE = it }
+                }
             }
         }
     }

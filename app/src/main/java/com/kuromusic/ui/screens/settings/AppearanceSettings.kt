@@ -2,15 +2,19 @@ package com.kuromusic.ui.screens.settings
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.kuromusic.R
 import com.kuromusic.constants.AnimateLyricsKey
+import com.kuromusic.constants.AnimatingThumbnailKey
+import com.kuromusic.constants.CanvasEnabledKey
 import com.kuromusic.constants.ChipSortTypeKey
 import com.kuromusic.constants.DarkModeKey
 import com.kuromusic.constants.DefaultMiniPlayerThumbnailShape
@@ -51,6 +57,8 @@ import com.kuromusic.constants.GridItemSize
 import com.kuromusic.constants.GridItemsSizeKey
 import com.kuromusic.constants.LibraryFilter
 import com.kuromusic.constants.LyricsClickKey
+import com.kuromusic.constants.MiniplayerEdgeGlowKey
+import com.kuromusic.constants.MiniplayerPartyModeKey
 import com.kuromusic.constants.LyricsTextPositionKey
 import com.kuromusic.constants.MiniPlayerThumbnailShapeKey
 import com.kuromusic.constants.PlayPauseButtonShapeKey
@@ -125,7 +133,7 @@ fun AppearanceSettings(
     val (lyricsClick, onLyricsClickChange) = rememberPreference(LyricsClickKey, defaultValue = true)
     val (sliderStyle, onSliderStyleChange) = rememberEnumPreference(
         SliderStyleKey,
-        defaultValue = SliderStyle.SQUIGGLY
+        defaultValue = SliderStyle.WAVEFORM
     )
     val (swipeThumbnail, onSwipeThumbnailChange) = rememberPreference(
         SwipeThumbnailKey,
@@ -142,6 +150,23 @@ fun AppearanceSettings(
 
     val (rotateBackground, onRotateBackgroundChange) = rememberPreference(
         key = RotateBackgroundKey,
+        defaultValue = false
+    )
+
+    val (animatingThumbnail, onAnimatingThumbnailChange) = rememberPreference(
+        AnimatingThumbnailKey,
+        defaultValue = false
+    )
+    val (canvasEnabled, onCanvasEnabledChange) = rememberPreference(
+        CanvasEnabledKey,
+        defaultValue = true
+    )
+    val (miniplayerEdgeGlow, onMiniplayerEdgeGlowChange) = rememberPreference(
+        MiniplayerEdgeGlowKey,
+        defaultValue = false
+    )
+    val (miniplayerPartyMode, onMiniplayerPartyModeChange) = rememberPreference(
+        MiniplayerPartyModeKey,
         defaultValue = false
     )
 
@@ -317,6 +342,56 @@ fun AppearanceSettings(
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .weight(1f)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            if (sliderStyle == SliderStyle.WAVEFORM) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                            RoundedCornerShape(16.dp)
+                        )
+                        .clickable {
+                            onSliderStyleChange(SliderStyle.WAVEFORM)
+                            showSliderOptionDialog = false
+                        }
+                        .padding(16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val primaryColor = MaterialTheme.colorScheme.primary
+                        Canvas(modifier = Modifier.fillMaxSize()) {
+                            val barCount = 16
+                            val gapPx = 1f
+                            val barWidth = (size.width - gapPx * (barCount - 1)) / barCount
+                            val halfHeight = size.height / 2f
+                            for (i in 0 until barCount) {
+                                val h = (kotlin.math.sin(i * 0.8f) * 0.4f + 0.3f) * halfHeight
+                                drawRoundRect(
+                                    color = primaryColor.copy(alpha = 0.7f),
+                                    topLeft = androidx.compose.ui.geometry.Offset(
+                                        i * (barWidth + gapPx),
+                                        halfHeight - h / 2f
+                                    ),
+                                    size = androidx.compose.ui.geometry.Size(barWidth, h),
+                                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(barWidth / 2f)
+                                )
+                            }
+                        }
+                    }
+                    Text(
+                        text = stringResource(R.string.waveform),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
         }
     }
@@ -451,6 +526,7 @@ fun AppearanceSettings(
                             SliderStyle.DEFAULT -> stringResource(R.string.default_)
                             SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
                             SliderStyle.SLIM -> stringResource(R.string.slim)
+                            SliderStyle.WAVEFORM -> stringResource(R.string.waveform)
                         },
                     icon = { Icon(painterResource(R.drawable.sliders), null) },
                     onClick = {
@@ -463,6 +539,32 @@ fun AppearanceSettings(
                     icon = { Icon(painterResource(R.drawable.swipe), null) },
                     checked = swipeThumbnail,
                     onCheckedChange = onSwipeThumbnailChange,
+                )},
+
+                // --- Visual Effects ---
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.animating_thumbnail)) },
+                    icon = { Icon(painterResource(R.drawable.album), null) },
+                    checked = animatingThumbnail,
+                    onCheckedChange = onAnimatingThumbnailChange,
+                )},
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.canvas_video)) },
+                    icon = { Icon(painterResource(R.drawable.album), null) },
+                    checked = canvasEnabled,
+                    onCheckedChange = onCanvasEnabledChange,
+                )},
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.miniplayer_edge_glow)) },
+                    icon = { Icon(painterResource(R.drawable.album), null) },
+                    checked = miniplayerEdgeGlow,
+                    onCheckedChange = onMiniplayerEdgeGlowChange,
+                )},
+                {SwitchPreference(
+                    title = { Text(stringResource(R.string.miniplayer_party_mode)) },
+                    icon = { Icon(painterResource(R.drawable.album), null) },
+                    checked = miniplayerPartyMode,
+                    onCheckedChange = onMiniplayerPartyModeChange,
                 )},
 
                 {SwitchPreference(
@@ -541,6 +643,7 @@ fun AppearanceSettings(
                             NavigationTab.HOME -> stringResource(R.string.home)
                             NavigationTab.EXPLORE -> stringResource(R.string.explore)
                             NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
+                            NavigationTab.OFFLINE -> stringResource(R.string.offline)
                         }
                     },
                 )},
@@ -606,6 +709,7 @@ enum class NavigationTab {
     HOME,
     EXPLORE,
     LIBRARY,
+    OFFLINE,
 }
 
 enum class LyricsPosition {

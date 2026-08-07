@@ -21,10 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 private data class AuroraBrushColors(
@@ -69,25 +67,23 @@ fun AuroraBackground(
     val duration3 = 15000L
 
     LaunchedEffect(Unit) {
-        withContext(Dispatchers.Default) {
-            val startTime = System.currentTimeMillis()
-            while (isActive) {
-                val elapsed = System.currentTimeMillis() - startTime
+        val startTime = System.currentTimeMillis()
+        while (isActive) {
+            val elapsed = System.currentTimeMillis() - startTime
 
-                val progress1 = (elapsed % (duration1 * 2)).toFloat() / duration1
-                val raw1 = if (progress1 <= 1f) progress1 else 2f - progress1
-                offset1 = raw1 * 100f
+            val progress1 = (elapsed % (duration1 * 2)).toFloat() / duration1
+            val raw1 = if (progress1 <= 1f) progress1 else 2f - progress1
+            offset1 = raw1 * 100f
 
-                val progress2 = (elapsed % (duration2 * 2)).toFloat() / duration2
-                val raw2 = if (progress2 <= 1f) progress2 else 2f - progress2
-                offset2 = raw2 * -80f
+            val progress2 = (elapsed % (duration2 * 2)).toFloat() / duration2
+            val raw2 = if (progress2 <= 1f) progress2 else 2f - progress2
+            offset2 = raw2 * -80f
 
-                val progress3 = (elapsed % (duration3 * 2)).toFloat() / duration3
-                val raw3 = if (progress3 <= 1f) progress3 else 2f - progress3
-                offset3 = -50f + (raw3 * 100f)
+            val progress3 = (elapsed % (duration3 * 2)).toFloat() / duration3
+            val raw3 = if (progress3 <= 1f) progress3 else 2f - progress3
+            offset3 = -50f + (raw3 * 100f)
 
-                delay(100)
-            }
+            delay(16)
         }
     }
 
@@ -96,7 +92,7 @@ fun AuroraBackground(
             val defaultColor = Color(0xFF121212)
             val isDynamic = animatedDynamicColor != defaultColor
             val primary = if (isDynamic) animatedDynamicColor else PurpleElectric
-            val secondary = if (isDynamic) animatedDynamicColor else defaultColor
+            val secondary = defaultColor
             AuroraBrushColors(
                 topPrimary = primary,
                 topSecondary = secondary,

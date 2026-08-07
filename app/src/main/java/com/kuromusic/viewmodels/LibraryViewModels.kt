@@ -297,16 +297,9 @@ class LibraryMixViewModel
 constructor(
     @ApplicationContext context: Context,
     val database: MusicDatabase,
-    val downloadUtil: DownloadUtil,
     private val syncUtils: SyncUtils,
 ) : ViewModel() {
     val likedSongsCount = database.songDao.likedSongsCount()
-    
-    val downloadedSongsCount = downloadUtil.downloads.flatMapLatest { downloads ->
-        database.allSongs().map { songs ->
-            songs.count { downloads[it.id]?.state == Download.STATE_COMPLETED }
-        }
-    }
 
     val topValue =
         context.dataStore.data

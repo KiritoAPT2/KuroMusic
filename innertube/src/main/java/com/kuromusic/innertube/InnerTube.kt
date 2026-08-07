@@ -15,6 +15,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.encodeBase64
+import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.ConnectionPool
@@ -27,6 +28,28 @@ import java.util.*
 class InnerTube {
     var apiKey: String = ""
     private var httpClient = createClient()
+
+    private companion object {
+        private const val RETRY_MAX_ATTEMPTS = 3
+        private const val RETRY_INITIAL_DELAY_MS = 500L
+    }
+
+    private suspend fun <T> withRetry(block: suspend () -> T): T {
+        var lastError: Throwable? = null
+        var delayMs = RETRY_INITIAL_DELAY_MS
+        for (attempt in 1..RETRY_MAX_ATTEMPTS) {
+            try {
+                return block()
+            } catch (e: Exception) {
+                lastError = e
+                if (attempt < RETRY_MAX_ATTEMPTS) {
+                    delay(delayMs)
+                    delayMs *= 2
+                }
+            }
+        }
+        throw lastError ?: Exception("Retry exhausted")
+    }
 
     var locale = YouTubeLocale(
         gl = Locale.getDefault().country,
@@ -135,7 +158,9 @@ class InnerTube {
         videoId: String,
         playlistId: String?,
         signatureTimestamp: Int?,
-    ) = httpClient.post("player") {
+        poToken: String? = null,
+    ) = withRetry {
+        httpClient.post("player") {
         ytClient(client, setLogin = true)
         setBody(
             PlayerBody(
@@ -157,8 +182,12 @@ class InnerTube {
                         )
                     )
                 } else null,
+                serviceIntegrityDimensions = if (client.useWebPoTokens && poToken != null) {
+                    PlayerBody.ServiceIntegrityDimensions(poToken)
+                } else null,
             )
         )
+    }
     }
 
     suspend fun registerPlayback(
@@ -184,20 +213,22 @@ class InnerTube {
         params: String? = null,
         continuation: String? = null,
         setLogin: Boolean = false,
-    ) = httpClient.post("browse") {
-        ytClient(client, setLogin = setLogin || useLoginForBrowse)
-        setBody(
-            BrowseBody(
-                context = client.toContext(
-                    locale,
-                    visitorData,
-                    if (setLogin || useLoginForBrowse) dataSyncId else null
-                ),
-                browseId = browseId,
-                params = params,
-                continuation = continuation
+    ) = withRetry {
+        httpClient.post("browse") {
+            ytClient(client, setLogin = setLogin || useLoginForBrowse)
+            setBody(
+                BrowseBody(
+                    context = client.toContext(
+                        locale,
+                        visitorData,
+                        if (setLogin || useLoginForBrowse) dataSyncId else null
+                    ),
+                    browseId = browseId,
+                    params = params,
+                    continuation = continuation
+                )
             )
-        )
+        }
     }
 
     suspend fun next(

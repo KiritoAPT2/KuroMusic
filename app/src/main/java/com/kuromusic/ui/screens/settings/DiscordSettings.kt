@@ -127,7 +127,7 @@ fun DiscordSettings(
 
     var infoDismissed by rememberPreference(DiscordInfoDismissedKey, false)
 
-    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.DEFAULT)
+    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.WAVEFORM)
 
     LaunchedEffect(playbackState) {
         if (playbackState == STATE_READY) {
@@ -788,6 +788,22 @@ fun EnhancedProgressBar(
                         .clip(RoundedCornerShape(2.dp)),
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
+
+            SliderStyle.WAVEFORM -> {
+                Slider(
+                    value = position.toFloat(),
+                    valueRange = 0f..duration.toFloat().coerceAtLeast(1f),
+                    onValueChange = {},
+                    enabled = false,
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        disabledActiveTrackColor = MaterialTheme.colorScheme.primary,
+                        disabledInactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        disabledThumbColor = MaterialTheme.colorScheme.primary
+                    )
                 )
             }
         }

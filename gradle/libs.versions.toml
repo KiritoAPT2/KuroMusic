@@ -17,7 +17,7 @@ okhttp = "5.3.2"
 loggingInterceptor = "5.3.2"
 blurry = "4.0.1"
 materialRipple = "1.10.0"
-extractor = "master-SNAPSHOT"
+extractor = "v0.25.2"
 composeReorderable = "3.0.0"
 materialIconsExtended = "1.7.6"
 
@@ -65,6 +65,7 @@ palette = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" 
 media3 = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 media3-okhttp = { group = "androidx.media3", name = "media3-datasource-okhttp", version.ref = "media3" }
 media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3" }
+media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
@@ -92,7 +93,7 @@ junit = { group = "junit", name = "junit", version = "4.13.2" }
 
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 
-newpipe-extractor = { module = "com.github.mostafaalagamy:MetroExtractor", version.ref = "extractor" }
+newpipe-extractor = { module = "com.github.TeamNewPipe:NewPipeExtractor", version.ref = "extractor" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
