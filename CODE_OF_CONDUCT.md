@@ -1,37 +1,26 @@
-# Contributor Covenant Code of Conduct
+# Code of Conduct
 
-## Our Pledge
+## Expected Behavior
+Contributors and maintainers participating in KuroMusic discussions, issues, and pull requests are expected to:
+- Communicate constructively and professionally.
+- Treat fellow contributors, maintainers, and users with respect.
+- Focus on technical merits and what is best for the project.
+- Gracefully accept constructive criticism.
 
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
+## Unacceptable Behavior
+The following behaviors are unacceptable within the project:
+- Harassment, derogatory comments, or personal attacks.
+- Trolling, insulting, or disruptive behavior.
+- Publishing private information without explicit permission.
+- Unwelcome sexual attention, advances, or inappropriate language.
 
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
+## Reporting
+If you experience or witness unacceptable behavior, report it privately to the project maintainer:
+- Email: `kushagrasinghx@gmail.com`
 
-## Our Standards
-
-Examples of behavior that contributes to a positive environment for our community include:
-
-* Demonstrating empathy and kindness toward others
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the overall community
-
-Examples of unacceptable behavior include:
-
-* The use of sexualized language or imagery, and sexual attention or advances of any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a professional setting
-
-## Enforcement Responsibilities
-
-Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+Reports will be handled privately and with appropriate discretion.
 
 ## Enforcement
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at **<conduct@kuromusic.com>**. All complaints will be reviewed and investigated promptly and fairly.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1, available at <https://www.contributor-covenant.org/version/2/1/code_of_conduct.html>.
+The project maintainer reserves the right to:
+- Remove, edit, or reject comments, commits, code, issues, or pull requests that violate this code of conduct.
+- Temporarily or permanently restrict or block participation in project repositories for repeated or severe violations.

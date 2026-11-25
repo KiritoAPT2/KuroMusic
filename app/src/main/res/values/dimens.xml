@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Widget dimensions - Adaptables al tamaño -->
-    <dimen name="widget_margin">8dp</dimen>
-    <dimen name="widget_padding">16dp</dimen>
-    <dimen name="widget_small_margin">4dp</dimen>
-    <dimen name="widget_medium_margin">12dp</dimen>
-    <dimen name="widget_content_margin_top">12dp</dimen>
+    <!--
+      The radius the launcher itself rounds a widget to. Overridden on API 31+
+      with the platform's own value (values-v31), so the corners baked into the
+      artwork bitmap land exactly where the host's clip does instead of leaving
+      a sliver of square image outside a rounder mask. 16dp is the pre-31
+      stand-in, where hosts don't clip at all and the baked corners are the only
+      ones there are.
+    -->
+    <dimen name="widget_corner_radius">16dp</dimen>
 
-    <!-- Logo - Tamaño adaptable -->
-    <dimen name="widget_logo_size">20dp</dimen>
+    <!--
+      The strip at the foot of the widget the track and transport sit in, and so
+      exactly how much of the artwork the blur has to cover. Read by both the
+      layout and the compositor — see MediaWidgetArt — because the two have to
+      agree: a band taller than the blur puts buttons on sharp artwork, and a
+      blur taller than the band puts a smudge above them with nothing on it.
 
-    <!-- Album art - Tamaño adaptable según widget -->
-    <dimen name="widget_album_size">64dp</dimen>
-    <dimen name="widget_album_size_large">80dp</dimen>
-    <dimen name="widget_album_size_xlarge">100dp</dimen>
+      The compact one is the taller of the two despite being the smaller widget:
+      it stacks the title over the buttons, where the wide one has the room to
+      set them side by side.
+    -->
+    <dimen name="widget_band_compact">66dp</dimen>
+    <dimen name="widget_band_wide">60dp</dimen>
 
-    <!-- Controls - Múltiples tamaños -->
-    <dimen name="widget_control_small">32dp</dimen>
-    <dimen name="widget_control_medium">40dp</dimen>
-    <dimen name="widget_control_large">44dp</dimen>
-    <dimen name="widget_control_xlarge">52dp</dimen>
+    <!-- Inset of the transport from the widget's edges. -->
+    <dimen name="widget_band_padding">8dp</dimen>
 
-    <dimen name="widget_control_padding">6dp</dimen>
-    <dimen name="widget_control_padding_large">8dp</dimen>
-    <dimen name="widget_control_padding_xlarge">12dp</dimen>
+    <!-- Touch target and glyph size for one transport button. -->
+    <dimen name="widget_button_compact">40dp</dimen>
+    <dimen name="widget_button_wide">44dp</dimen>
+    <dimen name="widget_glyph_compact">22dp</dimen>
+    <dimen name="widget_glyph_wide">24dp</dimen>
 
-    <dimen name="widget_control_margin">4dp</dimen>
-    <dimen name="widget_control_margin_large">6dp</dimen>
-    <dimen name="widget_control_margin_xlarge">8dp</dimen>
-
-    <!-- Text sizes adaptables -->
-    <dimen name="widget_text_size_small">12sp</dimen>
-    <dimen name="widget_text_size_medium">14sp</dimen>
-    <dimen name="widget_text_size_large">15sp</dimen>
-    <dimen name="widget_title_size_small">14sp</dimen>
-    <dimen name="widget_title_size_medium">16sp</dimen>
-    <dimen name="widget_title_size_large">18sp</dimen>
+    <!-- The 4×1 capsule: its height, round cover, and its row of five buttons. -->
+    <dimen name="widget_pill_height">78dp</dimen>
+    <dimen name="widget_pill_art">64dp</dimen>
+    <dimen name="widget_button_pill">38dp</dimen>
 </resources>

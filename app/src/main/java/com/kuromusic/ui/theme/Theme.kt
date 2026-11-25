@@ -1,252 +1,187 @@
 package com.kuromusic.ui.theme
 
-import android.graphics.Bitmap
-import android.os.Build
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MotionScheme
-import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.palette.graphics.Palette
-import com.kuromusic.constants.PlayerBackgroundStyle
-import com.google.material.color.dynamiccolor.DynamicScheme
-import com.google.material.color.hct.Hct
-import com.google.material.color.scheme.SchemeTonalSpot
-import com.google.material.color.score.Score
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.kuromusic.R
+import com.kuromusic.data.settings.AppFont
 
-val DefaultThemeColor = Color(0xFF8B5CF6)  // MORADO KURO ✨
-val KuroSecondaryColor = Color(0xFFEC4899) // Rosa morado
+// Apple Music's signature red. No longer the primary accent, but kept for the
+// spots (Replay's rank badge) that want that specific red regardless of theme.
+val AccentRed = Color(0xFFFA2D48)
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private val DarkColors = darkColorScheme(
+    primary = Color(0xFFA78BFA),        // Morado eléctrico Kuro
+    onPrimary = Color(0xFF140A2E),
+    primaryContainer = Color(0xFF4C1D95),
+    onPrimaryContainer = Color(0xFFEDE9FE),
+    secondary = Color(0xFFEC4899),      // Rosa Kuro
+    onSecondary = Color.White,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = Color(0xFF0D0D0F),
+    onSurface = Color.White,
+    surfaceVariant = Color(0xFF1C1C1E),
+    onSurfaceVariant = Color(0xFF9E9EA8),
+    outline = Color(0xFF2E2A3B),
+)
+
+private val LightColors = lightColorScheme(
+    primary = Color(0xFF7C3AED),        // Morado Kuro
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFEDE9FE),
+    onPrimaryContainer = Color(0xFF2E1065),
+    secondary = Color(0xFFDB2777),
+    onSecondary = Color.White,
+    background = Color.White,
+    onBackground = Color.Black,
+    surface = Color(0xFFF7F7F9),
+    onSurface = Color.Black,
+    surfaceVariant = Color(0xFFF2F2F7),
+    onSurfaceVariant = Color(0xFF6E6E73),
+    outline = Color(0xFFE5E5EA),
+)
+
+/**
+ * SF Pro Display, the face Apple Music itself is set in, drawn one weight
+ * lighter than it is asked for.
+ *
+ * Measured against Apple Music's own screens, every weight here came out a
+ * cut heavier than the same text there: its titles are Semibold where these
+ * asked for Bold, its metadata Medium where these asked for Semibold. The
+ * shift is made once, in the family, so it reaches the type scale and every
+ * weight set in place alike and keeps the steps between them: Heavy draws
+ * Bold, Bold draws Semibold, Semibold draws Medium, Medium draws Regular.
+ * Regular stays Regular — no lighter cut is bundled, and Apple's body text is
+ * Regular too. A FontWeight in this app therefore names the step it sits at in
+ * the scale, not the cut it draws.
+ *
+ * Compose synthesises nothing, so a weight outside these falls back to the
+ * nearest one listed.
+ */
+val SFProDisplay = FontFamily(
+    Font(R.font.sf_pro_display_regular, FontWeight.W400),
+    Font(R.font.sf_pro_display_regular, FontWeight.W500),
+    Font(R.font.sf_pro_display_medium, FontWeight.W600),
+    Font(R.font.sf_pro_display_semibold, FontWeight.W700),
+    Font(R.font.sf_pro_display_bold, FontWeight.W800),
+)
+
+/*
+ * Letter spacing measured off Apple Music's own screens: the spacing the
+ * bundled Display cut needs, at the weight it draws, to set a line to the
+ * width Apple sets it. Apple sets text under 20pt in SF Pro Text, which is
+ * spaced looser than Display, so the small sizes open up — about +0.25 to
+ * +0.4 at 12 to 14 — and the spacing closes as the size grows, to just under
+ * nothing for semibold titles at 18 to 24. The large titles had nothing to
+ * measure against and follow the same trend.
+ */
+private val BitChordTypography = Typography(
+    displayLarge = TextStyle(fontWeight = FontWeight.W800, fontSize = 34.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontWeight = FontWeight.W800, fontSize = 30.sp, letterSpacing = (-0.4).sp),
+    headlineMedium = TextStyle(fontWeight = FontWeight.W700, fontSize = 22.sp, letterSpacing = (-0.25).sp),
+    titleLarge = TextStyle(fontWeight = FontWeight.W700, fontSize = 20.sp, letterSpacing = (-0.2).sp),
+    titleMedium = TextStyle(fontWeight = FontWeight.W600, fontSize = 16.sp, letterSpacing = 0.05.sp),
+    bodyLarge = TextStyle(fontWeight = FontWeight.W400, fontSize = 16.sp, letterSpacing = 0.2.sp),
+    bodyMedium = TextStyle(fontWeight = FontWeight.W400, fontSize = 14.sp, letterSpacing = 0.3.sp),
+    labelMedium = TextStyle(fontWeight = FontWeight.W600, fontSize = 12.sp, letterSpacing = 0.25.sp),
+    labelSmall = TextStyle(fontWeight = FontWeight.W600, fontSize = 11.sp, letterSpacing = 0.3.sp),
+).withFamily(SFProDisplay)
+
+/**
+ * SF Pro Display as the app first shipped it, before [SFProDisplay] moved every
+ * weight a cut lighter: each weight draws its own cut, Heavy included. Kept for
+ * [AppFont.LEGACY].
+ */
+val SFProDisplayLegacy = FontFamily(
+    Font(R.font.sf_pro_display_regular, FontWeight.W400),
+    Font(R.font.sf_pro_display_medium, FontWeight.W500),
+    Font(R.font.sf_pro_display_semibold, FontWeight.W600),
+    Font(R.font.sf_pro_display_bold, FontWeight.W700),
+    Font(R.font.sf_pro_display_heavy, FontWeight.W800),
+)
+
+// Heavy, tight typography — the original scale [AppFont.LEGACY] restores.
+private val LegacyTypography = Typography(
+    displayLarge = TextStyle(fontWeight = FontWeight.W800, fontSize = 34.sp, letterSpacing = (-0.8).sp),
+    headlineLarge = TextStyle(fontWeight = FontWeight.W800, fontSize = 30.sp, letterSpacing = (-0.7).sp),
+    headlineMedium = TextStyle(fontWeight = FontWeight.W700, fontSize = 22.sp, letterSpacing = (-0.4).sp),
+    titleLarge = TextStyle(fontWeight = FontWeight.W700, fontSize = 20.sp, letterSpacing = (-0.3).sp),
+    titleMedium = TextStyle(fontWeight = FontWeight.W600, fontSize = 16.sp, letterSpacing = (-0.2).sp),
+    bodyLarge = TextStyle(fontWeight = FontWeight.W400, fontSize = 16.sp),
+    bodyMedium = TextStyle(fontWeight = FontWeight.W400, fontSize = 14.sp),
+    labelMedium = TextStyle(fontWeight = FontWeight.W600, fontSize = 12.sp),
+    labelSmall = TextStyle(fontWeight = FontWeight.W600, fontSize = 11.sp),
+).withFamily(SFProDisplayLegacy)
+
+/** Applies [family] to every style in the scale, so nothing is left on Roboto. */
+private fun Typography.withFamily(family: FontFamily) = Typography(
+    displayLarge = displayLarge.copy(fontFamily = family),
+    displayMedium = displayMedium.copy(fontFamily = family),
+    displaySmall = displaySmall.copy(fontFamily = family),
+    headlineLarge = headlineLarge.copy(fontFamily = family),
+    headlineMedium = headlineMedium.copy(fontFamily = family),
+    headlineSmall = headlineSmall.copy(fontFamily = family),
+    titleLarge = titleLarge.copy(fontFamily = family),
+    titleMedium = titleMedium.copy(fontFamily = family),
+    titleSmall = titleSmall.copy(fontFamily = family),
+    bodyLarge = bodyLarge.copy(fontFamily = family),
+    bodyMedium = bodyMedium.copy(fontFamily = family),
+    bodySmall = bodySmall.copy(fontFamily = family),
+    labelLarge = labelLarge.copy(fontFamily = family),
+    labelMedium = labelMedium.copy(fontFamily = family),
+    labelSmall = labelSmall.copy(fontFamily = family),
+)
+
 @Composable
-fun KuroMusicTheme(
+fun BitChordTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    pureBlack: Boolean = false,
-    expressive: Boolean = true,
-    enableDynamicTheme: Boolean = false, // Nuevo parámetro
-    themeColor: Color = DefaultThemeColor,
+    font: AppFont = AppFont.DEFAULT,
     content: @Composable () -> Unit,
 ) {
-    val context = LocalContext.current
-
-    val colorScheme = remember(darkTheme, pureBlack, themeColor, enableDynamicTheme) {
-        val baseScheme = if (enableDynamicTheme && themeColor != DefaultThemeColor) {
-            // Album art disponible: generar scheme completo desde la carátula (textos incluidos)
-            SchemeTonalSpot(Hct.fromInt(themeColor.toArgb()), darkTheme, 0.0)
-                .toColorScheme()
-        } else if (enableDynamicTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Fallback: wallpaper del sistema mientras no hay carátula
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        } else {
-            // No dinámico: usar themeColor normalmente
-            SchemeTonalSpot(Hct.fromInt(themeColor.toArgb()), darkTheme, 0.0)
-                .toColorScheme()
-        }
-
-        // Si el scheme ya viene del album art, dejar que los colores fluyan sin forzar púrpura
-        val balancedScheme = if (enableDynamicTheme && themeColor != DefaultThemeColor) {
-            baseScheme
-        } else {
-            baseScheme.copy(
-                secondary = if (darkTheme) Color(0xFFD0BCFF) else Color(0xFF6750A4),
-                tertiary = if (darkTheme) Color(0xFFEFB8C8) else Color(0xFF7D5260),
-                outline = if (darkTheme) Color(0xFF938F99) else Color(0xFF79747E),
-                onSurfaceVariant = if (darkTheme) Color(0xFFD0BCFF) else Color(0xFF6750A4),
-                surfaceVariant = if (darkTheme) Color(0xFF49454F) else Color(0xFFE7E0EC)
-            )
-        }
-
-        balancedScheme.pureBlack(pureBlack, darkTheme)
-    }
-
-    val motionScheme = if (expressive) {
-        MotionScheme.expressive()
-    } else {
-        MotionScheme.standard()
-    }
-
-    MaterialExpressiveTheme(
-        colorScheme = colorScheme,
-        typography = KuroTypography,
-        shapes = MaterialTheme.shapes,
-        motionScheme = motionScheme,
-        content = content
-    )
-}
-
-fun Bitmap.extractThemeColor(): Color {
-    // Redimensionamos a un tamaño ridículamente pequeño para ahorrar CPU
-    val smallBitmap = Bitmap.createScaledBitmap(this, 50, 50, false)
-    val palette = Palette.from(smallBitmap).maximumColorCount(12).generate()
-    
-    // Prioridad: Vibrant -> Dominant -> Gray (fallback)
-    val intColor = palette.getVibrantColor(
-        palette.getDominantColor(android.graphics.Color.GRAY)
-    )
-    
-    // Si el bitmap pequeño no es el original, lo reciclamos para liberar RAM rápido
-    if (smallBitmap != this) smallBitmap.recycle()
-    
-    return Color(intColor)
-}
-
-fun Bitmap.extractGradientColors(): List<Color> {
-    val config = config
-    val finalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && config == Bitmap.Config.HARDWARE) {
-        copy(Bitmap.Config.ARGB_8888, false)
-    } else {
-        this
-    }
-    val extractedColors = Palette.from(finalBitmap)
-        .maximumColorCount(64)
-        .generate()
-        .swatches
-        .associate { it.rgb to it.population }
-
-    val orderedColors = Score.score(extractedColors, 2, 0xFF4285F4.toInt(), true)
-        .sortedByDescending { Color(it).luminance() }
-
-    return if (orderedColors.size >= 2)
-        listOf(Color(orderedColors[0]), Color(orderedColors[1]))
-    else
-        listOf(Color(0xFF595959), Color(0xFF0D0D0D))
-}
-
-object PlayerColorExtractor {
-    fun extractGradientColors(
-        palette: Palette,
-        fallbackColor: Int = Color(0xFF595959).toArgb()
-    ): List<Color> {
-        val extractedColors = palette.swatches
-            .associate { it.rgb to it.population }
-
-        val orderedColors = Score.score(extractedColors, 2, fallbackColor, true)
-            .sortedByDescending { Color(it).luminance() }
-
-        return if (orderedColors.size >= 2) {
-            listOf(Color(orderedColors[0]), Color(orderedColors[1]))
-        } else {
-            listOf(Color(0xFF595959), Color(0xFF0D0D0D))
-        }
-    }
-}
-
-fun DynamicScheme.toColorScheme() =
-    ColorScheme(
-        primary = Color(primary),
-        onPrimary = Color(onPrimary),
-        primaryContainer = Color(primaryContainer),
-        onPrimaryContainer = Color(onPrimaryContainer),
-        inversePrimary = Color(inversePrimary),
-        secondary = Color(secondary),
-        onSecondary = Color(onSecondary),
-        secondaryContainer = Color(secondaryContainer),
-        onSecondaryContainer = Color(onSecondaryContainer),
-        tertiary = Color(tertiary),
-        onTertiary = Color(onTertiary),
-        tertiaryContainer = Color(tertiaryContainer),
-        onTertiaryContainer = Color(onTertiaryContainer),
-        background = Color(background),
-        onBackground = Color(onBackground),
-        surface = Color(surface),
-        onSurface = Color(onSurface),
-        surfaceVariant = Color(surfaceVariant),
-        onSurfaceVariant = Color(onSurfaceVariant),
-        surfaceTint = Color(primary),
-        inverseSurface = Color(inverseSurface),
-        inverseOnSurface = Color(inverseOnSurface),
-        error = Color(error),
-        onError = Color(onError),
-        errorContainer = Color(errorContainer),
-        onErrorContainer = Color(onErrorContainer),
-        outline = Color(outline),
-        outlineVariant = Color(outlineVariant),
-        scrim = Color(scrim),
-        surfaceBright = Color(surfaceBright),
-        surfaceDim = Color(surfaceDim),
-        surfaceContainer = Color(surfaceContainer),
-        surfaceContainerHigh = Color(surfaceContainerHigh),
-        surfaceContainerHighest = Color(surfaceContainerHighest),
-        surfaceContainerLow = Color(surfaceContainerLow),
-        surfaceContainerLowest = Color(surfaceContainerLowest),
-        primaryFixed = Color(primaryPalette.tone(90)),
-        primaryFixedDim = Color(primaryPalette.tone(80)),
-        onPrimaryFixed = Color(primaryPalette.tone(10)),
-        onPrimaryFixedVariant = Color(primaryPalette.tone(30)),
-        secondaryFixed = Color(secondaryPalette.tone(90)),
-        secondaryFixedDim = Color(secondaryPalette.tone(80)),
-        onSecondaryFixed = Color(secondaryPalette.tone(10)),
-        onSecondaryFixedVariant = Color(secondaryPalette.tone(30)),
-        tertiaryFixed = Color(tertiaryPalette.tone(90)),
-        tertiaryFixedDim = Color(tertiaryPalette.tone(80)),
-        onTertiaryFixed = Color(tertiaryPalette.tone(10)),
-        onTertiaryFixedVariant = Color(tertiaryPalette.tone(30)),
-    )
-
-fun ColorScheme.pureBlack(apply: Boolean, isDarkTheme: Boolean) =
-    if (apply && isDarkTheme) {
-        copy(
-            surface = Color.Black,
-            background = Color.Black,
-            surfaceContainer = Color.Black,
-            surfaceContainerLow = Color.Black,
-            surfaceContainerLowest = Color.Black,
-            surfaceContainerHigh = Color.Black,
-            surfaceContainerHighest = Color.Black,
-            surfaceVariant = Color.Black,
-            surfaceBright = Color.Black,
-            surfaceDim = Color.Black,
-        )
-    } else {
-        this
-    }
-
-val ColorSaver = object : Saver<Color, Int> {
-    override fun restore(value: Int): Color = Color(value)
-    override fun SaverScope.save(value: Color): Int = value.toArgb()
-}
-
-object PlayerSliderColors {
-    @Composable
-    fun getSliderColors(
-        textButtonColor: Color,
-        playerBackground: PlayerBackgroundStyle,
-        useDarkTheme: Boolean
-    ) = SliderDefaults.colors(
-        activeTrackColor = when (playerBackground) {
-            PlayerBackgroundStyle.DEFAULT -> textButtonColor
-            PlayerBackgroundStyle.BLUR -> Color.White
-            PlayerBackgroundStyle.GRADIENT -> Color.White
-            PlayerBackgroundStyle.APPLE_MUSIC -> Color.White
+    MaterialTheme(
+        colorScheme = if (darkTheme) DarkColors else LightColors,
+        typography = when (font) {
+            AppFont.DEFAULT -> BitChordTypography
+            AppFont.LEGACY -> LegacyTypography
         },
-        inactiveTrackColor = when {
-            useDarkTheme -> Color.Gray.copy(alpha = 0.5f)
-            else -> Color.Gray.copy(alpha = 0.3f)
-        },
-        activeTickColor = when (playerBackground) {
-            PlayerBackgroundStyle.DEFAULT -> textButtonColor
-            PlayerBackgroundStyle.BLUR -> Color.White
-            PlayerBackgroundStyle.GRADIENT -> Color.White
-            PlayerBackgroundStyle.APPLE_MUSIC -> Color.White
-        },
-        inactiveTickColor = Color.Gray,
-        thumbColor = when (playerBackground) {
-            PlayerBackgroundStyle.DEFAULT -> textButtonColor
-            PlayerBackgroundStyle.BLUR -> Color.White
-            PlayerBackgroundStyle.GRADIENT -> Color.White
-            PlayerBackgroundStyle.APPLE_MUSIC -> Color.White
-        }
+        content = content,
     )
 }
+
+/**
+ * Draws the status and navigation bar glyphs dark or light.
+ *
+ * `enableEdgeToEdge()` decides this from the *system* dark-mode setting, which
+ * is the wrong input the moment the in-app theme disagrees with it: Light theme
+ * on a phone in dark mode left white icons on a white bar, invisible. The bars
+ * have to follow the content the app is actually painting. The player supplies
+ * its own stable light-icon value and paints contrast behind it; every other
+ * surface follows the theme. Hence a parameter rather than reading it here.
+ */
+@Composable
+fun SystemBarIcons(dark: Boolean) {
+    val view = LocalView.current
+    if (view.isInEditMode) return
+    val window = findWindow(view) ?: return
+    SideEffect {
+        WindowCompat.getInsetsController(window, view).apply {
+            isAppearanceLightStatusBars = dark
+            isAppearanceLightNavigationBars = dark
+        }
+    }
+}
+

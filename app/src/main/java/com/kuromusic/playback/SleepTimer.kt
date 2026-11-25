@@ -1,67 +1,94 @@
 package com.kuromusic.playback
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
+import android.os.SystemClock
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.math.roundToInt
 
-class SleepTimer(
-    private val scope: CoroutineScope,
-    val player: Player,
-) : Player.Listener {
-    private var sleepTimerJob: Job? = null
-    var triggerTime by mutableStateOf(-1L)
-        private set
-    var pauseWhenSongEnd by mutableStateOf(false)
-        private set
-    val isActive: Boolean
-        get() = triggerTime != -1L || pauseWhenSongEnd
+/**
+ * Sleep timer. Holds a deadline; [PlaybackService] watches it and pauses
+ * playback once it passes.
+ *
+ * A deadline rather than a countdown: nothing has to tick for the timer to
+ * stay accurate, so it survives the player UI being dismissed, and any
+ * observer can work out how long is left for itself. elapsedRealtime, not
+ * wall clock, so changing the system time can't cut a timer short.
+ */
+object SleepTimer {
 
-    fun start(minute: Int) {
-        sleepTimerJob?.cancel()
-        sleepTimerJob = null
-        if (minute == -1) {
-            pauseWhenSongEnd = true
-        } else {
-            triggerTime = System.currentTimeMillis() + minute.minutes.inWholeMilliseconds
-            sleepTimerJob =
-                scope.launch {
-                    delay(minute.minutes)
-                    player.pause()
-                    triggerTime = -1L
-                }
-        }
+    /** Deadline on [SystemClock.elapsedRealtime], or null when no timer is set. */
+    val deadline = MutableStateFlow<Long?>(null)
+
+    /** The preset that was chosen, so the picker can tick it. Null when off. */
+    val minutes = MutableStateFlow<Int?>(null)
+
+    /**
+     * Pause when the current track ends instead of after a fixed wait.
+     *
+     * Deliberately not expressed as a deadline of "duration minus position":
+     * seeking, crossfade and a queue that reorders itself would all leave that
+     * number wrong, whereas the track ending is an event the player reports.
+     */
+    val afterTrack = MutableStateFlow(false)
+
+    /** Durations offered in the picker. */
+    val PRESETS = listOf(15, 30, 45, 60)
+
+    /** The custom picker moves in steps this size, from one step up to [MAX_MINUTES]. */
+    const val STEP_MINUTES = 5
+
+    /** Longest custom duration: twelve hours. */
+    const val MAX_MINUTES = 720
+
+    /** The custom duration a slider at [fraction] (0..1) of its travel stands for. */
+    fun minutesAt(fraction: Float): Int {
+        val raw = STEP_MINUTES + fraction.coerceIn(0f, 1f) * (MAX_MINUTES - STEP_MINUTES)
+        return (raw / STEP_MINUTES).roundToInt() * STEP_MINUTES
     }
 
-    fun clear() {
-        sleepTimerJob?.cancel()
-        sleepTimerJob = null
-        pauseWhenSongEnd = false
-        triggerTime = -1L
+    /** Where [minutes] sits along the custom slider, the inverse of [minutesAt]. */
+    fun fractionOf(minutes: Int): Float =
+        (minutes - STEP_MINUTES).toFloat() / (MAX_MINUTES - STEP_MINUTES)
+
+    /** Whether any kind of timer is currently armed. */
+    val isRunning: Boolean get() = deadline.value != null || afterTrack.value
+
+    fun start(minutes: Int) {
+        afterTrack.value = false
+        this.minutes.value = minutes
+        deadline.value = SystemClock.elapsedRealtime() + minutes * 60_000L
     }
 
-    override fun onMediaItemTransition(
-        mediaItem: MediaItem?,
-        reason: Int,
-    ) {
-        if (pauseWhenSongEnd) {
-            pauseWhenSongEnd = false
-            player.pause()
-        }
+    /** Pause once the track playing right now finishes. */
+    fun startAfterTrack() {
+        minutes.value = null
+        deadline.value = null
+        afterTrack.value = true
     }
 
-    override fun onPlaybackStateChanged(
-        @Player.State playbackState: Int,
-    ) {
-        if (playbackState == Player.STATE_ENDED && pauseWhenSongEnd) {
-            pauseWhenSongEnd = false
-            player.pause()
-        }
+    fun cancel() {
+        minutes.value = null
+        deadline.value = null
+        afterTrack.value = false
+    }
+
+    /** How long is left, or null when no timer is running. */
+    fun remainingMs(): Long? =
+        deadline.value?.let { (it - SystemClock.elapsedRealtime()).coerceAtLeast(0L) }
+
+    /** Duration of the volume fade-out before playback stops (30 seconds). */
+    const val FADE_OUT_DURATION_MS = 30_000L
+
+    /**
+     * Volume multiplier (0.0f..1.0f) for [remainingMs] milliseconds before deadline.
+     * When fade is active and under [fadeDurationMs], volume decreases linearly to 0.
+     */
+    fun calculateFadeVolume(
+        remainingMs: Long,
+        fadeDurationMs: Long = FADE_OUT_DURATION_MS,
+        fadeOutEnabled: Boolean = true,
+    ): Float {
+        if (!fadeOutEnabled || remainingMs >= fadeDurationMs) return 1f
+        if (remainingMs <= 0L || fadeDurationMs <= 0L) return 0f
+        return (remainingMs.toFloat() / fadeDurationMs.toFloat()).coerceIn(0f, 1f)
     }
 }

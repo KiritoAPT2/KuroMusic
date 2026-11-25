@@ -1,142 +1,116 @@
-# KuroMusic
-
 <div align="center">
-  <img src="https://raw.githubusercontent.com/KuroMusic/KuroMusic/main/assets/BannerKuro.png" alt="KuroMusic" width="100%"/>
 
-  A Material Design 3 YouTube Music client for Android.
+```ocaml
+KUROMUSIC 2.0 • CLIENTE DE MÚSICA PARA ANDROID
+```
 
-  [![GitHub release](https://img.shields.io/github/v/release/KiritoAPT2/KuroMusic?style=flat-square)](https://github.com/KiritoAPT2/KuroMusic/releases)
-  [![License](https://img.shields.io/github/license/KiritoAPT2/KuroMusic?style=flat-square)](LICENSE)
-  [![Downloads](https://img.shields.io/github/downloads/KiritoAPT2/KuroMusic/total?style=flat-square)](https://github.com/KiritoAPT2/KuroMusic/releases)
-  [![Telegram](https://img.shields.io/badge/Telegram-Channel-26A5E4?style=flat-square&logo=telegram)](https://t.me/KiritoAPT2)
 </div>
 
-## 📸 Screenshots
+<h1 align="center">
+  <br>
+    <a href="https://github.com/KiritoAPT2/KuroMusic"><img src="./app/src/main/res/drawable/img_kuro_logo.png" alt="KuroMusic" width="110"></a>
+      <br>
+      KuroMusic
+  <br>
+</h1>
 
 <p align="center">
-  <img src="screenshots/home.png" width="30%" alt="Home" />
-  <img src="screenshots/player.png" width="30%" alt="Player" />
-  <img src="screenshots/settings.png" width="30%" alt="Settings" />
+  <a href="https://github.com/KiritoAPT2/KuroMusic/releases">
+    <img src="https://img.shields.io/github/v/release/KiritoAPT2/KuroMusic?style=flat-square&color=8B5CF6" alt="Release">
+  </a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/KiritoAPT2/KuroMusic?style=flat-square&color=1C1C1E" alt="License">
+  </a>
+  <a href="https://t.me/KiritoAPT2">
+    <img src="https://img.shields.io/badge/Telegram-@KiritoAPT2-26A5E4?style=flat-square&logo=telegram" alt="Telegram">
+  </a>
+  <a href="https://kiritoapt2.github.io/KuroMusic-Web/">
+    <img src="https://img.shields.io/badge/Web-KuroMusic-8B5CF6?style=flat-square" alt="Website">
+  </a>
 </p>
 
-## 📥 Download
+<pre align="center">
+  <a href="#caracteristicas">CARACTERÍSTICAS</a> • <a href="#compilacion">COMPILACIÓN</a> • <a href="#dependencias">DEPENDENCIAS</a> • <a href="#descargar">DESCARGAR</a> • <a href="#agradecimientos">AGRADECIMIENTOS</a> • <a href="#licencia">LICENCIA</a>
+</pre>
 
-[![GitHub](https://img.shields.io/badge/Download-GitHub_Release-181717?style=for-the-badge&logo=github)](https://github.com/KiritoAPT2/KuroMusic/releases/latest)
+<p align="center">
+  <img src="./banner.png" width="680" alt="KuroMusic Banner">
+</p>
 
-Download the latest APK from [Releases](https://github.com/KiritoAPT2/KuroMusic/releases/latest). Minimum Android 6.0 (API 23).
+<p align="center">
+  <em>Cliente de música para Android con interfaz fluida, fondo Aurora dinámico y reproducción sin anuncios. Visita la web oficial en <a href="https://kiritoapt2.github.io/KuroMusic-Web/">kiritoapt2.github.io/KuroMusic-Web</a>.</em>
+</p>
 
-## ✨ Features
+## :octocat: ‎ <sup><sub><samp>¡HOLA! ¡GRACIAS POR VENIR!</samp></sub></sup>
 
-### 🎵 Playback
-- Ad-free streaming from YouTube Music
-- Background playback with Media3 notification controls
-- High-quality audio streaming
-- Skip silence
-- Volume normalization (loudness normalization)
-- Sleep timer
-- Persistent queue across app restarts
-- Queue reorder
+<img src="./app/src/main/res/drawable/img_kuro_logo.png" align="right"
+     alt="KuroMusic" width="160">
 
-### 🔍 Browse & Search
-- Search songs, albums, artists, and playlists
-- Home feed with recommendations
-- Explore page with new releases and curated content
-- Mood & genres browsing
-- Song, album, artist radio / auto-play similar content
+**KuroMusic 2.0** es un reproductor de música y cliente de YouTube Music para Android diseñado con enfoque en fluidez, estabilidad de sesión (con cuenta o como invitado), audio de alta calidad y personalización visual con **Aurora dinámica** según la carátula actual y **BeatBuddy** en el reproductor.
 
-### 📚 Library
-- Liked songs, playlists, albums, and artists
-- Listening history (local and remote)
-- Import YouTube Music playlists
-- Create and manage local playlists
-- Listening statistics
-- Bookmark artists and albums
+> [!IMPORTANT]
+> KuroMusic no está afiliado, respaldado ni conectado con YouTube ni Google LLC. Úsalo bajo tu propio criterio.
 
-### 🎨 Visual & Customization
-- Material 3 Dynamic theming (follows wallpaper colors)
-- Pure black OLED theme
-- Light / Dark / System / Dynamic theme modes
-- Album art-based color extraction
-- Animated player UI
+## <samp><a id="caracteristicas"></a>Características</samp>
 
-### 🎤 Lyrics
-- Real-time synchronized lyrics
-- Multiple providers: LRCLib, KuGou, Kizzy
-- Auto-search and fallback between providers
+- **Aurora dinámica:** Fondo ambiental en Inicio que adapta su color vibrante a la carátula en reproducción.
+- **BeatBuddy en MiniPlayer:** Mascota animada (gato u oso) bailando al ritmo de la música.
+- **Selección rápida al instante:** Acceso directo en la parte superior del Inicio, Explorar, Radio, Biblioteca y Búsqueda.
+- **Audio avanzado:** Audio Espacial, normalización de volumen, saltar silencio, crossfade y salida bit-perfect por USB DAC.
+- **Letras y carátulas animadas:** Letras sincronizadas en tiempo real y portadas animadas (Canvas).
+- **Sesión estable y modo invitado:** Renovación automática de sesión con cuenta Google y soporte completo sin cuenta.
+- **Actualizador integrado:** Notifica, descarga e instala nuevas versiones directamente desde GitHub Releases.
 
-### 🔗 Integrations
-- Discord Rich Presence *(experimental — shows current song in profile)*
-- Last.fm scrobbling
+## <samp><a id="compilacion"></a>Compilación</samp>
 
-### ⚙️ Other
-- Download songs for offline playback
-- In-app update checker
-- Cache management
-- Force AAC fallback for devices without Opus support
-
-## 🛠 Tech Stack
-
-| Category | Technology |
-|----------|-----------|
-| Language | Kotlin |
-| UI | Jetpack Compose + Material 3 |
-| Playback | Media3 ExoPlayer |
-| Architecture | MVVM + Clean Architecture |
-| DI | Dagger Hilt |
-| Database | Room with auto-migrations |
-| Image loading | Coil |
-| API client | InnerTube (Ktor + OkHttp) |
-| YouTube API | InnerTube (ANDROID_MUSIC, WEB_REMIX, and 7+ fallback clients) |
-| Lyrics APIs | LRCLib, KuGou, Kizzy |
-| Discord RPC | WebSocket Gateway (user token) |
-| Preferences | DataStore |
-
-## 🏗️ Architecture
-
-```
-:app              → Android app (UI, playback, database, DI)
-:innertube        → YouTube Music API client (JVM library)
-:kugou            → KuGou lyrics provider
-:lrclib           → LRCLib lyrics provider
-:kizzy            → Unknown/experimental module
-:jossredconnect   → JossRed client
-:lastfm           → Last.fm scrobbling
-```
-
-## 🔧 Build
-
-Requires JDK 17 and Android SDK.
+Requiere JDK 17, Android SDK y NDK 27.
 
 ```bash
-git clone https://github.com/KuroMusic/KuroMusic.git
+git clone https://github.com/KiritoAPT2/KuroMusic.git
 cd KuroMusic
-./gradlew assembleRelease
+./gradlew :app:assembleProdRelease
 ```
 
-APK output: `app/build/outputs/apk/release/KuroMusic.apk`
+## <samp><a id="dependencias"></a>Dependencias</samp>
 
-> [!NOTE]
-> A `local.properties` file with API keys and signing credentials is required for release builds. See [AGENTS.md](AGENTS.md) for details.
+| Nombre | Uso | Licencia |
+| :----- | :-- | :------- |
+| [Jetpack Compose & Material 3](https://developer.android.com/jetpack/compose) | Interfaz de usuario | Apache 2.0 |
+| [Media3 ExoPlayer](https://developer.android.com/media/media3) | Reproducción y DSP de audio | Apache 2.0 |
+| [Ktor & OkHttp](https://ktor.io/) | Cliente de red y API | Apache 2.0 |
+| [Coil 3](https://coil-kt.github.io/coil/) | Carga de imágenes y carátulas | Apache 2.0 |
+| [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) | Extracción de streams de respaldo | GPLv3 |
 
-## 🛡️ Security & Privacy
+## <samp><a id="descargar"></a>Descargar</samp>
 
-KuroMusic connects directly to YouTube/InnerTube — no backend server. No user data is sent to third parties beyond the services you explicitly use (Last.fm, Discord). The app does not require a YouTube account; guest playback uses visitor data.
+Puedes [descargar](https://github.com/KiritoAPT2/KuroMusic/releases) la última versión instalable (APK) de **KuroMusic** o visitar la [página web oficial](https://kiritoapt2.github.io/KuroMusic-Web/).
 
-## 💬 Community
+## <samp>Colaboradores</samp>
 
-- [Telegram Channel](https://t.me/KiritoAPT2)
-- [GitHub Issues](https://github.com/KiritoAPT2/KuroMusic/issues) — bug reports and feature requests
+1. ¡Bifúrcalo!
+2. Crea tu rama de características: `git checkout -b nueva-funcion`
+3. Confirme sus cambios: `git commit -am 'Agregar funcionalidad'`
+4. Empuje la rama: `git push origin nueva-funcion`
+5. Envíe una pull request :D
 
-## ⚠️ Disclaimer
+El proyecto está mantenido por [KiritoAPT2](https://github.com/KiritoAPT2).
 
-KuroMusic is not affiliated with Google LLC or YouTube Music. All media content is streamed from YouTube Music's public API via InnerTube. This project is for educational purposes.
+<a href="https://github.com/KiritoAPT2/KuroMusic/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=KiritoAPT2/KuroMusic" />
+</a>
 
-## 🙏 Créditos
+## <samp><a id="agradecimientos"></a>Agradecimientos</samp>
 
-**TeamAnimax** — Por el apoyo incondicional y los buenos momentos. Esto también es suyo. 🫶
+| | | Dedicatoria |
+| :-: | :-: | :---------- |
+| 🫶 | 1 | **TeamAnimax** — Por el apoyo incondicional y los buenos momentos. Esto también es suyo. |
 
-## 📄 License
+## <samp><a id="licencia"></a>Licencia</samp>
 
-[GNU General Public License v3.0](LICENSE)
+<pre align="center">
+  <a href="https://github.com/KiritoAPT2/KuroMusic/blob/main/LICENSE">GPLv3</a> • <a href="https://kiritoapt2.github.io/KuroMusic-Web/">kiritoapt2.github.io/KuroMusic-Web</a> • <a href="https://github.com/KiritoAPT2">@KiritoAPT2</a> • <a href="https://t.me/KiritoAPT2">Telegram</a>
+</pre>
 
-Copyright © 2026 KuroMusic
+<pre align="center">
+  <a href="#readme">VOLVER ARRIBA</a>
+</pre>

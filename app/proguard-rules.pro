@@ -1,173 +1,96 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.kts.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# R8 is on for release for speed, not size — see the note on isMinifyEnabled in
+# build.gradle.kts. These rules keep it away from everything that finds classes
+# by name at runtime, where a missing class shows up as a crash on a device
+# rather than as a build error.
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Nothing is renamed. Stack traces stay readable, and every lookup by name —
+# enum names in preferences, Media3 custom commands, library reflection — keeps
+# working without a rule of its own.
+-dontobfuscate
+-keepattributes SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,Exceptions,*Annotation*
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-## Kotlin Serialization
-# Keep `Companion` object fields of serializable classes.
-# This avoids serializer lookup through `getDeclaredClasses` as done for named companion objects.
--if @kotlinx.serialization.Serializable class **
--keepclasseswithmembers class <1> {
-    static <1>$Companion Companion;
-}
-
-# Keep `serializer()` on companion objects (both default and named) of serializable classes.
--if @kotlinx.serialization.Serializable class ** {
-    static **$* *;
-}
--keepclasseswithmembers class <2>$<3> {
-    kotlinx.serialization.KSerializer serializer(...);
-}
-
-# Keep `INSTANCE.serializer()` of serializable objects.
--if @kotlinx.serialization.Serializable class ** {
-    public static ** INSTANCE;
-}
--keepclasseswithmembers class <1> {
-    public static <1> INSTANCE;
-    kotlinx.serialization.KSerializer serializer(...);
-}
-
-# @Serializable and @Polymorphic are used at runtime for polymorphic serialization.
--keepattributes RuntimeVisibleAnnotations,AnnotationDefault,InnerClasses
--dontnote kotlinx.serialization.AnnotationsKt
--dontwarn kotlinx.serialization.**
-
--dontwarn javax.servlet.ServletContainerInitializer
--dontwarn org.bouncycastle.jsse.BCSSLParameters
--dontwarn org.bouncycastle.jsse.BCSSLSocket
--dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
--dontwarn org.conscrypt.Conscrypt$Version
--dontwarn org.conscrypt.Conscrypt
--dontwarn org.conscrypt.ConscryptHostnameVerifier
--dontwarn org.openjsse.javax.net.ssl.SSLParameters
--dontwarn org.openjsse.javax.net.ssl.SSLSocket
--dontwarn org.openjsse.net.ssl.OpenJSSE
--dontwarn org.slf4j.impl.StaticLoggerBinder
-
-## Coil image loading
--keep class coil.** { *; }
--keep interface coil.** { *; }
--keep class coil.memory.** { *; }
--keep class coil.disk.** { *; }
--keep class coil.network.** { *; }
--keep class coil.decode.** { *; }
--keep class coil.fetch.** { *; }
--keep class coil.key.** { *; }
--keep class coil.size.** { *; }
--keep class coil.target.** { *; }
--keep class coil.transition.** { *; }
--keep class coil.util.** { *; }
--dontwarn coil.**
-
-## Rules for NewPipeExtractor
--keep class org.schabi.newpipe.extractor.timeago.patterns.** { *; }
--keep class org.mozilla.javascript.** { *; }
--keep class org.mozilla.javascript.engine.** { *; }
--dontwarn org.mozilla.javascript.JavaToJSONConverters
--dontwarn org.mozilla.javascript.tools.**
--keep class javax.script.** { *; }
--dontwarn javax.script.**
--keep class jdk.dynalink.** { *; }
--dontwarn jdk.dynalink.**
-
-## Logging (does not affect Timber)
+# ---- Logging ------------------------------------------------------------------
+# A release build writes nothing to logcat. Every call is removed, ours and every
+# library's that goes through android.util.Log — Media3's included — and with it
+# the string each one built, on threads like playback's and the analyzer's that
+# log several times a second. Nobody reads logcat on a user's phone: what a bug
+# report needs is Copy Log in the player, which reads TrackLog's own buffer and
+# never touched logcat to begin with (see TrackLog's class doc).
 -assumenosideeffects class android.util.Log {
-    public static boolean isLoggable(java.lang.String, int);
     public static int v(...);
     public static int d(...);
-    ## Leave in release builds
-    #public static int i(...);
-    #public static int w(...);
-    #public static int e(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+    public static int wtf(...);
+    public static int println(...);
 }
 
-# Generated automatically by the Android Gradle plugin.
--dontwarn java.beans.BeanDescriptor
--dontwarn java.beans.BeanInfo
--dontwarn java.beans.IntrospectionException
--dontwarn java.beans.Introspector
--dontwarn java.beans.PropertyDescriptor
--dontwarn okhttp3.internal.Util
+# ---- Script engines and extractors ------------------------------------------
+# Rhino compiles and runs YouTube's player JavaScript and binds Java classes into
+# it reflectively; NewPipe and InnerTubeX drive it and parse with nanojson/jsoup.
+-keep class org.mozilla.javascript.** { *; }
+-keep class org.mozilla.classfile.** { *; }
+-keep class org.schabi.newpipe.** { *; }
+-keep class com.grack.nanojson.** { *; }
+-keep class org.jsoup.** { *; }
+-keep class com.metrolist.** { *; }
+-keep class com.dokar.quickjs.** { *; }
 
-
-## Rules for PipePipeExtractor
--keep class project.pipepipe.extractor.** { *; }
--keep class project.pipepipe.shared.** { *; }
-
-## Netty rules (used by PipePipeExtractor dependencies)
--dontwarn io.netty.**
--dontwarn org.apache.log4j.**
--dontwarn org.apache.logging.log4j.**
--dontwarn reactor.blockhound.**
--dontwarn io.micrometer.context.**
--dontwarn javax.enterprise.inject.**
-
-## Lettuce (Redis client used by PipePipeExtractor)
--dontwarn io.lettuce.core.**
-
-## Reactor
--dontwarn reactor.util.context.**
-
-## Keep Wire protobuf classes
--keep class com.squareup.wire.** { *; }
-
-## Media3 rules (Prevent ClassCastException and reflection issues in Release)
--keep class androidx.media3.common.** { *; }
--keep class androidx.media3.exoplayer.** { *; }
--keep class androidx.media3.session.** { *; }
--keep class androidx.media3.datasource.** { *; }
--keep class androidx.media3.ui.** { *; }
--keep interface androidx.media3.common.** { *; }
--keep interface androidx.media3.exoplayer.** { *; }
--keep interface androidx.media3.session.** { *; }
--dontwarn androidx.media3.exoplayer.**
--dontwarn androidx.media3.common.**
--dontwarn androidx.media3.session.**
-
-# KuroMusic Models
--keep class com.kuromusic.models.** { *; }
--keep class com.kuromusic.innertube.models.** { *; }
-
-# Serialization
--keep class com.kuromusic.innertube.utils.UtilsKt { *; }
-
-## Ktor and OkHttp engine
--keep class io.ktor.** { *; }
--dontwarn io.ktor.**
--keep class okhttp3.** { *; }
--dontwarn okhttp3.**
--keep class org.bouncycastle.** { *; }
+# ---- Native and crypto --------------------------------------------------------
+# ONNX Runtime and QuickJS are called from JNI, which R8 cannot see. SMBJ picks
+# its authenticators and event bus handlers reflectively.
+-keep class ai.onnxruntime.** { *; }
+-keep class com.hierynomus.** { *; }
+-keep class net.engio.mbassy.** { *; }
+# BouncyCastle needs no keep rule: SMBJ (BCSecurityProvider), libadb (pairing's
+# HKDF/AES-GCM) and WatchInstaller (the X.509 builder) all call it directly, so
+# R8 traces what they use. Its only lookups by name are inside its JCA provider
+# packages, and nothing registers BouncyCastleProvider — the certificate is
+# signed through the platform's own providers. Keep an exact class here if a
+# new use reaches it by name.
 -dontwarn org.bouncycastle.**
-
-# Auth classes
--keep class com.kuromusic.innertube.YouTube { *; }
--keep class com.kuromusic.innertube.InnerTube { *; }
--keep class com.kuromusic.innertube.** { *; }
--keep class com.kuromusic.playback.YouTubeSessionInterceptor { *; }
--keepclassmembers class com.kuromusic.models.** {
-    <fields>;
-    <methods>;
+-keepclasseswithmembernames,includedescriptorclasses class * { native <methods>; }
+# The vendored FFmpeg extension's JNI calls back into this by name to grow
+# its output buffer (native/ffmpeg/ffmpeg_jni.cc, JNI_OnLoad).
+-keep,includedescriptorclasses class androidx.media3.decoder.ffmpeg.FfmpegAudioDecoder {
+    private java.nio.ByteBuffer growOutputBuffer(androidx.media3.decoder.SimpleDecoderOutputBuffer, int);
 }
 
-# Mantener nombres de variables para los detalles técnicos
--keepclassmembers class ** {
-    @com.google.gson.annotations.SerializedName <fields>;
+# ---- Serialization --------------------------------------------------------------
+# protobuf-lite reads its generated messages' fields reflectively.
+-keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+# Ktor resolves serializers and engine pieces by type at runtime.
+-keep class io.ktor.** { *; }
+# Our own @Serializable models, whole: kotlinx.serialization's bundled rules
+# cover the generated serializers, and keeping the classes too costs little.
+-keep @kotlinx.serialization.Serializable class com.kuromusic.** { *; }
+-keep @kotlinx.serialization.Serializable class com.my.kizzy.** { *; }
+
+# ---- WebView bridges ------------------------------------------------------------
+# PoToken minting and the Spotify token page call back into these from JavaScript.
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
 }
+
+# ---- JVM-only APIs ------------------------------------------------------------
+# Referenced by desktop-only paths in Rhino (JSR-223, java.beans, dynalink),
+# mbassy's EL filters, SMBJ's Kerberos and Ktor's IntelliJ debugger probe. None
+# of them exist on Android and none of those paths run here — the debug build,
+# which R8 never touches, has always lived without them.
+-dontwarn java.beans.**
+-dontwarn java.lang.management.**
+-dontwarn javax.el.**
+-dontwarn javax.script.**
+-dontwarn jdk.dynalink.**
+-dontwarn org.ietf.jgss.**
+
+# ---- "BitChord for Wear OS": the ADB client that installs the watch app ----
+# libadb-android drives the pairing and transport through Conscrypt and SPAKE2,
+# both of which reach their native halves by name.
+-keep class io.github.muntashirakon.adb.** { *; }
+-keep class org.conscrypt.** { *; }
+-keep class com.android.org.conscrypt.** { *; }
+-dontwarn org.conscrypt.**
+-dontwarn com.android.org.conscrypt.**
+-dontwarn io.github.muntashirakon.adb.**
