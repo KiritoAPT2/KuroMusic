@@ -15,12 +15,12 @@ import android.content.pm.PackageManager
 enum class AppIcon(val alias: String, val iconRes: Int, val labelRes: Int, val previewRes: Int? = null) {
     Default("LauncherDefault", R.mipmap.ic_launcher, R.string.app_icon_default),
     Monochrome("LauncherMonochrome", R.mipmap.ic_monochrome, R.string.app_icon_monochrome),
-    Purple("LauncherPurple", R.mipmap.ic_kuro_purple, R.string.app_icon_purple),
-    Dark("LauncherDark", R.mipmap.ic_kuro_dark, R.string.app_icon_dark),
-    Cyan("LauncherCyan", R.mipmap.ic_kuro_cyan, R.string.app_icon_cyan),
-    Pink("LauncherPink", R.mipmap.ic_kuro_pink, R.string.app_icon_pink),
-    White("LauncherWhite", R.mipmap.ic_kuro_white, R.string.app_icon_white),
-    Emerald("LauncherEmerald", R.mipmap.ic_kuro_emerald, R.string.app_icon_emerald);
+    Purple("LauncherPurple", R.mipmap.ic_kuro_purple, R.string.app_icon_purple, R.drawable.ic_kuro_purple_fg),
+    Dark("LauncherDark", R.mipmap.ic_kuro_dark, R.string.app_icon_dark, R.drawable.ic_kuro_dark_fg),
+    Cyan("LauncherCyan", R.mipmap.ic_kuro_cyan, R.string.app_icon_cyan, R.drawable.ic_kuro_cyan_fg),
+    Pink("LauncherPink", R.mipmap.ic_kuro_pink, R.string.app_icon_pink, R.drawable.ic_kuro_pink_fg),
+    White("LauncherWhite", R.mipmap.ic_kuro_white, R.string.app_icon_white, R.drawable.ic_kuro_white_fg),
+    Emerald("LauncherEmerald", R.mipmap.ic_kuro_emerald, R.string.app_icon_emerald, R.drawable.ic_kuro_emerald_fg);
 
     private fun component(context: Context) =
         ComponentName(context.packageName, "com.kuromusic.$alias")
