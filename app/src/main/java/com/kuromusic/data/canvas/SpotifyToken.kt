@@ -43,7 +43,7 @@ import com.kuromusic.data.web.QuietWebChromeClient
 internal object SpotifyToken {
 
     private const val TAG = "SpotifyToken"
-    private const val BRIDGE_NAME = "BitChordSpotifyTokenBridge"
+    private const val BRIDGE_NAME = "KuroMusicSpotifyTokenBridge"
     private const val HARVEST_TIMEOUT_MS = 20_000L
     private const val DEFAULT_TOKEN_LIFETIME_MS = 3_600_000L
 
@@ -211,8 +211,8 @@ internal object SpotifyToken {
 
     private val HOOK_SCRIPT = """
         (function () {
-          if (window.__bitchordTokenHook) return;
-          window.__bitchordTokenHook = true;
+          if (window.__kuromusicTokenHook) return;
+          window.__kuromusicTokenHook = true;
           var report = function (body) {
             try { $BRIDGE_NAME.onTokenPayload(body); } catch (e) {}
           };
@@ -236,7 +236,7 @@ internal object SpotifyToken {
           }
           var origOpen = XMLHttpRequest.prototype.open;
           XMLHttpRequest.prototype.open = function (method, url) {
-            this.__bitchordUrl = url;
+            this.__kuromusicUrl = url;
             return origOpen.apply(this, arguments);
           };
           var origSend = XMLHttpRequest.prototype.send;
@@ -244,7 +244,7 @@ internal object SpotifyToken {
             var xhr = this;
             try {
               xhr.addEventListener('load', function () {
-                if (isToken(xhr.__bitchordUrl)) {
+                if (isToken(xhr.__kuromusicUrl)) {
                   try { report(xhr.responseText); } catch (e) {}
                 }
               });

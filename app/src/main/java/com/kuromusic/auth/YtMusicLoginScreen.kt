@@ -29,7 +29,7 @@ private const val LOGIN_URL =
         "?ltmpl=music&service=youtube&prompt=select_account" +
     "&continue=https%3A%2F%2Fmusic.youtube.com%2F"
 
-private const val TAG = "BitChord"
+private const val TAG = "KuroMusic"
 
 /**
  * In-app Google sign-in for YouTube Music, and the way to change which channel

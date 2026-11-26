@@ -28,7 +28,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
- * What BitChord asks of Google Drive — list its files, write one, read one,
+ * What KuroMusic asks of Google Drive — list its files, write one, read one,
  * delete one — as plain REST calls into the hidden `appDataFolder`.
  *
  * Every file is small: a device's manifest, or one month of one device's
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit
 object DriveApi {
 
     /** The single shared file earlier builds wrote; still read, never written. */
-    const val LEGACY_FILE_NAME = "bitchord-backup.json.gz"
+    const val LEGACY_FILE_NAME = "kuromusic-backup.json.gz"
 
     private const val MIME = "application/gzip"
     private const val API = "https://www.googleapis.com/drive/v3"

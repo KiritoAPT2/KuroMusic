@@ -108,7 +108,7 @@ object DriveBackup {
     /** The grant has gone; the run stops and the screen asks again. */
     class NeedsSignIn : Exception("Sign in to Google Drive again to continue")
 
-    private const val PREFS = "bitchord_drive_backup"
+    private const val PREFS = "kuromusic_drive_backup"
     private const val KEY_ACCOUNT = "account"
     private const val KEY_ACCOUNT_NAME = "account_name"
     private const val KEY_FREQUENCY = "frequency"
