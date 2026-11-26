@@ -3,7 +3,8 @@ package com.kuromusic.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -50,7 +51,7 @@ fun AuroraBackground(
     maxScrollOffset: Float = 1000f,
     content: @Composable () -> Unit
 ) {
-    val isDarkTheme = isSystemInDarkTheme()
+    val isDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     val animatedDynamicColor by animateColorAsState(
         targetValue = color,
@@ -66,7 +67,8 @@ fun AuroraBackground(
     val duration2 = 13000L
     val duration3 = 15000L
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isVisible) {
+        if (!isVisible) return@LaunchedEffect
         val startTime = System.currentTimeMillis()
         while (isActive) {
             val elapsed = System.currentTimeMillis() - startTime
@@ -83,7 +85,7 @@ fun AuroraBackground(
             val raw3 = if (progress3 <= 1f) progress3 else 2f - progress3
             offset3 = -50f + (raw3 * 100f)
 
-            delay(16)
+            delay(33)
         }
     }
 
@@ -106,16 +108,21 @@ fun AuroraBackground(
                 blendMode = BlendMode.Plus
             )
         } else {
+            val lightTint = if (animatedDynamicColor != PurpleElectric) {
+                animatedDynamicColor.copy(alpha = 0.35f).compositeOver(Color.White)
+            } else {
+                LightPrimary
+            }
             AuroraBrushColors(
-                topPrimary = LightPrimary,
+                topPrimary = lightTint,
                 topSecondary = LightSecondary,
-                topAlpha = 0.3f,
-                leftPrimary = LightPrimary,
+                topAlpha = 0.35f,
+                leftPrimary = lightTint,
                 leftSecondary = LightSecondary,
-                leftAlpha = 0.3f,
-                rightPrimary = LightPrimary,
+                leftAlpha = 0.35f,
+                rightPrimary = lightTint,
                 rightSecondary = LightSecondary,
-                rightAlpha = 0.3f,
+                rightAlpha = 0.35f,
                 blendMode = BlendMode.SrcOver
             )
         }

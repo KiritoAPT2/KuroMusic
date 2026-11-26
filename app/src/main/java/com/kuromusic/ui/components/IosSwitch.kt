@@ -80,10 +80,10 @@ fun IosSwitch(
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 900f),
         label = "iosSwitchStretch",
     )
+    val activeTrack = MaterialTheme.colorScheme.primary
     val track by animateColorAsState(
         targetValue = when {
-            checked && dark -> Color(0xFF30D158)
-            checked -> Color(0xFF34C759)
+            checked -> activeTrack
             else -> Color(0xFF8E8E93).copy(alpha = if (dark) 0.36f else 0.22f)
         },
         label = "iosSwitchTrack",

@@ -1,6 +1,7 @@
 package com.kuromusic
 
 import android.Manifest
+import coil3.request.allowHardware
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -457,7 +458,12 @@ class MainActivity : AppCompatActivity() {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
             }
-            BitChordTheme(darkTheme = darkTheme, font = appFont) {
+            var dynamicPrimaryColor by remember { mutableStateOf<Color?>(null) }
+            BitChordTheme(
+                darkTheme = darkTheme,
+                font = appFont,
+                dynamicPrimary = dynamicPrimaryColor,
+            ) {
                 // The glass surfaces sample this layer, and a layer records only
                 // what is drawn into it — which, for BitChord, is a page that
                 // paints no background of its own. Everywhere a page is not
@@ -497,6 +503,7 @@ class MainActivity : AppCompatActivity() {
                         windowWidth = maxWidth,
                         windowHeight = maxHeight,
                         appBackdrop = appBackdrop,
+                        onDynamicPrimaryChange = { dynamicPrimaryColor = it },
                     )
                 }
                 }
@@ -567,6 +574,7 @@ private fun BitChordApp(
      */
     windowHeight: Dp,
     appBackdrop: LayerBackdrop,
+    onDynamicPrimaryChange: (Color?) -> Unit = {},
     viewModel: MainViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -1132,6 +1140,56 @@ private fun BitChordApp(
     }
     val controller = rememberMediaController()
     val player = rememberPlayerState(controller)
+    val dynamicAurora by AppSettings.dynamicAurora.collectAsStateWithLifecycle()
+    val defaultAuroraColor = Color(0xFF8A2BE2)
+    var auroraColor by remember { mutableStateOf(defaultAuroraColor) }
+    val auroraThumbUrl = player.song?.thumbnailUrl
+    LaunchedEffect(auroraThumbUrl, dynamicAurora) {
+        if (!dynamicAurora || auroraThumbUrl.isNullOrBlank()) {
+            auroraColor = defaultAuroraColor
+            onDynamicPrimaryChange(null)
+            return@LaunchedEffect
+        }
+        val extracted = withContext(Dispatchers.IO) {
+            runCatching {
+                val loader = coil3.SingletonImageLoader.get(context)
+                val req = coil3.request.ImageRequest.Builder(context)
+                    .data(auroraThumbUrl)
+                    .size(128, 128)
+                    .allowHardware(false)
+                    .build()
+                val res = loader.execute(req)
+                val rawBmp = (res as? coil3.request.SuccessResult)?.image?.let { img ->
+                    (img as? coil3.BitmapImage)?.bitmap
+                }
+                val bmp = rawBmp?.let {
+                    if (it.config == android.graphics.Bitmap.Config.HARDWARE) {
+                        it.copy(android.graphics.Bitmap.Config.ARGB_8888, false)
+                    } else {
+                        it
+                    }
+                }
+                if (bmp != null) {
+                    val small = android.graphics.Bitmap.createScaledBitmap(bmp, 50, 50, false)
+                    val palette = androidx.palette.graphics.Palette.from(small)
+                        .maximumColorCount(16)
+                        .generate()
+                    val intColor = palette.vibrantSwatch?.rgb
+                        ?: palette.lightVibrantSwatch?.rgb
+                        ?: palette.darkVibrantSwatch?.rgb
+                        ?: palette.dominantSwatch?.rgb
+                        ?: 0xFF8A2BE2.toInt()
+                    if (small != bmp) small.recycle()
+                    if (bmp != rawBmp) bmp.recycle()
+                    Color(intColor)
+                } else {
+                    defaultAuroraColor
+                }
+            }.getOrDefault(defaultAuroraColor)
+        }
+        auroraColor = extracted
+        onDynamicPrimaryChange(if (extracted != defaultAuroraColor) extracted else null)
+    }
     val queueUndo by QueueScreenUndo.notice.collectAsStateWithLifecycle()
     // A music video's picture follows this controller's clock — see [MusicVideoEngine].
     DisposableEffect(controller) {
@@ -3563,42 +3621,6 @@ private fun BitChordApp(
                             )
                         } else when ((destination as? AppDestination.Tab)?.index ?: selectedTab) {
                             TAB_HOME -> {
-                                val dynamicAurora by AppSettings.dynamicAurora.collectAsStateWithLifecycle()
-                                val defaultAuroraColor = Color(0xFF8A2BE2)
-                                var auroraColor by remember { mutableStateOf(defaultAuroraColor) }
-                                val thumbUrl = player.song?.thumbnailUrl
-                                LaunchedEffect(thumbUrl, dynamicAurora) {
-                                    if (!dynamicAurora || thumbUrl.isNullOrBlank()) {
-                                        auroraColor = defaultAuroraColor
-                                        return@LaunchedEffect
-                                    }
-                                    auroraColor = withContext(Dispatchers.IO) {
-                                        runCatching {
-                                            val loader = coil3.SingletonImageLoader.get(context)
-                                            val req = coil3.request.ImageRequest.Builder(context)
-                                                .data(thumbUrl)
-                                                .size(128, 128)
-                                                .build()
-                                            val res = loader.execute(req)
-                                            val bmp = (res as? coil3.request.SuccessResult)?.image?.let { img ->
-                                                (img as? coil3.BitmapImage)?.bitmap
-                                            }
-                                            if (bmp != null) {
-                                                val small = android.graphics.Bitmap.createScaledBitmap(bmp, 50, 50, false)
-                                                val palette = androidx.palette.graphics.Palette.from(small)
-                                                    .maximumColorCount(12)
-                                                    .generate()
-                                                val intColor = palette.getVibrantColor(
-                                                    palette.getDominantColor(0xFF8A2BE2.toInt())
-                                                )
-                                                if (small != bmp) small.recycle()
-                                                Color(intColor)
-                                            } else {
-                                                defaultAuroraColor
-                                            }
-                                        }.getOrDefault(defaultAuroraColor)
-                                    }
-                                }
                                 com.kuromusic.ui.components.AuroraBackground(
                                     isVisible = true,
                                     color = auroraColor,

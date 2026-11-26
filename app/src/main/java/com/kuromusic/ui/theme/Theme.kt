@@ -9,6 +9,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.compose.ui.text.TextStyle
@@ -150,10 +152,28 @@ private fun Typography.withFamily(family: FontFamily) = Typography(
 fun BitChordTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     font: AppFont = AppFont.DEFAULT,
+    dynamicPrimary: Color? = null,
     content: @Composable () -> Unit,
 ) {
+    val baseColors = if (darkTheme) DarkColors else LightColors
+    val colors = if (dynamicPrimary != null) {
+        val adaptedPrimary = if (darkTheme) {
+            if (dynamicPrimary.luminance() < 0.32f) lerp(dynamicPrimary, Color.White, 0.35f) else dynamicPrimary
+        } else {
+            if (dynamicPrimary.luminance() > 0.55f) lerp(dynamicPrimary, Color.Black, 0.35f) else dynamicPrimary
+        }
+        val container = lerp(baseColors.surface, adaptedPrimary, if (darkTheme) 0.28f else 0.18f)
+        baseColors.copy(
+            primary = adaptedPrimary,
+            onPrimary = if (adaptedPrimary.luminance() > 0.5f) Color.Black else Color.White,
+            primaryContainer = container,
+            onPrimaryContainer = if (darkTheme) Color.White else Color.Black,
+        )
+    } else {
+        baseColors
+    }
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = colors,
         typography = when (font) {
             AppFont.DEFAULT -> BitChordTypography
             AppFont.LEGACY -> LegacyTypography

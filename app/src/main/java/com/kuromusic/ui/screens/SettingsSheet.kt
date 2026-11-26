@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -37,12 +38,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.ScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Notes
+import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.rounded.Animation
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.BlurOff
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.BlurOn
 import androidx.compose.material.icons.rounded.Brightness4
 import androidx.compose.material.icons.rounded.Cached
@@ -468,6 +471,111 @@ fun SettingsScreen(
                 placeholder = stringResource(R.string.settings_search_hint),
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 4.dp),
             )
+
+            if (!searching) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .border(
+                                width = 1.5.dp,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(20.dp),
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.img_kuro_logo),
+                            contentDescription = "KuroMusic",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(20.dp)),
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = "KuroMusic",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+                                .padding(horizontal = 9.dp, vertical = 3.dp),
+                        ) {
+                            Text(
+                                text = "v$version",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Tu espacio para disfrutar y escuchar tu música",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        val openLink: (String) -> Unit = { url ->
+                            runCatching {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            }
+                        }
+                        listOf(
+                            Triple(Icons.AutoMirrored.Rounded.Send, "Telegram", "https://t.me/KiritoAPT2"),
+                            Triple(SfIcons.Language, "Web", "https://kiritoapt2.github.io/KuroMusic-Web/"),
+                            Triple(Icons.Rounded.Favorite, "Donar", "https://app.binance.com/uni-qr/TTgsNfUM"),
+                        ).forEach { (icon, label, url) ->
+                            Row(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(50))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f))
+                                    .border(
+                                        width = 0.75.dp,
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.28f),
+                                        shape = RoundedCornerShape(50),
+                                    )
+                                    .clickable { openLink(url) }
+                                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = label,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
 
             SearchableSettingsGroup(search) {
                 val accountTitle = stringResource(R.string.account_integrations)
@@ -1975,44 +2083,12 @@ fun SettingsScreen(
             MessageState(stringResource(R.string.settings_search_empty, searchQuery))
         }
 
-        // Acerca de KuroMusic & Actualizaciones
+        // Actualizaciones (al final en su propio apartado)
         if (section == null && searchQuery.isBlank()) {
             val updateScope = rememberCoroutineScope()
             var checkingUpdates by remember { mutableStateOf(false) }
 
-            SettingsGroup(header = "Acerca de KuroMusic") {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.drawable_ic_kuro),
-                        contentDescription = "KuroMusic",
-                        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-                        modifier = Modifier.size(36.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "KuroMusic",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = "Versión $version",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-                androidx.compose.material3.HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = 0.5.dp,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f),
-                )
+            SettingsGroup(header = "Actualizaciones") {
                 SettingsRow(
                     icon = Icons.Rounded.Cached,
                     title = if (checkingUpdates) "Buscando actualizaciones..." else "Buscar actualizaciones",
@@ -2439,7 +2515,8 @@ internal fun AccountCard(
                     Modifier
                         .padding(horizontal = GROUP_INSET)
                         .clip(GroupShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f))
+                        .border(0.75.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.22f), GroupShape)
                 },
             )
             .then(
@@ -2762,7 +2839,8 @@ internal fun SettingsGroup(
         Text(
             text = header.uppercase(Locale.ROOT),
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
             modifier = Modifier.padding(
                 start = GROUP_INSET + 4.dp,
                 end = GROUP_INSET,
@@ -2778,7 +2856,8 @@ internal fun SettingsGroup(
             .fillMaxWidth()
             .padding(horizontal = GROUP_INSET)
             .clip(GroupShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f))
+            .border(0.75.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.65f), GroupShape),
     ) {
         content()
     }
@@ -2868,19 +2947,35 @@ internal fun SettingsRow(
         if (iconContent != null) {
             iconContent()
         } else if (iconPainter != null) {
-            Icon(
-                painter = iconPainter,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(ICON_SIZE),
-            )
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = iconPainter,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
         } else if (icon != null) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(ICON_SIZE),
-            )
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
         }
         Spacer(Modifier.width(ICON_GAP))
         Column(Modifier.weight(1f)) {

@@ -534,7 +534,7 @@ object AppSettings {
     val reduceDynamicBlur = MutableStateFlow(false)
 
     /** Tints the Home Aurora background with the currently playing track's artwork accent color. */
-    val dynamicAurora = MutableStateFlow(true)
+    val dynamicAurora = MutableStateFlow(false)
 
     /** Animated BeatBuddy mascot in the MiniPlayer (NONE, CAT, BEAR). */
     val beatBuddyType = MutableStateFlow("CAT")
@@ -1140,7 +1140,7 @@ object AppSettings {
         VideoThumbnails.square = squareVideoThumbnails.value
         smartVersionAlignment.value = prefs.getBoolean(KEY_SMART_VERSION_ALIGNMENT, true)
         reduceDynamicBlur.value = prefs.getBoolean(KEY_REDUCE_BLUR, false)
-        dynamicAurora.value = prefs.getBoolean(KEY_DYNAMIC_AURORA, true)
+        dynamicAurora.value = prefs.getBoolean(KEY_DYNAMIC_AURORA, false)
         beatBuddyType.value = prefs.getString(KEY_BEAT_BUDDY, "CAT") ?: "CAT"
         disableBlendEffects.value = prefs.getBoolean(KEY_DISABLE_BLEND_EFFECTS, false)
         liquidGlass.value = prefs.getBoolean(KEY_LIQUID_GLASS, false)
