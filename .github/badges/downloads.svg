@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="152" height="28" role="img" aria-label="Descargas: 810">
+  <title>Descargas: 810</title>
+  <g shape-rendering="crispEdges">
+    <rect width="92" height="28" fill="#18181B"/>
+    <rect x="92" width="60" height="28" fill="#10B981"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="105">
+    <text x="460" y="175" transform="scale(.1)" fill="#E4E4E7" textLength="720">DESCARGAS</text>
+    <text x="1220" y="175" transform="scale(.1)" fill="#fff" font-weight="bold" textLength="320">810</text>
+  </g>
+</svg>

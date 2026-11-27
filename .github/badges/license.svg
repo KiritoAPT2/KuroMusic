@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="28" role="img" aria-label="Licencia: GPLv3">
+  <title>Licencia: GPLv3</title>
+  <g shape-rendering="crispEdges">
+    <rect width="78" height="28" fill="#18181B"/>
+    <rect x="78" width="66" height="28" fill="#3F3F46"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="105">
+    <text x="390" y="175" transform="scale(.1)" fill="#E4E4E7" textLength="580">LICENCIA</text>
+    <text x="1110" y="175" transform="scale(.1)" fill="#fff" font-weight="bold" textLength="440">GPLv3</text>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="190" height="28" role="img" aria-label="Telegram: @KiritoAPT2">
+  <title>Telegram: @KiritoAPT2</title>
+  <g shape-rendering="crispEdges">
+    <rect width="84" height="28" fill="#18181B"/>
+    <rect x="84" width="106" height="28" fill="#26A5E4"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="105">
+    <text x="420" y="175" transform="scale(.1)" fill="#E4E4E7" textLength="640">TELEGRAM</text>
+    <text x="1370" y="175" transform="scale(.1)" fill="#fff" font-weight="bold" textLength="860">@KiritoAPT2</text>
+  </g>
+</svg>
