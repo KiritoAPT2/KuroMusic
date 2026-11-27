@@ -44,6 +44,14 @@ KUROMUSIC 2.0 • CLIENTE DE MÚSICA PARA ANDROID
 > [!IMPORTANT]
 > KuroMusic no está afiliado, respaldado ni conectado con YouTube ni Google LLC. Úsalo bajo tu propio criterio.
 
+## <samp><a id="capturas"></a>Capturas de pantalla</samp>
+
+<p align="center">
+  <img src="./screenshots/home.jpg" width="240" alt="Inicio KuroMusic">
+  <img src="./screenshots/player.jpg" width="240" alt="Reproductor KuroMusic">
+  <img src="./screenshots/settings.jpg" width="240" alt="Ajustes KuroMusic">
+</p>
+
 ## <samp><a id="caracteristicas"></a>Características</samp>
 
 - **Aurora dinámica:** Fondo ambiental en Inicio que adapta su color vibrante a la carátula en reproducción.
@@ -77,6 +85,15 @@ cd KuroMusic
 ## <samp><a id="descargar"></a>Descargar</samp>
 
 Puedes [descargar](https://github.com/KiritoAPT2/KuroMusic/releases) la última versión instalable (APK) de **KuroMusic** o visitar la [página web oficial](https://kiritoapt2.github.io/KuroMusic-Web/).
+
+> [!TIP]
+> **¿No sabes qué APK descargar?** Usa **`app-prod-arm64-v8a-release.apk`** (es la ideal para la gran mayoría de teléfonos Android modernos). Si tienes dudas, descarga **`app-prod-universal-release.apk`**.
+
+### Actualizar automáticamente con Obtainium
+Si usas **[Obtainium](https://github.com/ImranR98/Obtainium)**, puedes agregar **KuroMusic** para recibir actualizaciones directo desde GitHub Releases:
+1. Abre **Obtainium** → **Agregar App**.
+2. Pega la URL del repositorio: `https://github.com/KiritoAPT2/KuroMusic`
+3. Pulsa **Agregar** e instala la versión `arm64-v8a`.
 
 ## <samp>Colaboradores</samp>
 
