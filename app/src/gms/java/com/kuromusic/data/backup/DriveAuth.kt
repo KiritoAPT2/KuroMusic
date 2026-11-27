@@ -54,6 +54,10 @@ object DriveAuth {
     fun available(context: Context): Boolean =
         GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
 
+    fun isCanceled(t: Throwable): Boolean =
+        t is com.google.android.gms.common.api.ApiException &&
+            t.statusCode == com.google.android.gms.common.api.CommonStatusCodes.CANCELED
+
     /**
      * A token for [account], or the sheet that will get one.
      *

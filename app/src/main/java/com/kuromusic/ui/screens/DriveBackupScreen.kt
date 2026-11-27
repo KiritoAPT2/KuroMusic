@@ -34,8 +34,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
 import com.kuromusic.R
 import com.kuromusic.data.backup.BackupFrequency
 import com.kuromusic.data.backup.DriveAuth
@@ -129,12 +127,10 @@ fun DriveBackupScreen(
                 then?.invoke()
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: ApiException) {
-                if (e.statusCode != CommonStatusCodes.CANCELED) {
+            } catch (e: Exception) {
+                if (!DriveAuth.isCanceled(e)) {
                     connectError = e.message ?: context.getString(R.string.unknown_error)
                 }
-            } catch (e: Exception) {
-                connectError = e.message ?: context.getString(R.string.unknown_error)
             }
         }
     }

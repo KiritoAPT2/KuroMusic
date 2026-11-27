@@ -147,6 +147,15 @@ android {
             dimension = "env"
             // Matches defaultConfig — this is the package already shipped/installed.
         }
+        create("foss") {
+            dimension = "env"
+            // Same package ID, built without Google Play Services (for IzzyOnDroid / F-Droid).
+        }
+    }
+
+    sourceSets {
+        getByName("dev").java.srcDir("src/gms/java")
+        getByName("prod").java.srcDir("src/gms/java")
     }
 
     signingConfigs {
@@ -446,21 +455,25 @@ dependencies {
     // its CastPlayer hands the receiver whatever URI a MediaItem carries, and
     // ours are `bitchord://` addresses that only the service's resolver can
     // turn into a real stream — see [com.kuromusic.playback.cast.CastPlayback].
-    implementation("com.google.android.gms:play-services-cast-framework:22.2.0")
+    "devImplementation"("com.google.android.gms:play-services-cast-framework:22.2.0")
+    "prodImplementation"("com.google.android.gms:play-services-cast-framework:22.2.0")
     implementation("androidx.mediarouter:mediarouter:1.8.1")
 
     // ---- The watch app (wearos/): Data Layer state out, commands in ----
     // See com.kuromusic.wear.WearBridge. Rides on the Play services base
     // the Cast framework already brings, so it adds very little.
-    implementation("com.google.android.gms:play-services-wearable:20.0.1")
+    "devImplementation"("com.google.android.gms:play-services-wearable:20.0.1")
+    "prodImplementation"("com.google.android.gms:play-services-wearable:20.0.1")
 
     // ---- Google Drive backup: the device's own Google sign-in ----
     // See com.kuromusic.data.backup.DriveAuth. Only the authorization
     // client: Drive itself is three REST calls over OkHttp, which is far
     // lighter than the google-api-services-drive client and its HTTP stack.
-    implementation("com.google.android.gms:play-services-auth:21.3.0")
+    "devImplementation"("com.google.android.gms:play-services-auth:21.3.0")
+    "prodImplementation"("com.google.android.gms:play-services-auth:21.3.0")
     // Opens the watch app after an update, so its install prompt is on screen.
-    implementation("androidx.wear:wear-remote-interactions:1.1.0")
+    "devImplementation"("androidx.wear:wear-remote-interactions:1.1.0")
+    "prodImplementation"("androidx.wear:wear-remote-interactions:1.1.0")
 
     // ---- "BitChord for Wear OS": the first install onto a watch ----
     // Without the Play Store only ADB can install on a watch, so this phone is
@@ -564,6 +577,7 @@ abstract class BundleWearApk : DefaultTask() {
 if (providers.gradleProperty("kuro.bundleWear").orNull?.trim() != "false" && findProject(":wearos") != null) {
     androidComponents.onVariants { variant ->
         val flavor = variant.productFlavors.firstOrNull { it.first == "env" }?.second ?: return@onVariants
+        if (flavor == "foss") return@onVariants
         val type = variant.buildType ?: return@onVariants
         // The benchmark build has no watch counterpart.
         if (type != "debug" && type != "release") return@onVariants
