@@ -1,18 +1,6 @@
-<div align="center">
-
-```ocaml
-KUROMUSIC 2.0 • CLIENTE DE MÚSICA PARA ANDROID
-```
-
-</div>
-
-<h1 align="center">
-  <br>
-    <a href="https://github.com/KiritoAPT2/KuroMusic"><img src="./app/src/main/res/drawable/img_kuro_logo.png" alt="KuroMusic" width="110"></a>
-      <br>
-      KuroMusic
-  <br>
-</h1>
+<p align="center">
+  <img src="./banner.png" width="680" alt="KuroMusic Banner">
+</p>
 
 <p align="center">
   <a href="https://github.com/KiritoAPT2/KuroMusic/releases/latest"><img src="./.github/badges/release.svg" alt="Release"></a>
@@ -25,10 +13,6 @@ KUROMUSIC 2.0 • CLIENTE DE MÚSICA PARA ANDROID
 <pre align="center">
   <a href="#caracteristicas">CARACTERÍSTICAS</a> • <a href="#compilacion">COMPILACIÓN</a> • <a href="#dependencias">DEPENDENCIAS</a> • <a href="#descargar">DESCARGAR</a> • <a href="#agradecimientos">AGRADECIMIENTOS</a> • <a href="#licencia">LICENCIA</a>
 </pre>
-
-<p align="center">
-  <img src="./banner.png" width="680" alt="KuroMusic Banner">
-</p>
 
 <p align="center">
   <em>Cliente de música para Android con interfaz fluida, fondo Aurora dinámico y reproducción sin anuncios. Visita la web oficial en <a href="https://kiritoapt2.github.io/KuroMusic-Web/">kiritoapt2.github.io/KuroMusic-Web</a>.</em>
