@@ -15,10 +15,10 @@ KUROMUSIC 2.0 • CLIENTE DE MÚSICA PARA ANDROID
 </h1>
 
 <p align="center">
-  <a href="https://github.com/KiritoAPT2/KuroMusic/releases/latest"><img src="https://img.shields.io/github/v/release/KiritoAPT2/KuroMusic?style=for-the-badge&logo=github&color=8B5CF6&labelColor=18181B&label=Versi%C3%B3n" alt="Release"></a>
-  <a href="https://github.com/KiritoAPT2/KuroMusic/releases"><img src="https://img.shields.io/github/downloads/KiritoAPT2/KuroMusic/total?style=for-the-badge&logo=download&color=10B981&labelColor=18181B&label=Descargas" alt="Descargas"></a>
-  <a href="https://github.com/KiritoAPT2/KuroMusic/blob/main/LICENSE"><img src="https://img.shields.io/github/license/KiritoAPT2/KuroMusic?style=for-the-badge&logo=gnu&color=EF4444&labelColor=18181B&label=Licencia" alt="License"></a>
-  <a href="https://t.me/KiritoAPT2"><img src="https://img.shields.io/badge/Telegram-KiritoAPT2-2CA5E0?style=for-the-badge&logo=telegram&labelColor=18181B" alt="Telegram"></a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/releases/latest"><img src="https://img.shields.io/github/v/release/KiritoAPT2/KuroMusic?style=for-the-badge&logo=github&logoColor=white&color=8B5CF6&labelColor=18181B&label=Versi%C3%B3n" alt="Release"></a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/releases"><img src="https://img.shields.io/github/downloads/KiritoAPT2/KuroMusic/total?style=for-the-badge&logo=android&logoColor=white&color=10B981&labelColor=18181B&label=Descargas" alt="Descargas"></a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/blob/main/LICENSE"><img src="https://img.shields.io/github/license/KiritoAPT2/KuroMusic?style=for-the-badge&logo=gnu&logoColor=white&color=EF4444&labelColor=18181B&label=Licencia" alt="License"></a>
+  <a href="https://t.me/KiritoAPT2"><img src="https://img.shields.io/badge/Telegram-KiritoAPT2-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white&labelColor=18181B" alt="Telegram"></a>
   <a href="https://kiritoapt2.github.io/KuroMusic-Web/"><img src="https://img.shields.io/badge/Web-KuroMusic-A855F7?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=18181B" alt="Website"></a>
 </p>
 
