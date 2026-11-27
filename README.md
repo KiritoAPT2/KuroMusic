@@ -90,10 +90,11 @@ Puedes [descargar](https://github.com/KiritoAPT2/KuroMusic/releases) la última 
 > **¿No sabes qué APK descargar?** Descarga **`KuroMusic.apk`** (es la versión universal, funciona en todos los teléfonos Android). Si quieres una descarga más ligera (~40 MB) para celulares modernos de 64 bits, usa **`KuroMusic-arm64-v8a-release.apk`**.
 
 ### Actualizar automáticamente con Obtainium
-Si usas **[Obtainium](https://github.com/ImranR98/Obtainium)**, puedes agregar **KuroMusic** para recibir actualizaciones directo desde GitHub Releases:
-1. Abre **Obtainium** → **Agregar App**.
-2. Pega la URL del repositorio: `https://github.com/KiritoAPT2/KuroMusic`
-3. Pulsa **Agregar** e instala **`KuroMusic.apk`** (o `KuroMusic-arm64-v8a-release.apk`).
+Si usas **[Obtainium](https://github.com/ImranR98/Obtainium)**, puedes agregar **KuroMusic** con un solo clic para recibir actualizaciones directo desde GitHub Releases:
+
+- **[👉 Agregar KuroMusic a Obtainium (1 clic)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.kuromusic%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FKiritoAPT2%2FKuroMusic%22%2C%22author%22%3A%22KiritoAPT2%22%2C%22name%22%3A%22KuroMusic%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22%5EKuroMusic%5C%5C%5C%5C.apk%24%5C%22%7D%22%7D)**
+
+O manualmente: abre **Obtainium** → **Agregar App** → pega `https://github.com/KiritoAPT2/KuroMusic` e instala **`KuroMusic.apk`**.
 
 ## <samp>Colaboradores</samp>
 
