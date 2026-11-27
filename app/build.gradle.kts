@@ -73,6 +73,11 @@ android {
     // InnerTubeX's AAR requires compiling against 37; targetSdk (runtime behaviour) stays 36.
     compileSdk = 37
 
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     // Automix's models stay in src/main/assets (the desktop build and the
     // release that hosts them read them from there) but are not packaged: the
     // app downloads them on first use, see AutomixModels. The rest is AGP's
@@ -228,6 +233,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     packaging {
+        dex {
+            useLegacyPackaging = true
+        }
+        jniLibs {
+            useLegacyPackaging = true
+        }
         resources {
             // SMBJ's BouncyCastle and jspecify both ship this descriptor.
             excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
