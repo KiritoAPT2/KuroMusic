@@ -1,0 +1,10 @@
+KuroMusic is an open-source Android music player and YouTube Music client focused on smooth performance, ad-free streaming, and Material 3 customization.
+
+Features:
+- Dynamic Aurora background adapting to the current album artwork
+- BeatBuddy animated mascot in the MiniPlayer
+- Real-time synced lyrics and animated covers
+- Offline downloads and local JSON backup
+- Audio DSP: Spatial Audio, volume normalization, skip silence, crossfade, and USB DAC bit-perfect output
+- Guest mode or Google account session support
+- Built-in updater via GitHub Releases
