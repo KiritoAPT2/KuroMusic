@@ -15,18 +15,11 @@ KUROMUSIC 2.0 • CLIENTE DE MÚSICA PARA ANDROID
 </h1>
 
 <p align="center">
-  <a href="https://github.com/KiritoAPT2/KuroMusic/releases">
-    <img src="https://img.shields.io/github/v/release/KiritoAPT2/KuroMusic?style=flat-square&color=8B5CF6" alt="Release">
-  </a>
-  <a href="https://github.com/KiritoAPT2/KuroMusic/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/KiritoAPT2/KuroMusic?style=flat-square&color=1C1C1E" alt="License">
-  </a>
-  <a href="https://t.me/KiritoAPT2">
-    <img src="https://img.shields.io/badge/Telegram-@KiritoAPT2-26A5E4?style=flat-square&logo=telegram" alt="Telegram">
-  </a>
-  <a href="https://kiritoapt2.github.io/KuroMusic-Web/">
-    <img src="https://img.shields.io/badge/Web-KuroMusic-8B5CF6?style=flat-square" alt="Website">
-  </a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/releases"><img src="https://img.shields.io/github/v/release/KiritoAPT2/KuroMusic?style=for-the-badge&color=8B5CF6&label=Versi%C3%B3n" alt="Release"></a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/releases"><img src="https://img.shields.io/github/downloads/KiritoAPT2/KuroMusic/total?style=for-the-badge&color=10B981&label=Descargas" alt="Descargas"></a>
+  <a href="https://github.com/KiritoAPT2/KuroMusic/blob/main/LICENSE"><img src="https://img.shields.io/github/license/KiritoAPT2/KuroMusic?style=for-the-badge&color=27272A&label=Licencia" alt="License"></a>
+  <a href="https://t.me/KiritoAPT2"><img src="https://img.shields.io/badge/Telegram-@KiritoAPT2-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram"></a>
+  <a href="https://kiritoapt2.github.io/KuroMusic-Web/"><img src="https://img.shields.io/badge/Web-KuroMusic-8B5CF6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website"></a>
 </p>
 
 <pre align="center">
